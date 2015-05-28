@@ -3,7 +3,7 @@ package retrystrategy
 import (
 	"time"
 
-	"github.com/pivotal-golang/clock"
+	"github.com/cloudfoundry/bosh-utils/internal/github.com/pivotal-golang/clock"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 )
 
