@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/bosh-utils/internal/github.com/onsi/ginkgo/config"
-	"github.com/onsi/ginkgo/ginkgo/testsuite"
+	"github.com/cloudfoundry/bosh-utils/internal/github.com/onsi/ginkgo/ginkgo/testsuite"
 )
 
 type Notifier struct {

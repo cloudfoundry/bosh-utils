@@ -6,9 +6,9 @@ import (
 	"sync"
 
 	"github.com/cloudfoundry/bosh-utils/internal/github.com/onsi/ginkgo/config"
-	"github.com/onsi/ginkgo/ginkgo/interrupthandler"
-	"github.com/onsi/ginkgo/ginkgo/testrunner"
-	"github.com/onsi/ginkgo/ginkgo/testsuite"
+	"github.com/cloudfoundry/bosh-utils/internal/github.com/onsi/ginkgo/ginkgo/interrupthandler"
+	"github.com/cloudfoundry/bosh-utils/internal/github.com/onsi/ginkgo/ginkgo/testrunner"
+	"github.com/cloudfoundry/bosh-utils/internal/github.com/onsi/ginkgo/ginkgo/testsuite"
 )
 
 type compilationInput struct {

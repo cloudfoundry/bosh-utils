@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/onsi/ginkgo/ginkgo/convert"
+	"github.com/cloudfoundry/bosh-utils/internal/github.com/onsi/ginkgo/ginkgo/convert"
 	"os"
 )
 
