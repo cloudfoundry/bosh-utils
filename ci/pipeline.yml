@@ -8,6 +8,8 @@ jobs:
       - task: test-unit
         file: bosh-utils/ci/tasks/test-unit.yml
       - put: bosh-utils-promoted
+        params:
+          repository: bosh-utils
 
 resources:
   - name: bosh-utils
