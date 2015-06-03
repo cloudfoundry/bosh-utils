@@ -82,6 +82,23 @@ var _ = Describe("sha1VerifiableBlobstore", func() {
 		})
 	})
 
+	Describe("Delete", func() {
+		It("delegates to inner blobstore to clean up", func() {
+			err := sha1VerifiableBlobstore.Delete("some-blob")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(innerBlobstore.DeleteBlobID).To(Equal("some-blob"))
+		})
+
+		It("returns error if inner blobstore cleaning up fails", func() {
+			innerBlobstore.DeleteErr = errors.New("fake-clean-up-error")
+
+			err := sha1VerifiableBlobstore.Delete("/some/file")
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("fake-clean-up-error"))
+		})
+	})
+
 	Describe("Create", func() {
 		It("delegates to inner blobstore to create blob and returns sha1 of returned blob", func() {
 			innerBlobstore.CreateBlobID = "fake-blob-id"

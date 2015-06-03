@@ -103,6 +103,23 @@ var _ = Describe("retryableBlobstore", func() {
 		})
 	})
 
+	Describe("Delete", func() {
+		It("delegates to inner blobstore to clean up", func() {
+			err := retryableBlobstore.Delete("some-blob")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(innerBlobstore.DeleteBlobID).To(Equal("some-blob"))
+		})
+
+		It("returns error if inner blobstore cleaning up fails", func() {
+			innerBlobstore.DeleteErr = errors.New("fake-clean-up-error")
+
+			err := retryableBlobstore.Delete("/some/file")
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("fake-clean-up-error"))
+		})
+	})
+
 	Describe("Create", func() {
 		Context("when inner blobstore succeeds before maximum number of create tries (first time)", func() {
 			It("returns blobID and fingerprint without an error", func() {

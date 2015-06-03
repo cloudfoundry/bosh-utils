@@ -481,7 +481,12 @@ func (fs *FakeFileSystem) CopyFile(srcPath, dstPath string) error {
 	srcPath = filepath.Join(srcPath)
 	dstPath = filepath.Join(dstPath)
 
-	fs.files[dstPath] = fs.files[srcPath]
+	srcFile, found := fs.files[srcPath]
+	if !found {
+		return errors.New(fmt.Sprintf("%s doesn't exist", srcPath))
+	}
+
+	fs.files[dstPath] = srcFile
 	return nil
 }
 
