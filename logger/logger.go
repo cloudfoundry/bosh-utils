@@ -38,14 +38,24 @@ func Levelify(levelString string) (LogLevel, error) {
 	return level, nil
 }
 
-type Logger struct {
+type Logger interface {
+	Debug(tag, msg string, args ...interface{})
+	DebugWithDetails(tag, msg string, args ...interface{})
+	Info(tag, msg string, args ...interface{})
+	Warn(tag, msg string, args ...interface{})
+	Error(tag, msg string, args ...interface{})
+	ErrorWithDetails(tag, msg string, args ...interface{})
+	HandlePanic(tag string)
+}
+
+type logger struct {
 	level LogLevel
 	out   *log.Logger
 	err   *log.Logger
 }
 
 func New(level LogLevel, out, err *log.Logger) Logger {
-	return Logger{
+	return &logger{
 		level: level,
 		out:   out,
 		err:   err,
@@ -57,14 +67,14 @@ func NewLogger(level LogLevel) Logger {
 }
 
 func NewWriterLogger(level LogLevel, out, err io.Writer) Logger {
-	return Logger{
+	return &logger{
 		level: level,
 		out:   log.New(out, "", log.LstdFlags),
 		err:   log.New(err, "", log.LstdFlags),
 	}
 }
 
-func (l Logger) Debug(tag, msg string, args ...interface{}) {
+func (l *logger) Debug(tag, msg string, args ...interface{}) {
 	if l.level > LevelDebug {
 		return
 	}
@@ -75,12 +85,12 @@ func (l Logger) Debug(tag, msg string, args ...interface{}) {
 
 // DebugWithDetails will automatically change the format of the message
 // to insert a block of text after the log
-func (l Logger) DebugWithDetails(tag, msg string, args ...interface{}) {
+func (l *logger) DebugWithDetails(tag, msg string, args ...interface{}) {
 	msg = msg + "\n********************\n%s\n********************"
 	l.Debug(tag, msg, args...)
 }
 
-func (l Logger) Info(tag, msg string, args ...interface{}) {
+func (l *logger) Info(tag, msg string, args ...interface{}) {
 	if l.level > LevelInfo {
 		return
 	}
@@ -89,7 +99,7 @@ func (l Logger) Info(tag, msg string, args ...interface{}) {
 	l.getOutLogger(tag).Printf(msg, args...)
 }
 
-func (l Logger) Warn(tag, msg string, args ...interface{}) {
+func (l *logger) Warn(tag, msg string, args ...interface{}) {
 	if l.level > LevelWarn {
 		return
 	}
@@ -98,7 +108,7 @@ func (l Logger) Warn(tag, msg string, args ...interface{}) {
 	l.getErrLogger(tag).Printf(msg, args...)
 }
 
-func (l Logger) Error(tag, msg string, args ...interface{}) {
+func (l *logger) Error(tag, msg string, args ...interface{}) {
 	if l.level > LevelError {
 		return
 	}
@@ -109,12 +119,12 @@ func (l Logger) Error(tag, msg string, args ...interface{}) {
 
 // ErrorWithDetails will automatically change the format of the message
 // to insert a block of text after the log
-func (l Logger) ErrorWithDetails(tag, msg string, args ...interface{}) {
+func (l *logger) ErrorWithDetails(tag, msg string, args ...interface{}) {
 	msg = msg + "\n********************\n%s\n********************"
 	l.Error(tag, msg, args...)
 }
 
-func (l Logger) HandlePanic(tag string) {
+func (l *logger) HandlePanic(tag string) {
 	panic := recover()
 
 	if panic != nil {
@@ -136,15 +146,15 @@ func (l Logger) HandlePanic(tag string) {
 	}
 }
 
-func (l Logger) getOutLogger(tag string) (logger *log.Logger) {
+func (l *logger) getOutLogger(tag string) (logger *log.Logger) {
 	return l.updateLogger(l.out, tag)
 }
 
-func (l Logger) getErrLogger(tag string) (logger *log.Logger) {
+func (l *logger) getErrLogger(tag string) (logger *log.Logger) {
 	return l.updateLogger(l.err, tag)
 }
 
-func (l Logger) updateLogger(logger *log.Logger, tag string) *log.Logger {
+func (l *logger) updateLogger(logger *log.Logger, tag string) *log.Logger {
 	prefix := fmt.Sprintf("[%s] ", tag)
 	logger.SetPrefix(prefix)
 	return logger
