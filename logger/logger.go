@@ -46,12 +46,14 @@ type Logger interface {
 	Error(tag, msg string, args ...interface{})
 	ErrorWithDetails(tag, msg string, args ...interface{})
 	HandlePanic(tag string)
+	ToggleForcedDebug()
 }
 
 type logger struct {
 	level LogLevel
 	out   *log.Logger
 	err   *log.Logger
+	forcedDebug bool
 }
 
 func New(level LogLevel, out, err *log.Logger) Logger {
@@ -67,15 +69,15 @@ func NewLogger(level LogLevel) Logger {
 }
 
 func NewWriterLogger(level LogLevel, out, err io.Writer) Logger {
-	return &logger{
-		level: level,
-		out:   log.New(out, "", log.LstdFlags),
-		err:   log.New(err, "", log.LstdFlags),
-	}
+	return New(
+		level,
+		log.New(out, "", log.LstdFlags),
+		log.New(err, "", log.LstdFlags),
+	)
 }
 
 func (l *logger) Debug(tag, msg string, args ...interface{}) {
-	if l.level > LevelDebug {
+	if l.level > LevelDebug && !l.forcedDebug {
 		return
 	}
 
@@ -91,7 +93,7 @@ func (l *logger) DebugWithDetails(tag, msg string, args ...interface{}) {
 }
 
 func (l *logger) Info(tag, msg string, args ...interface{}) {
-	if l.level > LevelInfo {
+	if l.level > LevelInfo && !l.forcedDebug {
 		return
 	}
 
@@ -100,7 +102,7 @@ func (l *logger) Info(tag, msg string, args ...interface{}) {
 }
 
 func (l *logger) Warn(tag, msg string, args ...interface{}) {
-	if l.level > LevelWarn {
+	if l.level > LevelWarn && !l.forcedDebug {
 		return
 	}
 
@@ -109,7 +111,7 @@ func (l *logger) Warn(tag, msg string, args ...interface{}) {
 }
 
 func (l *logger) Error(tag, msg string, args ...interface{}) {
-	if l.level > LevelError {
+	if l.level > LevelError && !l.forcedDebug {
 		return
 	}
 
@@ -144,6 +146,10 @@ func (l *logger) HandlePanic(tag string) {
 		l.ErrorWithDetails(tag, "Panic: %s", msg, debug.Stack())
 		os.Exit(2)
 	}
+}
+
+func (l *logger) ToggleForcedDebug() {
+	l.forcedDebug = !l.forcedDebug
 }
 
 func (l *logger) getOutLogger(tag string) (logger *log.Logger) {
