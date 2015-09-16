@@ -130,10 +130,14 @@ type FakeFile struct {
 }
 
 func NewFakeFile(path string, fs *FakeFileSystem) *FakeFile {
-	return &FakeFile{
+	fakeFile := &FakeFile{
 		path: path,
 		fs:   fs,
 	}
+	if fs.files[path] != nil {
+		fakeFile.Contents = fs.files[path].Content
+	}
+	return fakeFile
 }
 
 func (f *FakeFile) Name() string {
@@ -263,12 +267,9 @@ func (fs *FakeFileSystem) OpenFile(path string, flag int, perm os.FileMode) (bos
 	if fs.openFiles[path] != nil {
 		return fs.openFiles[path], nil
 	}
+	file := NewFakeFile(path, fs)
 
-	file := &FakeFile{
-		path: path,
-		fs:   fs,
-	}
-
+	fs.RegisterOpenFile(path, file)
 	return file, nil
 }
 
