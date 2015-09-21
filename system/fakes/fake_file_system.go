@@ -87,7 +87,10 @@ type FakeFileStats struct {
 	FileType FakeFileType
 
 	FileMode os.FileMode
+	Flags    int
 	Username string
+
+	Open bool
 
 	SymlinkTarget string
 
@@ -134,8 +137,11 @@ func NewFakeFile(path string, fs *FakeFileSystem) *FakeFile {
 		path: path,
 		fs:   fs,
 	}
-	if fs.files[path] != nil {
-		fakeFile.Contents = fs.files[path].Content
+	me := fs.files[path]
+	if me != nil {
+		fakeFile.Contents = me.Content
+		fakeFile.Stats = me
+		fakeFile.Stats.Open = true
 	}
 	return fakeFile
 }
@@ -174,6 +180,9 @@ func (f *FakeFile) ReadAt(b []byte, offset int64) (int, error) {
 }
 
 func (f *FakeFile) Close() error {
+	if f.Stats != nil {
+		f.Stats.Open = false
+	}
 	return f.CloseErr
 }
 
@@ -249,6 +258,13 @@ func (fs *FakeFileSystem) RegisterOpenFile(path string, file *FakeFile) {
 	fs.openFiles[path] = file
 }
 
+func (fs *FakeFileSystem) FindFileStats(path string) (*FakeFileStats, error) {
+	if fs.files[path] != nil {
+		return fs.files[path], nil
+	}
+	return nil, fmt.Errorf("Path does not exist: %s", path)
+}
+
 func (fs *FakeFileSystem) OpenFile(path string, flag int, perm os.FileMode) (boshsys.File, error) {
 	fs.filesLock.Lock()
 	defer fs.filesLock.Unlock()
@@ -262,6 +278,7 @@ func (fs *FakeFileSystem) OpenFile(path string, flag int, perm os.FileMode) (bos
 	// Make sure to record a reference for FileExist, etc. to work
 	stats := fs.getOrCreateFile(path)
 	stats.FileMode = perm
+	stats.Flags = flag
 	stats.FileType = FakeFileTypeFile
 
 	if fs.openFiles[path] != nil {
@@ -439,6 +456,7 @@ func (fs *FakeFileSystem) Rename(oldPath, newPath string) error {
 	newStats.Content = stats.Content
 	newStats.FileMode = stats.FileMode
 	newStats.FileType = stats.FileType
+	newStats.Flags = stats.Flags
 
 	// Ignore error from RemoveAll
 	fs.removeAll(oldPath)
