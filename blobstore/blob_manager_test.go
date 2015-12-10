@@ -2,15 +2,16 @@ package blobstore_test
 
 import (
 	"bytes"
+	"io"
+	"os"
+	"path/filepath"
+
 	. "github.com/cloudfoundry/bosh-utils/blobstore"
 	. "github.com/cloudfoundry/bosh-utils/internal/github.com/onsi/ginkgo"
 	. "github.com/cloudfoundry/bosh-utils/internal/github.com/onsi/gomega"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	boshsys "github.com/cloudfoundry/bosh-utils/system"
 	boshsysfake "github.com/cloudfoundry/bosh-utils/system/fakes"
-	"io"
-	"os"
-	"path/filepath"
 )
 
 var _ = Describe("Blob Manager", func() {
@@ -27,7 +28,7 @@ var _ = Describe("Blob Manager", func() {
 		logger = boshlog.NewLogger(boshlog.LevelNone)
 		fs = boshsys.NewOsFileSystem(logger)
 		blobId = "105d33ae-655c-493d-bf9f-1df5cf3ca847"
-		basePath = "/tmp"
+		basePath = os.TempDir()
 		blobPath = filepath.Join(basePath, blobId)
 		toWrite = bytes.NewReader([]byte("new data"))
 	})

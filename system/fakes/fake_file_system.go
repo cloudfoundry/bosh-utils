@@ -361,7 +361,9 @@ func (fs *FakeFileSystem) WriteFile(path string, content []byte) (err error) {
 
 func (fs *FakeFileSystem) writeDir(path string) (err error) {
 	parent := filepath.Dir(path)
-	if parent != "." && parent != "/" && parent != "D:\\" && parent != "C:\\" {
+
+	grandparent := filepath.Dir(parent)
+	if grandparent != parent {
 		fs.writeDir(parent)
 	}
 
@@ -562,9 +564,9 @@ func (fs *FakeFileSystem) TempFile(prefix string) (file boshsys.File, err error)
 	if fs.ReturnTempFile != nil {
 		file = fs.ReturnTempFile
 	} else {
-		file, err = os.Open("/dev/null")
+		file, err = os.Open(os.DevNull)
 		if err != nil {
-			err = bosherr.WrapError(err, "Opening /dev/null")
+			err = bosherr.WrapError(err, fmt.Sprintf("Opening %s", os.DevNull))
 			return
 		}
 	}
