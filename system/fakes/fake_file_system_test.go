@@ -36,6 +36,14 @@ var _ = Describe("FakeFileSystem", func() {
 			Expect(fs.FileExists("foobarbaz")).To(BeFalse())
 		})
 
+		It("works with windows drives", func() {
+			fs.WriteFileString("D:/env1", "fake-content1")
+			Expect(fs.FileExists("D:/env1")).To(BeTrue())
+
+			fs.WriteFileString("C:/env2", "fake-content2")
+			Expect(fs.FileExists("C:/env2")).To(BeTrue())
+		})
+
 		It("removes the specified dir and the files under it", func() {
 			err := fs.MkdirAll("foobarbaz", os.ModePerm)
 			Expect(err).ToNot(HaveOccurred())

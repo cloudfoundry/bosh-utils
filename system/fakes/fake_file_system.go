@@ -361,7 +361,7 @@ func (fs *FakeFileSystem) WriteFile(path string, content []byte) (err error) {
 
 func (fs *FakeFileSystem) writeDir(path string) (err error) {
 	parent := filepath.Dir(path)
-	if parent != "." && parent != "/" {
+	if parent != "." && parent != "/" && parent != "D:\\" && parent != "C:\\" {
 		fs.writeDir(parent)
 	}
 
