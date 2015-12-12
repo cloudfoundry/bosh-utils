@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"syscall"
 
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 )
 
@@ -25,22 +26,22 @@ func NewConcretePSRunner(fs FileSystem, logger boshlog.Logger) PSRunner {
 func (r concretePSRunner) RunCommand(cmd PSCommand) (string, string, error) {
 	file, err := r.fs.TempFile(r.logTag)
 	if err != nil {
-		return "", "", err
+		return "", "", bosherr.WrapError(err, "Creating tempfile")
 	}
 
 	_, err = file.Write([]byte(cmd.Script))
 	if err != nil {
-		return "", "", err
+		return "", "", bosherr.WrapError(err, "Writing to tempfile")
 	}
 
 	err = file.Close()
 	if err != nil {
-		return "", "", err
+		return "", "", bosherr.WrapError(err, "Closing tempfile")
 	}
 
 	err = r.fs.Rename(file.Name(), file.Name()+".ps1")
 	if err != nil {
-		return "", "", err
+		return "", "", bosherr.WrapError(err, "Renaming tempfile")
 	}
 
 	execCmd := exec.Command("powershell", "-noprofile", "-noninteractive", file.Name()+".ps1")

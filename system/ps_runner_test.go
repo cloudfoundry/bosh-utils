@@ -87,7 +87,7 @@ Exit 10
 					fs.TempFileError = errors.New("boo")
 
 					_, _, err := runner.RunCommand(PSCommand{})
-					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal("Creating tempfile: boo"))
 				})
 			})
 
@@ -98,7 +98,7 @@ Exit 10
 					tempfile.WriteErr = errors.New("foo")
 
 					_, _, err := runner.RunCommand(PSCommand{})
-					Expect(err.Error()).To(Equal("foo"))
+					Expect(err.Error()).To(Equal("Writing to tempfile: foo"))
 				})
 			})
 
@@ -109,7 +109,7 @@ Exit 10
 					tempfile.CloseErr = errors.New("oh noes")
 
 					_, _, err := runner.RunCommand(PSCommand{})
-					Expect(err.Error()).To(Equal("oh noes"))
+					Expect(err.Error()).To(Equal("Closing tempfile: oh noes"))
 				})
 			})
 
@@ -120,7 +120,7 @@ Exit 10
 					fs.RenameError = errors.New("sigh")
 
 					_, _, err := runner.RunCommand(PSCommand{})
-					Expect(err.Error()).To(Equal("sigh"))
+					Expect(err.Error()).To(Equal("Renaming tempfile: sigh"))
 				})
 			})
 		})
