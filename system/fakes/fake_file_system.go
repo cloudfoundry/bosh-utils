@@ -300,7 +300,7 @@ func (fs *FakeFileSystem) Chown(path, username string) error {
 		return fs.ChownErr
 	}
 
-	path = filepath.Join(path)
+	path = gopath.Join(path)
 
 	stats := fs.files[path]
 	if stats == nil {
@@ -361,9 +361,9 @@ func (fs *FakeFileSystem) WriteFile(path string, content []byte) (err error) {
 }
 
 func (fs *FakeFileSystem) writeDir(path string) (err error) {
-	parent := filepath.Dir(path)
+	parent := gopath.Dir(path)
 
-	grandparent := filepath.Dir(parent)
+	grandparent := gopath.Dir(parent)
 	if grandparent != parent {
 		fs.writeDir(parent)
 	}
@@ -505,8 +505,8 @@ func (fs *FakeFileSystem) CopyFile(srcPath, dstPath string) error {
 		return fs.CopyFileError
 	}
 
-	srcPath = filepath.Join(srcPath)
-	dstPath = filepath.Join(dstPath)
+	srcPath = gopath.Join(srcPath)
+	dstPath = gopath.Join(dstPath)
 
 	srcFile, found := fs.files[srcPath]
 	if !found {
@@ -525,12 +525,12 @@ func (fs *FakeFileSystem) CopyDir(srcPath, dstPath string) error {
 		return fs.CopyDirError
 	}
 
-	srcPath = filepath.Join(srcPath) + string(os.PathSeparator)
-	dstPath = filepath.Join(dstPath)
+	srcPath = gopath.Join(srcPath) + "/"
+	dstPath = gopath.Join(dstPath)
 
 	for filePath, fileStats := range fs.files {
 		if strings.HasPrefix(filePath, srcPath) {
-			dstPath := filepath.Join(dstPath, filePath[len(srcPath)-1:])
+			dstPath := gopath.Join(dstPath, filePath[len(srcPath)-1:])
 			fs.files[dstPath] = fileStats
 		}
 	}
