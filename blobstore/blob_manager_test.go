@@ -67,6 +67,11 @@ var _ = Describe("Blob Manager", func() {
 	})
 
 	Context("when it writes", func() {
+		BeforeEach(func() {
+			basePath = filepath.ToSlash(basePath)
+			blobPath = filepath.ToSlash(blobPath)
+		})
+
 		It("creates and closes the file", func() {
 			fs_ := boshsysfake.NewFakeFileSystem()
 			blobManager := NewBlobManager(fs_, basePath)
@@ -76,6 +81,7 @@ var _ = Describe("Blob Manager", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(fileStats.Open).To(BeFalse())
 		})
+
 		It("creates file with correct permissions", func() {
 			fs_ := boshsysfake.NewFakeFileSystem()
 			blobManager := NewBlobManager(fs_, basePath)
