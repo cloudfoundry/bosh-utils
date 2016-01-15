@@ -152,19 +152,20 @@ func (fs *osFileSystem) ConvergeFileContents(path string, content []byte) (bool,
 
 	err := fs.MkdirAll(filepath.Dir(path), os.ModePerm)
 	if err != nil {
-		return true, bosherr.WrapErrorf(err, "Making dir for file %s", path)
+		return false, bosherr.WrapErrorf(err, "Making dir for file %s", path)
 	}
 
 	file, err := os.Create(path)
 	if err != nil {
-		return true, bosherr.WrapErrorf(err, "Creating file %s", path)
+		return false, bosherr.WrapErrorf(err, "Creating file %s", path)
 	}
 
 	defer file.Close()
 
+	fs.logger.DebugWithDetails(fs.logTag, "Write content", content)
 	_, err = file.Write(content)
 	if err != nil {
-		return true, bosherr.WrapErrorf(err, "Writing content to file %s", path)
+		return false, bosherr.WrapErrorf(err, "Writing content to file %s", path)
 	}
 
 	return true, nil
