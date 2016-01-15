@@ -234,7 +234,8 @@ var _ = Describe("Testing with Ginkgo", func() {
 		It("returns true when file exists", func() {
 			osFs := createOsFs()
 			testPath := filepath.Join(os.TempDir(), "FileExistsTestFile")
-			osFs.WriteFileString(testPath, "initial write")
+			err := osFs.WriteFileString(testPath, "initial write")
+			Expect(err).NotTo(HaveOccurred())
 			defer os.Remove(testPath)
 
 			Expect(osFs.FileExists(testPath)).To(BeTrue())
@@ -245,6 +246,23 @@ var _ = Describe("Testing with Ginkgo", func() {
 			longFilePath := filepath.Join(os.TempDir(), strings.Repeat("a", 1000))
 
 			Expect(osFs.FileExists(longFilePath)).To(BeFalse())
+		})
+
+		It("returns true when directory exists", func() {
+			osFs := createOsFs()
+			testPath := filepath.Join(os.TempDir(), "FileExistsTestDir")
+			err := osFs.MkdirAll(testPath, os.ModeDir)
+			Expect(err).NotTo(HaveOccurred())
+			defer os.Remove(testPath)
+
+			Expect(osFs.FileExists(testPath)).To(BeTrue())
+		})
+
+		It("returns false when directory does not exist", func() {
+			osFs := createOsFs()
+			testPath := filepath.Join(os.TempDir(), "FileExistsTestDir")
+
+			Expect(osFs.FileExists(testPath)).To(BeFalse())
 		})
 
 		It("returns false when file does not exist", func() {
