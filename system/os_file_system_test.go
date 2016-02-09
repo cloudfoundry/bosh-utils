@@ -144,8 +144,8 @@ var _ = Describe("Testing with Ginkgo", func() {
 		Expect(readFile(createdFile)).To(Equal("testing new file"))
 	})
 
-	Context("ConvergeFileContents", func() {
-		It("writes to file when file does not exist", func() {
+	Context("the file already exists and is not write only", func() {
+		It("writes to file", func() {
 			osFs := createOsFs()
 			testPath := filepath.Join(os.TempDir(), "subDir", "ConvergeFileContentsTestFile")
 
@@ -160,43 +160,26 @@ var _ = Describe("Testing with Ginkgo", func() {
 			file, err := os.Open(testPath)
 			Expect(err).ToNot(HaveOccurred())
 			defer file.Close()
+
 			Expect(readFile(file)).To(Equal("initial write"))
-		})
 
-		Context("When the file already exists and is not write only", func() {
-			It("overwrites contents of the file", func() {
-				osFs := createOsFs()
-				testPath := filepath.Join(os.TempDir(), "subDir", "ConvergeFileContentsTestFile")
-				err := osFs.WriteFile(testPath, []byte("initial write"))
-				Expect(err).ToNot(HaveOccurred())
+			written, err = osFs.ConvergeFileContents(testPath, []byte("second write"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(written).To(BeTrue())
 
-				written, err := osFs.ConvergeFileContents(testPath, []byte("second write"))
-				Expect(err).ToNot(HaveOccurred())
-				Expect(written).To(BeTrue())
+			file.Close()
+			file, err = os.Open(testPath)
+			Expect(err).ToNot(HaveOccurred())
 
-				file, err := os.Open(testPath)
-				Expect(err).ToNot(HaveOccurred())
-				defer file.Close()
-				Expect(readFile(file)).To(Equal("second write"))
-			})
-		})
+			Expect(readFile(file)).To(Equal("second write"))
 
-		Context("When the file exists and new contents are identical to existing content", func() {
-			It("skips writing to file", func() {
-				osFs := createOsFs()
-				testPath := filepath.Join(os.TempDir(), "subDir", "ConvergeFileContentsTestFile")
-				err := osFs.WriteFile(testPath, []byte("initial write"))
-				Expect(err).ToNot(HaveOccurred())
+			file.Close()
+			file, err = os.Open(testPath)
 
-				written, err := osFs.ConvergeFileContents(testPath, []byte("initial write"))
-				Expect(err).ToNot(HaveOccurred())
-				Expect(written).To(BeFalse())
-
-				file, err := os.Open(testPath)
-				Expect(err).ToNot(HaveOccurred())
-				defer file.Close()
-				Expect(readFile(file)).To(Equal("initial write"))
-			})
+			written, err = osFs.ConvergeFileContents(testPath, []byte("second write"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(written).To(BeFalse())
+			Expect(readFile(file)).To(Equal("second write"))
 		})
 	})
 
@@ -205,7 +188,7 @@ var _ = Describe("Testing with Ginkgo", func() {
 			osFs := createOsFs()
 			testPath := filepath.Join(os.TempDir(), "subDir", "ConvergeFileContentsTestFile")
 
-			_, err := os.OpenFile(testPath, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, os.FileMode(0200))
+			_, err := os.OpenFile(testPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(0200))
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(testPath)
 
@@ -247,47 +230,16 @@ var _ = Describe("Testing with Ginkgo", func() {
 		Expect("some contents").To(Equal(string(content)))
 	})
 
-	Context("FileExists", func() {
-		It("returns true when file exists", func() {
-			osFs := createOsFs()
-			testPath := filepath.Join(os.TempDir(), "FileExistsTestFile")
-			err := osFs.WriteFileString(testPath, "initial write")
-			Expect(err).NotTo(HaveOccurred())
-			defer os.Remove(testPath)
+	It("file exists", func() {
+		osFs := createOsFs()
+		testPath := filepath.Join(os.TempDir(), "FileExistsTestFile")
 
-			Expect(osFs.FileExists(testPath)).To(BeTrue())
-		})
+		Expect(osFs.FileExists(testPath)).To(BeFalse())
 
-		It("returns false when file does not exist and filename is unusually long", func() {
-			osFs := createOsFs()
-			longFilePath := filepath.Join(os.TempDir(), strings.Repeat("a", 1000))
+		osFs.WriteFileString(testPath, "initial write")
+		defer os.Remove(testPath)
 
-			Expect(osFs.FileExists(longFilePath)).To(BeFalse())
-		})
-
-		It("returns true when directory exists", func() {
-			osFs := createOsFs()
-			testPath := filepath.Join(os.TempDir(), "FileExistsTestDir")
-			err := osFs.MkdirAll(testPath, os.ModeDir)
-			Expect(err).NotTo(HaveOccurred())
-			defer os.Remove(testPath)
-
-			Expect(osFs.FileExists(testPath)).To(BeTrue())
-		})
-
-		It("returns false when directory does not exist", func() {
-			osFs := createOsFs()
-			testPath := filepath.Join(os.TempDir(), "FileExistsTestDir")
-
-			Expect(osFs.FileExists(testPath)).To(BeFalse())
-		})
-
-		It("returns false when file does not exist", func() {
-			osFs := createOsFs()
-			testPath := filepath.Join(os.TempDir(), "FileExistsTestFile")
-
-			Expect(osFs.FileExists(testPath)).To(BeFalse())
-		})
+		Expect(osFs.FileExists(testPath)).To(BeTrue())
 	})
 
 	It("rename", func() {
