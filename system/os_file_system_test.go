@@ -364,6 +364,37 @@ var _ = Describe("Testing with Ginkgo", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect("some content").To(Equal(readFile(symlinkFile)))
 		})
+
+		It("deletes a broken symlink if it exists at the intended path", func() {
+			dir, err := ioutil.TempDir("", "")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(dir)
+
+			osFs := createOsFs()
+			fileA := filepath.Join(dir, "file_a")
+			fileB := filepath.Join(dir, "file_b")
+			symlinkPath := filepath.Join(dir, "symlink")
+
+			osFs.WriteFileString(fileA, "file a")
+			osFs.WriteFileString(fileB, "file b")
+
+			err = osFs.Symlink(fileA, symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
+
+			os.Remove(fileA) // creates a broken symlink
+
+			err = osFs.Symlink(fileB, symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
+
+			symlinkStats, err := os.Lstat(symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(os.ModeSymlink).To(Equal(os.ModeSymlink & symlinkStats.Mode()))
+
+			symlinkFile, err := os.Open(symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect("file b").To(Equal(readFile(symlinkFile)))
+
+		})
 	})
 
 	It("read link", func() {
