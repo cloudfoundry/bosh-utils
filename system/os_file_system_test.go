@@ -262,102 +262,108 @@ var _ = Describe("Testing with Ginkgo", func() {
 		Expect(osFs.FileExists(newFilePath)).To(BeTrue())
 	})
 
-	It("symlink", func() {
-		osFs := createOsFs()
-		filePath := filepath.Join(os.TempDir(), "SymlinkTestFile")
-		containingDir := filepath.Join(os.TempDir(), "SubDir")
-		os.Remove(containingDir)
-		symlinkPath := filepath.Join(containingDir, "SymlinkTestSymlink")
+	Describe("Symlink", func() {
+		It("creates a symlink", func() {
+			osFs := createOsFs()
+			filePath := filepath.Join(os.TempDir(), "SymlinkTestFile")
+			containingDir := filepath.Join(os.TempDir(), "SubDir")
+			os.Remove(containingDir)
+			symlinkPath := filepath.Join(containingDir, "SymlinkTestSymlink")
 
-		osFs.WriteFileString(filePath, "some content")
-		defer os.Remove(filePath)
+			osFs.WriteFileString(filePath, "some content")
+			defer os.Remove(filePath)
 
-		osFs.Symlink(filePath, symlinkPath)
-		defer os.Remove(containingDir)
+			osFs.Symlink(filePath, symlinkPath)
+			defer os.Remove(containingDir)
 
-		symlinkStats, err := os.Lstat(symlinkPath)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(os.ModeSymlink).To(Equal(os.ModeSymlink & symlinkStats.Mode()))
+			symlinkStats, err := os.Lstat(symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(os.ModeSymlink).To(Equal(os.ModeSymlink & symlinkStats.Mode()))
 
-		symlinkFile, err := os.Open(symlinkPath)
-		Expect(err).ToNot(HaveOccurred())
-		Expect("some content").To(Equal(readFile(symlinkFile)))
-	})
+			symlinkFile, err := os.Open(symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect("some content").To(Equal(readFile(symlinkFile)))
+		})
 
-	It("symlink when link already exists and links to the intended path", func() {
-		osFs := createOsFs()
-		filePath := filepath.Join(os.TempDir(), "SymlinkTestIdempotent1File")
-		symlinkPath := filepath.Join(os.TempDir(), "SymlinkTestIdempotent1Symlink")
+		It("does not modify the link when it already exists and links to the intended path", func() {
+			dir, err := ioutil.TempDir("", "")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(dir)
+			osFs := createOsFs()
 
-		osFs.WriteFileString(filePath, "some content")
-		defer os.Remove(filePath)
+			filePath := filepath.Join(dir, "SymlinkTestIdempotent1File")
+			symlinkPath := filepath.Join(dir, "SymlinkTestIdempotent1Symlink")
 
-		osFs.Symlink(filePath, symlinkPath)
-		defer os.Remove(symlinkPath)
+			osFs.WriteFileString(filePath, "some content")
+			defer os.Remove(filePath)
 
-		firstSymlinkStats, err := os.Lstat(symlinkPath)
-		Expect(err).ToNot(HaveOccurred())
+			osFs.Symlink(filePath, symlinkPath)
+			defer os.Remove(symlinkPath)
 
-		err = osFs.Symlink(filePath, symlinkPath)
-		Expect(err).ToNot(HaveOccurred())
+			firstSymlinkStats, err := os.Lstat(symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
 
-		secondSymlinkStats, err := os.Lstat(symlinkPath)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(firstSymlinkStats.ModTime()).To(Equal(secondSymlinkStats.ModTime()))
-	})
+			err = osFs.Symlink(filePath, symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
 
-	It("symlink when link already exists and does not link to the intended path", func() {
-		osFs := createOsFs()
-		filePath := filepath.Join(os.TempDir(), "SymlinkTestIdempotent1File")
-		otherFilePath := filepath.Join(os.TempDir(), "SymlinkTestIdempotent1OtherFile")
-		symlinkPath := filepath.Join(os.TempDir(), "SymlinkTestIdempotent1Symlink")
+			secondSymlinkStats, err := os.Lstat(symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(firstSymlinkStats.ModTime()).To(Equal(secondSymlinkStats.ModTime()))
+		})
 
-		osFs.WriteFileString(filePath, "some content")
-		defer os.Remove(filePath)
+		It("removes the old link when it already exists and does not link to the intended path", func() {
+			osFs := createOsFs()
+			filePath := filepath.Join(os.TempDir(), "SymlinkTestIdempotent1File")
+			otherFilePath := filepath.Join(os.TempDir(), "SymlinkTestIdempotent1OtherFile")
+			symlinkPath := filepath.Join(os.TempDir(), "SymlinkTestIdempotent1Symlink")
 
-		osFs.WriteFileString(otherFilePath, "other content")
-		defer os.Remove(otherFilePath)
+			osFs.WriteFileString(filePath, "some content")
+			defer os.Remove(filePath)
 
-		err := osFs.Symlink(otherFilePath, symlinkPath)
-		Expect(err).ToNot(HaveOccurred())
+			osFs.WriteFileString(otherFilePath, "other content")
+			defer os.Remove(otherFilePath)
 
-		err = osFs.Symlink(filePath, symlinkPath)
-		Expect(err).ToNot(HaveOccurred())
+			err := osFs.Symlink(otherFilePath, symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
 
-		defer os.Remove(symlinkPath)
+			err = osFs.Symlink(filePath, symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
 
-		symlinkStats, err := os.Lstat(symlinkPath)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(os.ModeSymlink).To(Equal(os.ModeSymlink & symlinkStats.Mode()))
+			defer os.Remove(symlinkPath)
 
-		symlinkFile, err := os.Open(symlinkPath)
-		Expect(err).ToNot(HaveOccurred())
-		Expect("some content").To(Equal(readFile(symlinkFile)))
-	})
+			symlinkStats, err := os.Lstat(symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(os.ModeSymlink).To(Equal(os.ModeSymlink & symlinkStats.Mode()))
 
-	It("symlink when a file exists at intended path", func() {
-		osFs := createOsFs()
-		filePath := filepath.Join(os.TempDir(), "SymlinkTestIdempotent1File")
-		symlinkPath := filepath.Join(os.TempDir(), "SymlinkTestIdempotent1Symlink")
+			symlinkFile, err := os.Open(symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect("some content").To(Equal(readFile(symlinkFile)))
+		})
 
-		osFs.WriteFileString(filePath, "some content")
-		defer os.Remove(filePath)
+		It("deletes a file if it exists at the intended path", func() {
+			osFs := createOsFs()
+			filePath := filepath.Join(os.TempDir(), "SymlinkTestIdempotent1File")
+			symlinkPath := filepath.Join(os.TempDir(), "SymlinkTestIdempotent1Symlink")
 
-		osFs.WriteFileString(symlinkPath, "some other content")
-		defer os.Remove(symlinkPath)
+			osFs.WriteFileString(filePath, "some content")
+			defer os.Remove(filePath)
 
-		err := osFs.Symlink(filePath, symlinkPath)
-		Expect(err).ToNot(HaveOccurred())
+			osFs.WriteFileString(symlinkPath, "some other content")
+			defer os.Remove(symlinkPath)
 
-		defer os.Remove(symlinkPath)
+			err := osFs.Symlink(filePath, symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
 
-		symlinkStats, err := os.Lstat(symlinkPath)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(os.ModeSymlink).To(Equal(os.ModeSymlink & symlinkStats.Mode()))
+			defer os.Remove(symlinkPath)
 
-		symlinkFile, err := os.Open(symlinkPath)
-		Expect(err).ToNot(HaveOccurred())
-		Expect("some content").To(Equal(readFile(symlinkFile)))
+			symlinkStats, err := os.Lstat(symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(os.ModeSymlink).To(Equal(os.ModeSymlink & symlinkStats.Mode()))
+
+			symlinkFile, err := os.Open(symlinkPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect("some content").To(Equal(readFile(symlinkFile)))
+		})
 	})
 
 	It("read link", func() {
