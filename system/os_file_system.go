@@ -244,7 +244,7 @@ func (fs *osFileSystem) Symlink(oldPath, newPath string) error {
 		fs.MkdirAll(containingDir, os.FileMode(0700))
 	}
 
-	return os.Symlink(oldPath, newPath)
+	return symlink(oldPath, newPath)
 }
 
 func (fs *osFileSystem) ReadLink(symlinkPath string) (targetPath string, err error) {
