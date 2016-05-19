@@ -88,7 +88,10 @@ var _ = Describe("tarballCompressor", func() {
 	BeforeEach(func() {
 		if runtime.GOOS == "windows" {
 			Skip("Pending on Windows")
+		} else if runtime.GOOS == "darwin" {
+			os.Setenv("COPYFILE_DISABLE", "1") // fix for bsd/osx tar: http://superuser.com/a/260264
 		}
+
 		fs.MkdirAll(dstDir, os.ModePerm)
 	})
 
