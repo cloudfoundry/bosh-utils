@@ -20,6 +20,8 @@ import (
 
 type FakeFileType string
 
+type removeAllFn func(path string) error
+
 const (
 	FakeFileTypeFile    FakeFileType = "file"
 	FakeFileTypeSymlink FakeFileType = "symlink"
@@ -65,6 +67,7 @@ type FakeFileSystem struct {
 
 	RemoveAllError       error
 	removeAllErrorByPath map[string]error
+	RemoveAllStub        removeAllFn
 
 	ReadLinkError error
 
@@ -620,6 +623,13 @@ func (fs *FakeFileSystem) RegisterRemoveAllError(path string, err error) {
 func (fs *FakeFileSystem) RemoveAll(path string) error {
 	if path == "" {
 		panic("RemoveAll requires path")
+	}
+
+	if fs.RemoveAllStub != nil {
+		err := fs.RemoveAllStub(path)
+		if err != nil {
+			return err
+		}
 	}
 
 	fs.filesLock.Lock()
