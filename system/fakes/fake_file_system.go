@@ -637,6 +637,10 @@ func (fs *FakeFileSystem) RemoveAll(path string) error {
 	return fs.removeAll(path)
 }
 
+func (fs *FakeFileSystem) Stat(fileOrDir string) (os.FileInfo, error) {
+	return nil, nil
+}
+
 func (fs *FakeFileSystem) removeAll(path string) error {
 	fileInfo := fs.fileRegistry.Get(path)
 	if fileInfo != nil {
