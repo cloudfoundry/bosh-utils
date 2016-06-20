@@ -23,8 +23,6 @@ type FileSystem interface {
 	MkdirAll(path string, perm os.FileMode) error
 	RemoveAll(fileOrDir string) error
 
-	Stat(fileOrDir string) (os.FileInfo, error)
-
 	Chown(path, username string) error
 	Chmod(path string, perm os.FileMode) error
 
