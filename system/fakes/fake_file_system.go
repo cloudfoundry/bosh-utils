@@ -67,9 +67,7 @@ type FakeFileSystem struct {
 	RenameOldPaths []string
 	RenameNewPaths []string
 
-	RemoveAllError       error
-	removeAllErrorByPath map[string]error
-	RemoveAllStub        removeAllFn
+	RemoveAllStub removeAllFn
 
 	ReadLinkError error
 
@@ -200,13 +198,12 @@ func (f FakeFile) Stat() (os.FileInfo, error) {
 
 func NewFakeFileSystem() *FakeFileSystem {
 	return &FakeFileSystem{
-		fileRegistry:         NewFakeFileStatsRegistry(),
-		openFileRegsitry:     NewFakeFileRegistry(),
-		globsMap:             map[string][][]string{},
-		readFileErrorByPath:  map[string]error{},
-		removeAllErrorByPath: map[string]error{},
-		mkdirAllErrorByPath:  map[string]error{},
-		WriteFileErrors:      map[string]error{},
+		fileRegistry:        NewFakeFileStatsRegistry(),
+		openFileRegsitry:    NewFakeFileRegistry(),
+		globsMap:            map[string][][]string{},
+		readFileErrorByPath: map[string]error{},
+		mkdirAllErrorByPath: map[string]error{},
+		WriteFileErrors:     map[string]error{},
 	}
 }
 
@@ -616,13 +613,6 @@ func (fs *FakeFileSystem) TempDir(prefix string) (string, error) {
 	return path, nil
 }
 
-func (fs *FakeFileSystem) RegisterRemoveAllError(path string, err error) {
-	if _, ok := fs.removeAllErrorByPath[path]; ok {
-		panic(fmt.Sprintf("RemoveAll error is already set for path: %s", path))
-	}
-	fs.removeAllErrorByPath[path] = err
-}
-
 func (fs *FakeFileSystem) RemoveAll(path string) error {
 	if path == "" {
 		panic("RemoveAll requires path")
@@ -638,15 +628,7 @@ func (fs *FakeFileSystem) RemoveAll(path string) error {
 	fs.filesLock.Lock()
 	defer fs.filesLock.Unlock()
 
-	if fs.RemoveAllError != nil {
-		return fs.RemoveAllError
-	}
-
 	path = fs.fileRegistry.UnifiedPath(path)
-	if fs.removeAllErrorByPath[path] != nil {
-		return fs.removeAllErrorByPath[path]
-	}
-
 	return fs.removeAll(path)
 }
 
@@ -680,7 +662,7 @@ func (fs *FakeFileSystem) removeAll(path string) error {
 }
 
 func (fs *FakeFileSystem) Glob(pattern string) (matches []string, err error) {
-	if fs.GlobStub != nil{
+	if fs.GlobStub != nil {
 		_, err = fs.GlobStub(pattern)
 		if err != nil {
 			return nil, err
