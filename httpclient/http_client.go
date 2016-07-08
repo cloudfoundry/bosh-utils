@@ -35,7 +35,7 @@ func CreateDefaultClient() http.Client {
 				Timeout:   30 * time.Second,
 				KeepAlive: 0,
 			}).Dial,
-			TLSHandshakeTimeout: 10 * time.Second,
+			TLSHandshakeTimeout: 30 * time.Second,
 			DisableKeepAlives:   true,
 		},
 	}
