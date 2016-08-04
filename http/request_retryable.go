@@ -46,6 +46,10 @@ func NewRequestRetryable(
 	}
 }
 
+type Seekable interface {
+	Seek(offset int64, whence int) (ret int64, err error)
+}
+
 func (r *requestRetryable) Attempt() (bool, error) {
 	var err error
 
@@ -56,16 +60,23 @@ func (r *requestRetryable) Attempt() (bool, error) {
 		}
 	}
 
-	if r.request.Body != nil && r.bodyBytes == nil {
-		r.bodyBytes, err = ReadAndClose(r.request.Body)
+	if seekableRequestBody, ok := r.request.Body.(Seekable); ok {
+		_, err := seekableRequestBody.Seek(0, 0)
 		if err != nil {
-			return false, bosherr.WrapError(err, "Buffering request body")
+			return false, bosherr.WrapError(err, "Seeking to begining of seekable request body")
 		}
-	}
+	} else {
+		if r.request.Body != nil && r.bodyBytes == nil {
+			r.bodyBytes, err = ReadAndClose(r.request.Body)
+			if err != nil {
+				return false, bosherr.WrapError(err, "Buffering request body")
+			}
+		}
 
-	// reset request body, because readers cannot be re-read
-	if r.bodyBytes != nil {
-		r.request.Body = ioutil.NopCloser(bytes.NewReader(r.bodyBytes))
+		// reset request body, because readers cannot be re-read
+		if r.bodyBytes != nil {
+			r.request.Body = ioutil.NopCloser(bytes.NewReader(r.bodyBytes))
+		}
 	}
 
 	// close previous attempt's response body to prevent HTTP client resource leaks
