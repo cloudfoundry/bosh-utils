@@ -95,6 +95,19 @@ var _ = Describe("RequestRetryable", func() {
 			})
 		})
 
+		Context("when request body is nil", func() {
+			BeforeEach(func() {
+				request.Body = nil
+				fakeClient.SetMessage("fake-response-body")
+				fakeClient.StatusCode = 200
+			})
+
+			It("should succeed", func() {
+				_, err := requestRetryable.Attempt()
+				Expect(err).ToNot(HaveOccurred())
+			})
+		})
+
 		Context("when the request body has a seek method", func() {
 			var (
 				seekableReaderCloser *seekableReadClose
