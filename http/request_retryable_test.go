@@ -44,7 +44,7 @@ func (s *seekableReadClose) Read(p []byte) (n int, err error) {
 }
 
 func (s *seekableReadClose) Close() error {
-	return s.readCloser.Close()
+	return errors.New("This should not be called from this context.")
 }
 
 var _ = Describe("RequestRetryable", func() {
@@ -95,19 +95,6 @@ var _ = Describe("RequestRetryable", func() {
 			})
 		})
 
-		Context("when request body is nil", func() {
-			BeforeEach(func() {
-				request.Body = nil
-				fakeClient.SetMessage("fake-response-body")
-				fakeClient.StatusCode = 200
-			})
-
-			It("should succeed", func() {
-				_, err := requestRetryable.Attempt()
-				Expect(err).ToNot(HaveOccurred())
-			})
-		})
-
 		Context("when the request body has a seek method", func() {
 			var (
 				seekableReaderCloser *seekableReadClose
@@ -137,11 +124,11 @@ var _ = Describe("RequestRetryable", func() {
 
 				// It does not consume the whole body and store it in memory for future re-attempts, it seeks to the
 				// beginning of the body instead
-				It("seeks to the beginning of the request body uses the request body as is", func() {
+				It("seeks to the beginning of the request body uses the request body *as is*", func() {
 					_, err := requestRetryable.Attempt()
 					Expect(err).ToNot(HaveOccurred())
 					Expect(seekableReaderCloser.Seeked).To(BeTrue())
-					Expect(fakeClient.Requests[0].Body).To(Equal(seekableReaderCloser))
+					Expect(fakeClient.RequestBodies[0]).To(Equal("hello from seekable"))
 				})
 			})
 
@@ -177,7 +164,6 @@ var _ = Describe("RequestRetryable", func() {
 						Expect(err).ToNot(HaveOccurred())
 
 						Expect(seekableReaderCloser.Seeked).To(BeTrue())
-						Expect(fakeClient.Requests[1].Body).To(Equal(seekableReaderCloser))
 						Expect(fakeClient.RequestBodies[1]).To(Equal("hello from seekable"))
 
 						resp := requestRetryable.Response()
