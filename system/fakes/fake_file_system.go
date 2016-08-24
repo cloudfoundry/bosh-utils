@@ -535,6 +535,7 @@ func (fs *FakeFileSystem) Symlink(oldPath, newPath string) (err error) {
 
 	if fs.SymlinkError == nil {
 		stats := fs.getOrCreateFile(newPath)
+		stats.FileMode |= os.ModeSymlink
 		stats.FileType = FakeFileTypeSymlink
 		stats.SymlinkTarget = fs.fileRegistry.UnifiedPath(oldPath)
 		return

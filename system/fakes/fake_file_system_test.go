@@ -174,6 +174,18 @@ var _ = Describe("FakeFileSystem", func() {
 		})
 	})
 
+	Describe("Symlink", func() {
+		It("creates", func() {
+			err := fs.Symlink("foobarbaz", "foobar")
+			Expect(err).ToNot(HaveOccurred())
+
+			stat, err := fs.Lstat("foobar")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(stat.Mode() & os.ModeSymlink).ToNot(Equal(0))
+		})
+	})
+
 	Describe("Stat", func() {
 		It("errors when symlink targets do not exist", func() {
 			err := fs.Symlink("foobarbaz", "foobar")
@@ -183,6 +195,7 @@ var _ = Describe("FakeFileSystem", func() {
 			Expect(err).To(HaveOccurred())
 
 		})
+
 		It("follows symlink target to show its stats", func() {
 			err := fs.WriteFileString("foobarbaz", "asdfghjk")
 			Expect(err).ToNot(HaveOccurred())
