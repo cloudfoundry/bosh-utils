@@ -3,7 +3,6 @@ package fileutil_test
 import (
 	"os"
 	"path/filepath"
-	"runtime"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -26,10 +25,6 @@ var _ = Describe("cpCopier", func() {
 		fs = boshsys.NewOsFileSystem(logger)
 		cmdRunner = boshsys.NewExecCmdRunner(logger)
 		cpCopier = NewCpCopier(cmdRunner, fs, logger)
-
-		if runtime.GOOS == "windows" {
-			Skip("Pending on Windows")
-		}
 	})
 
 	Describe("FilteredCopyToTemp", func() {
