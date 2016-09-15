@@ -1,7 +1,6 @@
 package retrystrategy
 
 import (
-	"reflect"
 	"time"
 
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
@@ -35,7 +34,7 @@ func (s *attemptRetryStrategy) Try() error {
 	var isRetryable bool
 
 	for i := 0; i < s.maxAttempts; i++ {
-		s.logger.Debug(s.logTag, "Making attempt #%d for %s", i, reflect.TypeOf(s.retryable))
+		s.logger.Debug(s.logTag, "Making attempt #%d for %T", i, s.retryable)
 
 		isRetryable, err = s.retryable.Attempt()
 		if err == nil {
