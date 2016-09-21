@@ -6,6 +6,7 @@ import (
   "os"
   "strings"
   "unicode/utf8"
+  "fmt"
 )
 
 var ErrBadPattern = path.ErrBadPattern
@@ -72,7 +73,7 @@ func indexRuneWithEscaping(s string, r rune) int {
 // returned error is ErrBadPattern, when pattern is malformed.
 //
 func Match(pattern, name string) (bool, error) {
-  return matchWithSeparator(pattern, name, '/')
+  return matchWithSeparator(pattern, name, os.PathSeparator)
 }
 
 // PathMatch is like Match except that it uses your system's path separator.
@@ -157,8 +158,8 @@ func Glob(pattern string) (matches []string, err error) {
   if len(patternComponents) == 0 { return nil, nil }
 
   // if the first pattern component is blank, the pattern is an absolute path.
-  if patternComponents[0] == "" {
-    return doGlob(string(filepath.Separator), patternComponents, matches)
+  if patternComponents[0] == "" || patternComponents[0] == "C:" {
+    return doGlob(fmt.Sprintf("%s%s",patternComponents[0], string(filepath.Separator)), patternComponents[1:], matches)
   }
   return doGlob(".", patternComponents, matches)
 }

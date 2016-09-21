@@ -3,7 +3,6 @@ package fileutil
 import (
 	"io"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -49,7 +48,7 @@ func (c genericCpCopier) FilteredCopyToTemp(dir string, filters []string) (strin
 
 	return c.tryInTempDir(func(tempDir string) error {
 		for _, relativePath := range filesToCopy {
-			src := path.Join(dir, relativePath)
+			src := filepath.Join(dir, relativePath)
 			dst := filepath.Join(tempDir, relativePath)
 
 			fileInfo, err := os.Stat(src)
@@ -100,10 +99,10 @@ func (c genericCpCopier) CleanUp(tempDir string) {
 func (c genericCpCopier) convertDirectoriesToGlobs(dir string, filters []string) []string {
 	convertedFilters := []string{}
 	for _, filter := range filters {
-		src := path.Join(dir, filter)
+		src := filepath.Join(dir, filter)
 		fileInfo, err := os.Stat(src)
 		if err == nil && fileInfo.IsDir() {
-			convertedFilters = append(convertedFilters, path.Join(src, "**", "*"))
+			convertedFilters = append(convertedFilters, filepath.Join(src, "**", "*"))
 		} else {
 			convertedFilters = append(convertedFilters, src)
 		}
