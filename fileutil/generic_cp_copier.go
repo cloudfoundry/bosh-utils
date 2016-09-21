@@ -5,9 +5,8 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 
-	"github.com/bmatcuk/doublestar"
+	"github.com/cloudfoundry/gofileutils/glob"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
@@ -29,27 +28,17 @@ func NewGenericCpCopier(
 }
 
 func (c genericCpCopier) FilteredCopyToTemp(dir string, filters []string) (string, error) {
-	var filtersFilesToCopy []string
-	var err error
-
 	filters = c.convertDirectoriesToGlobs(dir, filters)
 
-	filesToCopy := []string{}
-
-	for _, filterPath := range filters {
-		filtersFilesToCopy, err = doublestar.Glob(filterPath)
-		if err != nil {
-			return "", bosherr.WrapError(err, "Finding files matching filters")
-		}
-
-		for _, fileToCopy := range filtersFilesToCopy {
-			filesToCopy = append(filesToCopy, strings.TrimPrefix(strings.TrimPrefix(fileToCopy, dir), "/"))
-		}
+	dirGlob := glob.NewDir(dir)
+	filesToCopy, err := dirGlob.Glob(filters...)
+	if err != nil {
+		return "", bosherr.WrapError(err, "Finding files matching filters")
 	}
 
 	return c.tryInTempDir(func(tempDir string) error {
 		for _, relativePath := range filesToCopy {
-			src := path.Join(dir, relativePath)
+			src := filepath.Join(dir, relativePath)
 			dst := filepath.Join(tempDir, relativePath)
 
 			fileInfo, err := os.Stat(src)
@@ -103,9 +92,9 @@ func (c genericCpCopier) convertDirectoriesToGlobs(dir string, filters []string)
 		src := path.Join(dir, filter)
 		fileInfo, err := os.Stat(src)
 		if err == nil && fileInfo.IsDir() {
-			convertedFilters = append(convertedFilters, path.Join(src, "**", "*"))
+			convertedFilters = append(convertedFilters, path.Join(filter, "**", "*"))
 		} else {
-			convertedFilters = append(convertedFilters, src)
+			convertedFilters = append(convertedFilters, filter)
 		}
 	}
 
