@@ -12,6 +12,7 @@ import (
 	. "github.com/cloudfoundry/bosh-utils/fileutil"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	boshsys "github.com/cloudfoundry/bosh-utils/system"
+	"sort"
 )
 
 var _ = Describe("genericCpCopier", func() {
@@ -46,6 +47,8 @@ var _ = Describe("genericCpCopier", func() {
 
 			Expect(err).ToNot(HaveOccurred())
 
+			sort.Strings(copiedFiles)
+
 			return copiedFiles
 		}
 
@@ -73,6 +76,8 @@ var _ = Describe("genericCpCopier", func() {
 				filepath.Join(dstDir, "other_logs", "more_logs", "more.stdout.log"),
 				filepath.Join(dstDir, "other_logs", "other_app.stdout.log"),
 				filepath.Join(dstDir, "some_directory", "sub_dir", "other_sub_dir", ".keep"),
+				filepath.Join(dstDir, "symlink_dir", "app.stdout.log"),
+				filepath.Join(dstDir, "symlink_dir", "sub_dir", "sub_app.stdout.log"),
 			}))
 
 			content, err := fs.ReadFileString(filepath.Join(dstDir, "app.stdout.log"))
