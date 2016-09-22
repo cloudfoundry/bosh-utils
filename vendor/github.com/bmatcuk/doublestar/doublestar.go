@@ -6,6 +6,7 @@ import (
   "os"
   "strings"
   "unicode/utf8"
+  "fmt"
 )
 
 var ErrBadPattern = path.ErrBadPattern
@@ -71,6 +72,11 @@ func indexRuneWithEscaping(s string, r rune) int {
 // The path-separator defaults to the '/' character. The only possible
 // returned error is ErrBadPattern, when pattern is malformed.
 //
+// Note: this is meant as a drop-in replacement for path.Match() which
+// always uses '/' as the path separator. If you want to support systems
+// which use a different path separator (such as Windows), what you want
+// is the PathMatch() function below.
+//
 func Match(pattern, name string) (bool, error) {
   return matchWithSeparator(pattern, name, '/')
 }
@@ -79,6 +85,8 @@ func Match(pattern, name string) (bool, error) {
 // For most systems, this will be '/'. However, for Windows, it would be '\\'.
 // Note that for systems where the path separator is '\\', escaping is
 // disabled.
+//
+// Note: this is meant as a drop-in replacement for filepath.Match().
 //
 func PathMatch(pattern, name string) (bool, error) {
   return matchWithSeparator(pattern, name, os.PathSeparator)
@@ -152,13 +160,20 @@ func doMatching(patternComponents, nameComponents []string) (matched bool, err e
 // systems where the separator is '\\' (Windows), escaping will be
 // disabled.
 //
+// Note: this is meant as a drop-in replacement for filepath.Glob().
+//
 func Glob(pattern string) (matches []string, err error) {
   patternComponents := splitPathOnSeparator(pattern, os.PathSeparator)
   if len(patternComponents) == 0 { return nil, nil }
 
-  // if the first pattern component is blank, the pattern is an absolute path.
-  if patternComponents[0] == "" {
-    return doGlob(string(filepath.Separator), patternComponents, matches)
+  // On Windows systems, this will return the drive name ('C:'), on others,
+  // it will return an empty string.
+  volumeName := filepath.VolumeName(pattern)
+
+  // If the first pattern component is equal to the volume name, then the
+  // pattern is an absolute path.
+  if patternComponents[0] == volumeName {
+    return doGlob(fmt.Sprintf("%s%s", volumeName, string(os.PathSeparator)), patternComponents[1:], matches)
   }
   return doGlob(".", patternComponents, matches)
 }
