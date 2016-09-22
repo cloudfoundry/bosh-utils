@@ -5,14 +5,11 @@ package system
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 )
-
-func symlink(oldPath, newPath string) error {
-	return os.Symlink(oldPath, newPath)
-}
 
 func (fs *osFileSystem) homeDir(username string) (string, error) {
 	homeDir, err := fs.runCommand(fmt.Sprintf("echo ~%s", username))
@@ -27,4 +24,33 @@ func (fs *osFileSystem) homeDir(username string) (string, error) {
 
 func (fs *osFileSystem) currentHomeDir() (string, error) {
 	return fs.HomeDir("")
+}
+
+func (fs *osFileSystem) chown(path, username string) error {
+	uid, err := fs.runCommand(fmt.Sprintf("id -u %s", username))
+	if err != nil {
+		return bosherr.WrapErrorf(err, "Getting user id for '%s'", username)
+	}
+
+	uidAsInt, err := strconv.Atoi(uid)
+	if err != nil {
+		return bosherr.WrapError(err, "Converting UID to integer")
+	}
+
+	gid, err := fs.runCommand(fmt.Sprintf("id -g %s", username))
+	if err != nil {
+		return bosherr.WrapErrorf(err, "Getting group id for '%s'", username)
+	}
+
+	gidAsInt, err := strconv.Atoi(gid)
+	if err != nil {
+		return bosherr.WrapError(err, "Converting GID to integer")
+	}
+
+	err = os.Chown(path, uidAsInt, gidAsInt)
+	if err != nil {
+		return bosherr.WrapError(err, "Doing Chown")
+	}
+
+	return nil
 }

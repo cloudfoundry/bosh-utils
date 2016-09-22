@@ -4,25 +4,11 @@ package system
 import "os/user"
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"syscall"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 )
-
-func symlink(oldPath, newPath string) error {
-	oldAbs, err := filepath.Abs(oldPath)
-	if err != nil {
-		return err
-	}
-	newAbs, err := filepath.Abs(newPath)
-	if err != nil {
-		return err
-	}
-	return os.Symlink(oldAbs, newAbs)
-}
 
 func (fs *osFileSystem) currentHomeDir() (string, error) {
 	t, err := syscall.OpenCurrentProcessToken()
@@ -44,4 +30,8 @@ func (fs *osFileSystem) homeDir(username string) (string, error) {
 		return "", bosherr.Errorf("Failed to get user '%s' home directory", username)
 	}
 	return u.HomeDir, nil
+}
+
+func (fs *osFileSystem) chown(path, username string) error {
+	return bosherr.WrapError(error(syscall.EWINDOWS), "Chown not supported on Windows")
 }
