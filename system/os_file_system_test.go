@@ -38,44 +38,46 @@ func readFile(file *os.File) string {
 }
 
 var _ = Describe("OS FileSystem", func() {
-	Describe("linux-only tests", func() {
-
-		It("home dir", func() {
-			superuser := "root"
-			expDir := "/root"
-			if Windows {
-				u, err := osuser.Current()
-				Expect(err).ToNot(HaveOccurred())
-				superuser = u.Name
-				expDir = `\` + u.Name
-			}
-			osFs := createOsFs()
-
-			homeDir, err := osFs.HomeDir(superuser)
+	It("home dir", func() {
+		superuser := "root"
+		expDir := "/root"
+		if Windows {
+			u, err := osuser.Current()
 			Expect(err).ToNot(HaveOccurred())
+			superuser = u.Name
+			expDir = `\` + u.Name
+		}
+
+		homeDir, err := createOsFs().HomeDir(superuser)
+		Expect(err).ToNot(HaveOccurred())
+
+		// path and user names are case-insensitive
+		if Windows {
+			Expect(strings.ToLower(homeDir)).To(ContainSubstring(strings.ToLower(expDir)))
+		} else {
 			Expect(homeDir).To(ContainSubstring(expDir))
-		})
+		}
+	})
 
-		It("expand path", func() {
-			osFs := createOsFs()
+	It("expand path", func() {
+		osFs := createOsFs()
 
-			expandedPath, err := osFs.ExpandPath("~/fake-dir/fake-file.txt")
-			Expect(err).ToNot(HaveOccurred())
+		expandedPath, err := osFs.ExpandPath("~/fake-dir/fake-file.txt")
+		Expect(err).ToNot(HaveOccurred())
 
-			currentUser, err := osuser.Current()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(expandedPath).To(MatchPath(currentUser.HomeDir + "/fake-dir/fake-file.txt"))
+		currentUser, err := osuser.Current()
+		Expect(err).ToNot(HaveOccurred())
+		Expect(expandedPath).To(MatchPath(currentUser.HomeDir + "/fake-dir/fake-file.txt"))
 
-			expandedPath, err = osFs.ExpandPath("/fake-dir//fake-file.txt")
-			Expect(err).ToNot(HaveOccurred())
-			Expect(expandedPath).To(MatchPath("/fake-dir/fake-file.txt"))
+		expandedPath, err = osFs.ExpandPath("/fake-dir//fake-file.txt")
+		Expect(err).ToNot(HaveOccurred())
+		Expect(expandedPath).To(MatchPath("/fake-dir/fake-file.txt"))
 
-			expandedPath, err = osFs.ExpandPath("./fake-file.txt")
-			Expect(err).ToNot(HaveOccurred())
-			currentDir, err := os.Getwd()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(expandedPath).To(MatchPath(currentDir + "/fake-file.txt"))
-		})
+		expandedPath, err = osFs.ExpandPath("./fake-file.txt")
+		Expect(err).ToNot(HaveOccurred())
+		currentDir, err := os.Getwd()
+		Expect(err).ToNot(HaveOccurred())
+		Expect(expandedPath).To(MatchPath(currentDir + "/fake-file.txt"))
 	})
 
 	It("mkdir all", func() {
