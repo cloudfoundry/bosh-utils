@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,6 +17,7 @@ import (
 )
 
 func randSeq(n int) string {
+	rand.Seed(time.Now().UnixNano())
 	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	b := make([]rune, n)
 	for i := range b {
@@ -38,8 +40,18 @@ func makeLongPath() string {
 	return filepath.Clean(buf.String())
 }
 
-var _ = Describe("OS FileSystem LongPaths", func() {
-	It("remove all long path", func() {
+var _ = Describe("Windows Specific tests", func() {
+	It("HomeDir returns an error if 'username' is not the current user", func() {
+		if !Windows {
+			Skip("Windows only test")
+		}
+		osFs := createOsFs()
+
+		_, err := osFs.HomeDir("Non-Existent User Name 1234")
+		Expect(err).To(HaveOccurred())
+	})
+
+	It("can remove a directory long path", func() {
 		osFs := createOsFs()
 
 		longPath := makeLongPath()

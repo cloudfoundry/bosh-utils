@@ -36,25 +36,19 @@ func NewOsFileSystemWithStrictTempRoot(logger boshlog.Logger) FileSystem {
 
 func (fs *osFileSystem) HomeDir(username string) (string, error) {
 	fs.logger.Debug(fs.logTag, "Getting HomeDir for %s", username)
-
-	homeDir, err := fs.runCommand(fmt.Sprintf("echo ~%s", username))
+	dir, err := fs.homeDir(username)
 	if err != nil {
-		return "", bosherr.WrapErrorf(err, "Shelling out to get user '%s' home directory", username)
+		return "", err
 	}
-
-	if strings.HasPrefix(homeDir, "~") {
-		return "", bosherr.Errorf("Failed to get user '%s' home directory", username)
-	}
-
-	fs.logger.Debug(fs.logTag, "HomeDir is %s", homeDir)
-	return homeDir, nil
+	fs.logger.Debug(fs.logTag, "HomeDir is %s", dir)
+	return dir, nil
 }
 
 func (fs *osFileSystem) ExpandPath(path string) (string, error) {
 	fs.logger.Debug(fs.logTag, "Expanding path for '%s'", path)
 
 	if strings.HasPrefix(path, "~") {
-		home, err := fs.HomeDir("")
+		home, err := fs.currentHomeDir()
 		if err != nil {
 			return "", bosherr.WrapError(err, "Getting current user home dir")
 		}
