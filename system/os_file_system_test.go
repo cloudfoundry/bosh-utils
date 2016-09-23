@@ -610,6 +610,8 @@ var _ = Describe("OS FileSystem", func() {
 		It("copies file", func() {
 			osFs := createOsFs()
 			srcPath := "test_assets/test_copy_dir_entries/foo.txt"
+			srcContent, err := osFs.ReadFileString(srcPath)
+			Expect(err).ToNot(HaveOccurred())
 			dstFile, err := osFs.TempFile("CopyFileTestFile")
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(dstFile.Name())
@@ -618,7 +620,7 @@ var _ = Describe("OS FileSystem", func() {
 
 			fooContent, err := osFs.ReadFileString(dstFile.Name())
 			Expect(err).ToNot(HaveOccurred())
-			Expect(fooContent).To(Equal("foo\n"))
+			Expect(fooContent).To(Equal(srcContent))
 		})
 
 		It("does not leak file descriptors", func() {
