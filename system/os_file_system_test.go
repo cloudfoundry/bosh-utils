@@ -12,10 +12,12 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
 	"github.com/stretchr/testify/assert"
 
 	"io/ioutil"
 
+	. "github.com/cloudfoundry/bosh-utils/assert"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	. "github.com/cloudfoundry/bosh-utils/system"
 )
