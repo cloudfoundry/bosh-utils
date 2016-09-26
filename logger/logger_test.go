@@ -1,12 +1,16 @@
 package logger_test
 
 import (
+	"bytes"
 	"fmt"
+	"runtime"
+	"strconv"
+	"strings"
+	"sync"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"bytes"
 	. "github.com/cloudfoundry/bosh-utils/logger"
 )
 
@@ -150,6 +154,49 @@ var _ = Describe("Logger", func() {
 			Expect(outBuf).ToNot(ContainSubstring(expectedDetails))
 			Expect(errBuf).To(ContainSubstring(expectedDetails))
 		})
+	})
+
+	testConcurrentPrefix := func(context string, printf func(tag, msg string, args ...interface{})) {
+		const tagLen = 5
+		const msgLen = 20
+
+		start := make(chan struct{})
+		wg := new(sync.WaitGroup)
+		for i := 0; i < runtime.NumCPU(); i++ {
+			wg.Add(1)
+			go func(index int) {
+				defer wg.Done()
+				s := strconv.Itoa(index % 10)
+				tag := strings.Repeat(s, tagLen)
+				msg := strings.Repeat(s, msgLen) + "\n"
+				<-start
+				for i := 0; i < 1000; i++ {
+					printf(tag, msg)
+				}
+			}(i)
+		}
+		close(start)
+		wg.Wait()
+
+		lines := strings.Split(outBuf.String(), "\n")
+		for _, line := range lines {
+			if len(line) < msgLen+tagLen {
+				continue
+			}
+			c := line[2:3]
+
+			prefix := fmt.Sprintf("[%s] ", strings.Repeat(c, tagLen))
+			Expect(line[:len(prefix)]).To(Equal(prefix), context)
+
+			suffix := strings.Repeat(c, msgLen)
+			Expect(line[len(line)-len(suffix):]).To(Equal(suffix), context)
+		}
+	}
+
+	It("prints the correct prefix during concurrent writes", func() {
+		logger := NewWriterLogger(LevelDebug, outBuf, errBuf)
+		testConcurrentPrefix("out", logger.Debug)
+		testConcurrentPrefix("err", logger.Error)
 	})
 
 	It("log level debug", func() {

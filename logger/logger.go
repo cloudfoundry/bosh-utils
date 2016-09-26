@@ -7,6 +7,7 @@ import (
 	"os"
 	"runtime/debug"
 	"strings"
+	"sync"
 )
 
 type LogLevel int
@@ -54,6 +55,8 @@ type logger struct {
 	out         *log.Logger
 	err         *log.Logger
 	forcedDebug bool
+	outMu       sync.Mutex
+	errMu       sync.Mutex
 }
 
 func New(level LogLevel, out, err *log.Logger) Logger {
@@ -82,7 +85,7 @@ func (l *logger) Debug(tag, msg string, args ...interface{}) {
 	}
 
 	msg = fmt.Sprintf("DEBUG - %s", msg)
-	l.getOutLogger(tag).Printf(msg, args...)
+	l.outPrintf(tag, msg, args...)
 }
 
 // DebugWithDetails will automatically change the format of the message
@@ -98,7 +101,7 @@ func (l *logger) Info(tag, msg string, args ...interface{}) {
 	}
 
 	msg = fmt.Sprintf("INFO - %s", msg)
-	l.getOutLogger(tag).Printf(msg, args...)
+	l.outPrintf(tag, msg, args...)
 }
 
 func (l *logger) Warn(tag, msg string, args ...interface{}) {
@@ -107,7 +110,7 @@ func (l *logger) Warn(tag, msg string, args ...interface{}) {
 	}
 
 	msg = fmt.Sprintf("WARN - %s", msg)
-	l.getErrLogger(tag).Printf(msg, args...)
+	l.errPrintf(tag, msg, args...)
 }
 
 func (l *logger) Error(tag, msg string, args ...interface{}) {
@@ -116,7 +119,7 @@ func (l *logger) Error(tag, msg string, args ...interface{}) {
 	}
 
 	msg = fmt.Sprintf("ERROR - %s", msg)
-	l.getErrLogger(tag).Printf(msg, args...)
+	l.errPrintf(tag, msg, args...)
 }
 
 // ErrorWithDetails will automatically change the format of the message
@@ -152,16 +155,16 @@ func (l *logger) ToggleForcedDebug() {
 	l.forcedDebug = !l.forcedDebug
 }
 
-func (l *logger) getOutLogger(tag string) (logger *log.Logger) {
-	return l.updateLogger(l.out, tag)
+func (l *logger) errPrintf(tag, msg string, args ...interface{}) {
+	l.errMu.Lock()
+	l.err.SetPrefix("[" + tag + "] ")
+	l.err.Printf(msg, args...)
+	l.errMu.Unlock()
 }
 
-func (l *logger) getErrLogger(tag string) (logger *log.Logger) {
-	return l.updateLogger(l.err, tag)
-}
-
-func (l *logger) updateLogger(logger *log.Logger, tag string) *log.Logger {
-	prefix := fmt.Sprintf("[%s] ", tag)
-	logger.SetPrefix(prefix)
-	return logger
+func (l *logger) outPrintf(tag, msg string, args ...interface{}) {
+	l.outMu.Lock()
+	l.out.SetPrefix("[" + tag + "] ")
+	l.out.Printf(msg, args...)
+	l.outMu.Unlock()
 }
