@@ -8,6 +8,7 @@ import (
 	"runtime/debug"
 	"strings"
 	"sync"
+	"time"
 )
 
 type LogLevel int
@@ -48,6 +49,8 @@ type Logger interface {
 	ErrorWithDetails(tag, msg string, args ...interface{})
 	HandlePanic(tag string)
 	ToggleForcedDebug()
+	Flush() error
+	FlushTimeout(time.Duration) error
 }
 
 type logger struct {
@@ -79,12 +82,15 @@ func NewWriterLogger(level LogLevel, out, err io.Writer) Logger {
 	)
 }
 
+func (l *logger) Flush() error                       { return nil }
+func (l *logger) FlushTimeout(_ time.Duration) error { return nil }
+
 func (l *logger) Debug(tag, msg string, args ...interface{}) {
 	if l.level > LevelDebug && !l.forcedDebug {
 		return
 	}
 
-	msg = fmt.Sprintf("DEBUG - %s", msg)
+	msg = "DEBUG - " + msg
 	l.outPrintf(tag, msg, args...)
 }
 
@@ -100,7 +106,7 @@ func (l *logger) Info(tag, msg string, args ...interface{}) {
 		return
 	}
 
-	msg = fmt.Sprintf("INFO - %s", msg)
+	msg = "INFO - " + msg
 	l.outPrintf(tag, msg, args...)
 }
 
@@ -109,7 +115,7 @@ func (l *logger) Warn(tag, msg string, args ...interface{}) {
 		return
 	}
 
-	msg = fmt.Sprintf("WARN - %s", msg)
+	msg = "WARN - " + msg
 	l.errPrintf(tag, msg, args...)
 }
 
@@ -118,7 +124,7 @@ func (l *logger) Error(tag, msg string, args ...interface{}) {
 		return
 	}
 
-	msg = fmt.Sprintf("ERROR - %s", msg)
+	msg = "ERROR - " + msg
 	l.errPrintf(tag, msg, args...)
 }
 
@@ -129,13 +135,10 @@ func (l *logger) ErrorWithDetails(tag, msg string, args ...interface{}) {
 	l.Error(tag, msg, args...)
 }
 
-func (l *logger) HandlePanic(tag string) {
-	panic := recover()
-
-	if panic != nil {
+func (l *logger) recoverPanic(tag string) (didPanic bool) {
+	if e := recover(); e != nil {
 		var msg string
-
-		switch obj := panic.(type) {
+		switch obj := e.(type) {
 		case string:
 			msg = obj
 		case fmt.Stringer:
@@ -145,8 +148,14 @@ func (l *logger) HandlePanic(tag string) {
 		default:
 			msg = fmt.Sprintf("%#v", obj)
 		}
-
 		l.ErrorWithDetails(tag, "Panic: %s", msg, debug.Stack())
+		return true
+	}
+	return false
+}
+
+func (l *logger) HandlePanic(tag string) {
+	if l.recoverPanic(tag) {
 		os.Exit(2)
 	}
 }
@@ -156,15 +165,17 @@ func (l *logger) ToggleForcedDebug() {
 }
 
 func (l *logger) errPrintf(tag, msg string, args ...interface{}) {
+	s := fmt.Sprintf(msg, args...)
 	l.errMu.Lock()
 	l.err.SetPrefix("[" + tag + "] ")
-	l.err.Printf(msg, args...)
+	l.err.Output(2, s)
 	l.errMu.Unlock()
 }
 
 func (l *logger) outPrintf(tag, msg string, args ...interface{}) {
+	s := fmt.Sprintf(msg, args...)
 	l.outMu.Lock()
 	l.out.SetPrefix("[" + tag + "] ")
-	l.out.Printf(msg, args...)
+	l.out.Output(2, s)
 	l.outMu.Unlock()
 }
