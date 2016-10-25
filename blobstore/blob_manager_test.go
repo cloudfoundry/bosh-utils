@@ -110,6 +110,8 @@ var _ = Describe("Blob Manager", func() {
 				blobManager := NewBlobManager(fs, basePath)
 
 				err := fs.WriteFileString(blobPath, "smurf-content-hello")
+				defer fs.RemoveAll(blobPath)
+
 				Expect(err).To(BeNil())
 
 				filename, err := blobManager.GetPath(blobId)
@@ -136,6 +138,8 @@ var _ = Describe("Blob Manager", func() {
 				blobManager := NewBlobManager(fs, basePath)
 
 				err := fs.WriteFileString(blobPath, "smurf-content-hello")
+				defer fs.RemoveAll(blobPath)
+
 				Expect(err).To(BeNil())
 
 				err = blobManager.Delete(blobId)
