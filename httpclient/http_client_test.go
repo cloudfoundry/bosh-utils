@@ -6,7 +6,6 @@ import (
 	"net"
 	"net/http"
 
-	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"
@@ -15,16 +14,19 @@ import (
 	"time"
 
 	. "github.com/cloudfoundry/bosh-utils/httpclient"
+	"github.com/cloudfoundry/bosh-utils/logger/loggerfakes"
 )
 
 var _ = Describe("HTTPClient", func() {
 	var (
 		httpClient HTTPClient
 		server     *ghttp.Server
+		logger loggerfakes.FakeLogger
 	)
 
 	BeforeEach(func() {
-		logger := boshlog.NewLogger(boshlog.LevelNone)
+		logger = loggerfakes.FakeLogger{}
+
 		httpClient = NewHTTPClient(&http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
@@ -42,7 +44,7 @@ var _ = Describe("HTTPClient", func() {
 				TLSHandshakeTimeout: 10 * time.Millisecond,
 				DisableKeepAlives:   true,
 			},
-		}, logger)
+		}, &logger)
 
 		server = ghttp.NewServer()
 	})
@@ -126,6 +128,14 @@ var _ = Describe("HTTPClient", func() {
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Post https://foo:<redacted>@10.10.0.0/path"))
 		})
+
+		It("redacts refresh_token query param from endpoint for https calls", func() {
+			url := "https://oauth-url?refresh_token=abc"
+
+			httpClient.PostCustomized(url, []byte("post-request"), func(r *http.Request) {})
+			_, _, args := logger.DebugArgsForCall(0)
+			Expect(args[0]).To(Equal("https://oauth-url?refresh_token=<redacted>"))
+		})
 	})
 
 	Describe("Put/PutCustomized", func() {
@@ -203,6 +213,14 @@ var _ = Describe("HTTPClient", func() {
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Put https://foo:<redacted>@10.10.0.0/path"))
 		})
+
+		It("redacts refresh_token query param from endpoint for https calls", func() {
+			url := "https://oauth-url?refresh_token=abc"
+
+			httpClient.PutCustomized(url, []byte("post-request"), func(r *http.Request) {})
+			_, _, args := logger.DebugArgsForCall(0)
+			Expect(args[0]).To(Equal("https://oauth-url?refresh_token=<redacted>"))
+		})
 	})
 
 	Describe("Get/GetCustomized", func() {
@@ -275,6 +293,15 @@ var _ = Describe("HTTPClient", func() {
 			_, err := httpClient.GetCustomized(url, func(r *http.Request) {})
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Get https://foo:<redacted>@10.10.0.0:8080/path"))
+		})
+
+
+		It("redacts refresh_token query param from endpoint for https calls", func() {
+			url := "https://oauth-url?refresh_token=abc"
+
+			httpClient.GetCustomized(url, func(r *http.Request) {})
+			_, _, args := logger.DebugArgsForCall(0)
+			Expect(args[0]).To(Equal("https://oauth-url?refresh_token=<redacted>"))
 		})
 	})
 
