@@ -5,27 +5,27 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "github.com/cloudfoundry/bosh-utils/blobstore"
+	boshcrypto "github.com/cloudfoundry/bosh-utils/crypto"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	fakesys "github.com/cloudfoundry/bosh-utils/system/fakes"
 	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
-	"github.com/cloudfoundry/bosh-utils/checksum"
 )
 
 var _ = Describe("Provider", func() {
 	var (
-		fs              *fakesys.FakeFileSystem
-		runner          *fakesys.FakeCmdRunner
-		logger          boshlog.Logger
-		provider        Provider
-		checksumFactory checksum.ChecksumFactory
+		fs             *fakesys.FakeFileSystem
+		runner         *fakesys.FakeCmdRunner
+		logger         boshlog.Logger
+		provider       Provider
+		digestProvider boshcrypto.DigestProvider
 	)
 
 	BeforeEach(func() {
 		fs = fakesys.NewFakeFileSystem()
 		runner = fakesys.NewFakeCmdRunner()
 		logger = boshlog.NewLogger(boshlog.LevelNone)
-		checksumFactory = checksum.NewChecksumFactory(fs)
-		provider = NewProvider(fs, runner, "/var/vcap/config", checksumFactory, logger)
+		digestProvider = boshcrypto.NewDigestProvider(fs)
+		provider = NewProvider(fs, runner, "/var/vcap/config", digestProvider, logger)
 	})
 
 	Describe("Get", func() {
@@ -47,7 +47,7 @@ var _ = Describe("Provider", func() {
 				boshuuid.NewGenerator(),
 				"/var/vcap/config/blobstore-fake-external-type.json",
 			)
-			expectedBlobstore = NewChecksumVerifiableBlobstore(expectedBlobstore, checksumFactory)
+			expectedBlobstore = NewDigestVerifiableBlobstore(expectedBlobstore, digestProvider)
 			expectedBlobstore = NewRetryableBlobstore(expectedBlobstore, 3, logger)
 
 			blobstore, err := provider.Get("fake-external-type", options)

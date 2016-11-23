@@ -1,9 +1,9 @@
 package blobstore
 
 import (
+	boshcrypto "github.com/cloudfoundry/bosh-utils/crypto"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
-	"github.com/cloudfoundry/bosh-utils/checksum"
 )
 
 type retryableBlobstore struct {
@@ -23,7 +23,7 @@ func NewRetryableBlobstore(blobstore Blobstore, maxTries int, logger boshlog.Log
 	}
 }
 
-func (b retryableBlobstore) Get(blobID string, fingerprint checksum.Checksum) (string, error) {
+func (b retryableBlobstore) Get(blobID string, fingerprint boshcrypto.Digest) (string, error) {
 	var fileName string
 	var lastErr error
 

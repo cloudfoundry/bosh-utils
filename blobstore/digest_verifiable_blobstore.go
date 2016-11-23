@@ -3,23 +3,23 @@ package blobstore
 import (
 	"fmt"
 
+	boshcrypto "github.com/cloudfoundry/bosh-utils/crypto"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
-	"github.com/cloudfoundry/bosh-utils/checksum"
 )
 
 type sha1VerifiableBlobstore struct {
-	blobstore       Blobstore
-	checksumFactory checksum.ChecksumFactory
+	blobstore      Blobstore
+	digestProvider boshcrypto.DigestProvider
 }
 
-func NewChecksumVerifiableBlobstore(blobstore Blobstore, checksumFactory checksum.ChecksumFactory) Blobstore {
+func NewDigestVerifiableBlobstore(blobstore Blobstore, digestProvider boshcrypto.DigestProvider) Blobstore {
 	return sha1VerifiableBlobstore{
-		blobstore:       blobstore,
-		checksumFactory: checksumFactory,
+		blobstore:      blobstore,
+		digestProvider: digestProvider,
 	}
 }
 
-func (b sha1VerifiableBlobstore) Get(blobID string, fingerprint checksum.Checksum) (string, error) {
+func (b sha1VerifiableBlobstore) Get(blobID string, fingerprint boshcrypto.Digest) (string, error) {
 	fileName, err := b.blobstore.Get(blobID, fingerprint)
 	if err != nil {
 		return "", bosherr.WrapError(err, "Getting blob from inner blobstore")
@@ -29,12 +29,12 @@ func (b sha1VerifiableBlobstore) Get(blobID string, fingerprint checksum.Checksu
 		return fileName, nil
 	}
 
-	actualChecksum, err := b.checksumFactory.CreateFromFile(fileName, fingerprint.Algorithm())
+	actualDigest, err := b.digestProvider.CreateFromFile(fileName, fingerprint.Algorithm())
 	if err != nil {
 		return "", err
 	}
 
-	err = fingerprint.Verify(actualChecksum)
+	err = fingerprint.Verify(actualDigest)
 	if err != nil {
 		return "", bosherr.WrapError(err, fmt.Sprintf(`Checking downloaded blob "%s"`, blobID))
 	}

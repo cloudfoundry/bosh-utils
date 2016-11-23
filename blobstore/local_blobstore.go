@@ -4,10 +4,10 @@ import (
 	"os"
 	"path"
 
+	boshcrypto "github.com/cloudfoundry/bosh-utils/crypto"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshsys "github.com/cloudfoundry/bosh-utils/system"
 	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
-	"github.com/cloudfoundry/bosh-utils/checksum"
 )
 
 const (
@@ -32,7 +32,7 @@ func NewLocalBlobstore(
 	}
 }
 
-func (b localBlobstore) Get(blobID string, _ checksum.Checksum) (fileName string, err error) {
+func (b localBlobstore) Get(blobID string, _ boshcrypto.Digest) (fileName string, err error) {
 	file, err := b.fs.TempFile("bosh-blobstore-external-Get")
 	if err != nil {
 		return "", bosherr.WrapError(err, "Creating temporary file")

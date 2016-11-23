@@ -1,4 +1,4 @@
-package checksum_test
+package crypto_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestChecksum(t *testing.T) {
+func TestDigest(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Checksum Suite")
+	RunSpecs(t, "Crypto Suite")
 }

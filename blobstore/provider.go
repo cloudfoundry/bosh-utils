@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"path"
 
+	boshcrypto "github.com/cloudfoundry/bosh-utils/crypto"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/cloudfoundry/bosh-utils/system"
 	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
-	"github.com/cloudfoundry/bosh-utils/checksum"
 )
 
 const (
@@ -17,28 +17,28 @@ const (
 )
 
 type Provider struct {
-	fs              system.FileSystem
-	runner          system.CmdRunner
-	configDir       string
-	uuidGen         boshuuid.Generator
-	checksumFactory checksum.ChecksumFactory
-	logger          boshlog.Logger
+	fs             system.FileSystem
+	runner         system.CmdRunner
+	configDir      string
+	uuidGen        boshuuid.Generator
+	digestProvider boshcrypto.DigestProvider
+	logger         boshlog.Logger
 }
 
 func NewProvider(
 	fs system.FileSystem,
 	runner system.CmdRunner,
 	configDir string,
-	checksumFactory checksum.ChecksumFactory,
+	digestProvider boshcrypto.DigestProvider,
 	logger boshlog.Logger,
 ) Provider {
 	return Provider{
-		uuidGen:         boshuuid.NewGenerator(),
-		fs:              fs,
-		runner:          runner,
-		configDir:       configDir,
-		checksumFactory: checksumFactory,
-		logger:          logger,
+		uuidGen:        boshuuid.NewGenerator(),
+		fs:             fs,
+		runner:         runner,
+		configDir:      configDir,
+		digestProvider: digestProvider,
+		logger:         logger,
 	}
 }
 
@@ -68,7 +68,7 @@ func (p Provider) Get(storeType string, options map[string]interface{}) (blobsto
 		)
 	}
 
-	blobstore = NewChecksumVerifiableBlobstore(blobstore, p.checksumFactory)
+	blobstore = NewDigestVerifiableBlobstore(blobstore, p.digestProvider)
 
 	blobstore = NewRetryableBlobstore(blobstore, 3, p.logger)
 
