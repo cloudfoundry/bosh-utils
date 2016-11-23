@@ -8,6 +8,7 @@ import (
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/cloudfoundry/bosh-utils/system"
 	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
+	"github.com/cloudfoundry/bosh-utils/checksum"
 )
 
 const (
@@ -16,25 +17,28 @@ const (
 )
 
 type Provider struct {
-	fs        system.FileSystem
-	runner    system.CmdRunner
-	configDir string
-	uuidGen   boshuuid.Generator
-	logger    boshlog.Logger
+	fs              system.FileSystem
+	runner          system.CmdRunner
+	configDir       string
+	uuidGen         boshuuid.Generator
+	checksumFactory checksum.ChecksumFactory
+	logger          boshlog.Logger
 }
 
 func NewProvider(
 	fs system.FileSystem,
 	runner system.CmdRunner,
 	configDir string,
+	checksumFactory checksum.ChecksumFactory,
 	logger boshlog.Logger,
 ) Provider {
 	return Provider{
-		uuidGen:   boshuuid.NewGenerator(),
-		fs:        fs,
-		runner:    runner,
-		configDir: configDir,
-		logger:    logger,
+		uuidGen:         boshuuid.NewGenerator(),
+		fs:              fs,
+		runner:          runner,
+		configDir:       configDir,
+		checksumFactory: checksumFactory,
+		logger:          logger,
 	}
 }
 
@@ -64,7 +68,7 @@ func (p Provider) Get(storeType string, options map[string]interface{}) (blobsto
 		)
 	}
 
-	blobstore = NewSHA1VerifiableBlobstore(blobstore)
+	blobstore = NewChecksumVerifiableBlobstore(blobstore, p.checksumFactory)
 
 	blobstore = NewRetryableBlobstore(blobstore, 3, p.logger)
 

@@ -3,6 +3,7 @@ package blobstore
 import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
+	"github.com/cloudfoundry/bosh-utils/checksum"
 )
 
 type retryableBlobstore struct {
@@ -22,7 +23,7 @@ func NewRetryableBlobstore(blobstore Blobstore, maxTries int, logger boshlog.Log
 	}
 }
 
-func (b retryableBlobstore) Get(blobID, fingerprint string) (string, error) {
+func (b retryableBlobstore) Get(blobID string, fingerprint checksum.Checksum) (string, error) {
 	var fileName string
 	var lastErr error
 
@@ -47,22 +48,21 @@ func (b retryableBlobstore) Delete(blobID string) error {
 	return b.blobstore.Delete(blobID)
 }
 
-func (b retryableBlobstore) Create(fileName string) (string, string, error) {
+func (b retryableBlobstore) Create(fileName string) (string, error) {
 	var blobID string
-	var fingerprint string
 	var lastErr error
 
 	for i := 0; i < b.maxTries; i++ {
-		blobID, fingerprint, lastErr = b.blobstore.Create(fileName)
+		blobID, lastErr = b.blobstore.Create(fileName)
 		if lastErr == nil {
-			return blobID, fingerprint, nil
+			return blobID, nil
 		}
 
 		b.logger.Info(b.logTag,
 			"Failed to create blob with error %s, attempt %d out of %d", lastErr.Error(), i, b.maxTries)
 	}
 
-	return "", "", bosherr.WrapError(lastErr, "Creating blob in inner blobstore")
+	return "", bosherr.WrapError(lastErr, "Creating blob in inner blobstore")
 }
 
 func (b retryableBlobstore) Validate() error {

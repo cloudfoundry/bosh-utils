@@ -1,12 +1,14 @@
 package blobstore
 
+import "github.com/cloudfoundry/bosh-utils/checksum"
+
 type dummyBlobstore struct{}
 
 func newDummyBlobstore() dummyBlobstore {
 	return dummyBlobstore{}
 }
 
-func (b dummyBlobstore) Get(blobID, fingerprint string) (string, error) {
+func (b dummyBlobstore) Get(blobID string, fingerprint checksum.Checksum) (string, error) {
 	return "", nil
 }
 
@@ -14,8 +16,8 @@ func (b dummyBlobstore) CleanUp(fileName string) error {
 	return nil
 }
 
-func (b dummyBlobstore) Create(fileName string) (string, string, error) {
-	return "", "", nil
+func (b dummyBlobstore) Create(fileName string) (string, error) {
+	return "", nil
 }
 
 func (b dummyBlobstore) Validate() error {

@@ -8,21 +8,24 @@ import (
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	fakesys "github.com/cloudfoundry/bosh-utils/system/fakes"
 	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
+	"github.com/cloudfoundry/bosh-utils/checksum"
 )
 
 var _ = Describe("Provider", func() {
 	var (
-		fs       *fakesys.FakeFileSystem
-		runner   *fakesys.FakeCmdRunner
-		logger   boshlog.Logger
-		provider Provider
+		fs              *fakesys.FakeFileSystem
+		runner          *fakesys.FakeCmdRunner
+		logger          boshlog.Logger
+		provider        Provider
+		checksumFactory checksum.ChecksumFactory
 	)
 
 	BeforeEach(func() {
 		fs = fakesys.NewFakeFileSystem()
 		runner = fakesys.NewFakeCmdRunner()
 		logger = boshlog.NewLogger(boshlog.LevelNone)
-		provider = NewProvider(fs, runner, "/var/vcap/config", logger)
+		checksumFactory = checksum.NewChecksumFactory(fs)
+		provider = NewProvider(fs, runner, "/var/vcap/config", checksumFactory, logger)
 	})
 
 	Describe("Get", func() {
@@ -44,7 +47,7 @@ var _ = Describe("Provider", func() {
 				boshuuid.NewGenerator(),
 				"/var/vcap/config/blobstore-fake-external-type.json",
 			)
-			expectedBlobstore = NewSHA1VerifiableBlobstore(expectedBlobstore)
+			expectedBlobstore = NewChecksumVerifiableBlobstore(expectedBlobstore, checksumFactory)
 			expectedBlobstore = NewRetryableBlobstore(expectedBlobstore, 3, logger)
 
 			blobstore, err := provider.Get("fake-external-type", options)
