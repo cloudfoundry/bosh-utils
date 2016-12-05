@@ -19,16 +19,6 @@ func (m multipleDigestImpl) Verify(digest Digest) error {
 	return errors.New(fmt.Sprintf("No digest found that matches %s", digest.Algorithm()))
 }
 
-func (m multipleDigestImpl) PreferredAlgorithm() DigestAlgorithm {
-	currentStrongest := m.digests[0]
-	for _, candidateDigest := range m.digests {
-		if candidateDigest.Compare(currentStrongest) > 0 {
-			currentStrongest = candidateDigest
-		}
-	}
-	return currentStrongest.Algorithm()
-}
-
 func NewMultipleDigest(digests ...Digest) multipleDigestImpl {
 	return multipleDigestImpl{digests: digests}
 }

@@ -53,6 +53,39 @@ var _ = Describe("utils", func() {
 				Expect(err.Error()).To(Equal("Unrecognized digest algorithm: unrecognized. Supported algorithms: sha1, sha256, sha512"))
 			})
 		})
+
+		Describe("empty string", func() {
+			It("errors", func() {
+				_, err := ParseDigestString("")
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal("Can not parse empty string."))
+			})
+		})
+	})
+
+	Describe("PreferredDigest", func() {
+		Context("Given multiple digests", func() {
+			It("returns the Digest with the strongest known algorithm", func() {
+				multipleDigest, err := ParseMultipleDigestString("sha1:07e1306432667f916639d47481edc4f2ca456454;sha256:b1e66f505465c28d705cf587b041a6506cfe749f7aa4159d8a3f45cc53f1fb23;sha512:6f06a0c6c3827d827145b077cd8c8b7a15c75eb2bed809569296e6502ef0872c8e7ef91307a6994fcd2be235d3c41e09bfe1b6023df45697d88111df4349d64a")
+				Expect(err).To(BeNil())
+
+				strongestDigest, err := PreferredDigest(multipleDigest)
+				Expect(err).To(BeNil())
+
+				Expect(strongestDigest.Algorithm()).To(Equal(DigestAlgorithmSHA512))
+				Expect(strongestDigest.Digest()).To(Equal("6f06a0c6c3827d827145b077cd8c8b7a15c75eb2bed809569296e6502ef0872c8e7ef91307a6994fcd2be235d3c41e09bfe1b6023df45697d88111df4349d64a"))
+			})
+
+			It("throws an error if there is no digest to choose from", func() {
+				multipleDigest := NewMultipleDigest()
+
+				strongestDigest, err := PreferredDigest(multipleDigest)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal("No valid digests available"))
+
+				Expect(strongestDigest.Digest()).To(BeEmpty())
+			})
+		})
 	})
 
 	Describe("ParseMultipleDigestString", func() {
@@ -97,20 +130,18 @@ var _ = Describe("utils", func() {
 				Expect(verifyDigest2Err).ToNot(HaveOccurred())
 			})
 
-			Context("when parsing", func() {
-				It("returns the strongest algorithm", func() {
-					multipleDigest, err := ParseMultipleDigestString("sha1:07e1306432667f916639d47481edc4f2ca456454;sha256:b1e66f505465c28d705cf587b041a6506cfe749f7aa4159d8a3f45cc53f1fb23;")
+			It("parses list of recognizable digests", func() {
+				multipleDigest, err := ParseMultipleDigestString("sha1:07e1306432667f916639d47481edc4f2ca456454;sha10:something")
+				Expect(err).To(BeNil())
 
-					Expect(err).ToNot(HaveOccurred())
-					Expect(multipleDigest.PreferredAlgorithm()).To(Equal(DigestAlgorithmSHA256))
-				})
+				digest1 := NewDigest(DigestAlgorithmSHA1, "07e1306432667f916639d47481edc4f2ca456454")
+				Expect(multipleDigest.Verify(digest1)).NotTo(HaveOccurred())
+			})
 
-				It("returns the sha when only given one algorithm", func() {
-					multipleDigest, err := ParseMultipleDigestString("sha1:07e1306432667f916639d47481edc4f2ca456454;")
-
-					Expect(err).ToNot(HaveOccurred())
-					Expect(multipleDigest.PreferredAlgorithm()).To(Equal(DigestAlgorithmSHA1))
-				})
+			It("returns an error if no digest is recongized", func() {
+				_, err := ParseMultipleDigestString("sha10:something")
+				Expect(err).ToNot(BeNil())
+				Expect(err.Error()).To(Equal("No recognizable digest algorithm found. Supported algorithms: sha1, sha256, sha512"))
 			})
 		})
 	})

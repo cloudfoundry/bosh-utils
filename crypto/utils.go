@@ -30,6 +30,10 @@ func CreateHashFromAlgorithm(algorithm DigestAlgorithm) (hash.Hash, error) {
 }
 
 func ParseDigestString(digest string) (Digest, error) {
+	if len(digest) == 0 {
+		return nil, errors.New("Can not parse empty string.")
+	}
+
 	pieces := strings.SplitN(digest, ":", 2)
 
 	if len(pieces) == 1 {
@@ -48,18 +52,35 @@ func ParseDigestString(digest string) (Digest, error) {
 	return nil, errors.New(fmt.Sprintf("Parsing digest: %s", digest))
 }
 
-func ParseMultipleDigestString(multipleDigest string) (MultipleDigest, error) {
+func PreferredDigest(m multipleDigestImpl) (Digest, error) {
+	if len(m.digests) == 0 {
+		return NewDigest(DigestAlgorithmSHA1, ""), errors.New("No valid digests available")
+	}
+
+	currentStrongest := m.digests[0]
+	for _, candidateDigest := range m.digests {
+		if candidateDigest.Compare(currentStrongest) > 0 {
+			currentStrongest = candidateDigest
+		}
+	}
+
+	return currentStrongest, nil
+}
+
+func ParseMultipleDigestString(multipleDigest string) (multipleDigestImpl, error) {
 	pieces := strings.Split(multipleDigest, ";")
 
 	digests := []Digest{}
 
 	for _, digest := range pieces {
 		parsedDigest, err := ParseDigestString(digest)
-		if err != nil {
-			return nil, err
+		if err == nil {
+			digests = append(digests, parsedDigest)
 		}
+	}
 
-		digests = append(digests, parsedDigest)
+	if len(digests) == 0 {
+		return NewMultipleDigest(), errors.New("No recognizable digest algorithm found. Supported algorithms: sha1, sha256, sha512")
 	}
 
 	return NewMultipleDigest(digests...), nil

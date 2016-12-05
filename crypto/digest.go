@@ -58,7 +58,7 @@ func (c digestImpl) Compare(digest Digest) int {
 		if digest.Algorithm() == DigestAlgorithmSHA512 {
 			return 0
 		} else {
-			return -1
+			return 1
 		}
 	}
 	return 0

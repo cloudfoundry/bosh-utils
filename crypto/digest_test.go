@@ -40,28 +40,28 @@ var _ = Describe("digest", func() {
 				})
 			})
 		})
+	})
 
-		Describe("Digest", func() {
-			Describe("#String", func() {
-				Context("sha1", func() {
-					It("excludes algorithm", func() {
-						digest := NewDigest("sha1", "07e1306432667f916639d47481edc4f2ca456454")
-						Expect(digest.String()).To(Equal("07e1306432667f916639d47481edc4f2ca456454"))
-					})
+	Describe("Digest", func() {
+		Describe("#String", func() {
+			Context("sha1", func() {
+				It("excludes algorithm", func() {
+					digest := NewDigest("sha1", "07e1306432667f916639d47481edc4f2ca456454")
+					Expect(digest.String()).To(Equal("07e1306432667f916639d47481edc4f2ca456454"))
 				})
+			})
 
-				Context("sha256", func() {
-					It("includes algorithm", func() {
-						digest := NewDigest("sha256", "b1e66f505465c28d705cf587b041a6506cfe749f7aa4159d8a3f45cc53f1fb23")
-						Expect(digest.String()).To(Equal("sha256:b1e66f505465c28d705cf587b041a6506cfe749f7aa4159d8a3f45cc53f1fb23"))
-					})
+			Context("sha256", func() {
+				It("includes algorithm", func() {
+					digest := NewDigest("sha256", "b1e66f505465c28d705cf587b041a6506cfe749f7aa4159d8a3f45cc53f1fb23")
+					Expect(digest.String()).To(Equal("sha256:b1e66f505465c28d705cf587b041a6506cfe749f7aa4159d8a3f45cc53f1fb23"))
 				})
+			})
 
-				Context("sha512", func() {
-					It("includes algorithm", func() {
-						digest := NewDigest("sha512", "6f06a0c6c3827d827145b077cd8c8b7a15c75eb2bed809569296e6502ef0872c8e7ef91307a6994fcd2be235d3c41e09bfe1b6023df45697d88111df4349d64a")
-						Expect(digest.String()).To(Equal("sha512:6f06a0c6c3827d827145b077cd8c8b7a15c75eb2bed809569296e6502ef0872c8e7ef91307a6994fcd2be235d3c41e09bfe1b6023df45697d88111df4349d64a"))
-					})
+			Context("sha512", func() {
+				It("includes algorithm", func() {
+					digest := NewDigest("sha512", "6f06a0c6c3827d827145b077cd8c8b7a15c75eb2bed809569296e6502ef0872c8e7ef91307a6994fcd2be235d3c41e09bfe1b6023df45697d88111df4349d64a")
+					Expect(digest.String()).To(Equal("sha512:6f06a0c6c3827d827145b077cd8c8b7a15c75eb2bed809569296e6502ef0872c8e7ef91307a6994fcd2be235d3c41e09bfe1b6023df45697d88111df4349d64a"))
 				})
 			})
 		})

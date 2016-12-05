@@ -16,8 +16,3 @@ type Digest interface {
 type VerifyingDigest interface {
 	Verify(Digest) error
 }
-
-type MultipleDigest interface {
-	VerifyingDigest
-	PreferredAlgorithm() DigestAlgorithm
-}
