@@ -155,33 +155,4 @@ var _ = Describe("Blob Manager", func() {
 			})
 		})
 	})
-
-	Context("BlobExists", func() {
-		BeforeEach(func() {
-			blobId = "super-smurf"
-		})
-
-		Describe("when blob requested exists in blobsPath", func() {
-			It("returns true", func() {
-				blobManager := NewBlobManager(fs, basePath)
-
-				err := fs.WriteFileString(filepath.Join(basePath, blobId), "super-smurf-content")
-				defer fs.RemoveAll(blobPath)
-
-				Expect(err).To(BeNil())
-
-				exists := blobManager.BlobExists(blobId)
-				Expect(exists).To(BeTrue())
-			})
-		})
-
-		Describe("when blob requested does NOT exist in blobsPath", func() {
-			It("returns false", func() {
-				blobManager := NewBlobManager(fs, basePath)
-				exists := blobManager.BlobExists("blob-id-does-not-exist")
-
-				Expect(exists).To(BeFalse())
-			})
-		})
-	})
 })
