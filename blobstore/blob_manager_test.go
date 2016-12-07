@@ -93,12 +93,12 @@ var _ = Describe("Blob Manager", func() {
 		})
 	})
 
-	Context("GetPath", func() {
+	Describe("GetPath", func() {
 		BeforeEach(func() {
 			blobId = "smurf-24"
 		})
 
-		Describe("when file requested does not exist in blobsPath", func() {
+		Context("when file requested does not exist in blobsPath", func() {
 			It("returns an error", func() {
 				blobManager := NewBlobManager(fs, basePath)
 
@@ -109,7 +109,7 @@ var _ = Describe("Blob Manager", func() {
 			})
 		})
 
-		Describe("when file requested exists in blobsPath", func() {
+		Context("when file requested exists in blobsPath", func() {
 			It("should return the path of a copy of the requested blob", func() {
 				blobManager := NewBlobManager(fs, basePath)
 
@@ -126,12 +126,12 @@ var _ = Describe("Blob Manager", func() {
 		})
 	})
 
-	Context("Delete", func() {
+	Describe("Delete", func() {
 		BeforeEach(func() {
 			blobId = "smurf-25"
 		})
 
-		Describe("when file to be deleted does not exist in blobsPath", func() {
+		Context("when file to be deleted does not exist in blobsPath", func() {
 			It("does not freak out", func() {
 				blobManager := NewBlobManager(fs, basePath)
 
@@ -141,7 +141,7 @@ var _ = Describe("Blob Manager", func() {
 			})
 		})
 
-		Describe("when file to be deleted exists in blobsPath", func() {
+		Context("when file to be deleted exists in blobsPath", func() {
 			It("should delete the blob", func() {
 				err := fs.WriteFileString(filepath.Join(basePath, blobId), "smurf-content")
 				Expect(err).To(BeNil())
@@ -156,12 +156,12 @@ var _ = Describe("Blob Manager", func() {
 		})
 	})
 
-	Context("BlobExists", func() {
+	Describe("BlobExists", func() {
 		BeforeEach(func() {
 			blobId = "super-smurf"
 		})
 
-		Describe("when blob requested exists in blobsPath", func() {
+		Context("when blob requested exists in blobsPath", func() {
 			It("returns true", func() {
 				blobManager := NewBlobManager(fs, basePath)
 
@@ -175,7 +175,7 @@ var _ = Describe("Blob Manager", func() {
 			})
 		})
 
-		Describe("when blob requested does NOT exist in blobsPath", func() {
+		Context("when blob requested does NOT exist in blobsPath", func() {
 			It("returns false", func() {
 				blobManager := NewBlobManager(fs, basePath)
 				exists := blobManager.BlobExists("blob-id-does-not-exist")
