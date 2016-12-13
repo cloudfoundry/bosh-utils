@@ -23,7 +23,7 @@ func NewRetryableBlobstore(blobstore Blobstore, maxTries int, logger boshlog.Log
 	}
 }
 
-func (b retryableBlobstore) Get(blobID string, fingerprint boshcrypto.Digest) (string, error) {
+func (b retryableBlobstore) Get(blobID string, fingerprint boshcrypto.MultipleDigestImpl) (string, error) {
 	var fileName string
 	var lastErr error
 
