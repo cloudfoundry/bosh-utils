@@ -64,15 +64,6 @@ var _ = Describe("checksumVerifiableBlobstore", func() {
 			Expect(err.Error()).To(ContainSubstring("fake-get-error"))
 		})
 
-		XIt("skips sha1 verification and returns without an error if sha1 is empty", func() {
-			innerBlobstore.GetFileName = fixturePath
-
-			fileName, err := checksumVerifiableBlobstore.Get("fake-blob-id", boshcrypto.NewMultipleDigest())
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(fileName).To(Equal(fixturePath))
-		})
-
 		Context("sha256", func() {
 			BeforeEach(func() {
 				fixtureDigest = boshcrypto.NewMultipleDigest(boshcrypto.NewDigest("sha256", fixtureSHA256))
