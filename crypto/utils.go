@@ -50,7 +50,7 @@ func ParseDigestString(digest string) (Digest, error) {
 	}
 }
 
-func PreferredDigest(m multipleDigestImpl) (Digest, error) {
+func PreferredDigest(m MultipleDigestImpl) (Digest, error) {
 	if len(m.digests) == 0 {
 		return NewDigest(DigestAlgorithmSHA1, ""), errors.New("No valid digests available")
 	}
@@ -65,7 +65,7 @@ func PreferredDigest(m multipleDigestImpl) (Digest, error) {
 	return currentStrongest, nil
 }
 
-func ParseMultipleDigestString(multipleDigest string) (multipleDigestImpl, error) {
+func ParseMultipleDigestString(multipleDigest string) (MultipleDigestImpl, error) {
 	pieces := strings.Split(multipleDigest, ";")
 
 	digests := []Digest{}

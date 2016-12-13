@@ -5,7 +5,7 @@ import (
 	"errors"
 )
 
-type multipleDigestImpl struct {
+type MultipleDigestImpl struct {
 	digests []Digest
 }
 
@@ -19,10 +19,21 @@ func Verify(m MultipleDigest, digest Digest) error {
 	return errors.New(fmt.Sprintf("No digest found that matches %s", digest.Algorithm()))
 }
 
-func (m multipleDigestImpl) Digests() []Digest {
+func (m MultipleDigestImpl) Digests() []Digest {
 	return m.digests
 }
 
-func NewMultipleDigest(digests ...Digest) multipleDigestImpl {
-	return multipleDigestImpl{digests: digests}
+func NewMultipleDigest(digests ...Digest) MultipleDigestImpl {
+	return MultipleDigestImpl{digests: digests}
+}
+
+func (m *MultipleDigestImpl) UnmarshalJSON(data []byte) error {
+	multiDigest, err := ParseMultipleDigestString(string(data))
+
+	if err != nil {
+		return err
+	}
+
+	*m = multiDigest
+	return nil
 }

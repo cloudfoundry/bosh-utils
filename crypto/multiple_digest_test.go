@@ -9,7 +9,7 @@ import (
 
 var _ = Describe("MultipleDigest", func() {
 	var (
-		expectedDigest MultipleDigest
+		expectedDigest MultipleDigestImpl
 		digest1 Digest
 		digest2 Digest
 	)
@@ -70,6 +70,25 @@ var _ = Describe("MultipleDigest", func() {
 		It("should return an empty array if there are no digests", func() {
 			multiDigest := NewMultipleDigest()
 			Expect(multiDigest.Digests()).To(BeNil())
+		})
+	})
+
+	Describe("Unmarshalling JSON", func() {
+		It("should produce valid JSON", func() {
+			jsonString := `{"sha1": "sha1:abcdefg;sha256:hijklmn"}`
+
+			err := expectedDigest.UnmarshalJSON([]byte(jsonString))
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(expectedDigest.Digests()).To(HaveLen(1))
+		})
+
+		It("should throw an error if JSON does not contain a valid algorithm", func() {
+			jsonString := `{"sha1": "sha33:abcdefg;sha34:hijklmn"}`
+
+			err := expectedDigest.UnmarshalJSON([]byte(jsonString))
+
+			Expect(err).To(HaveOccurred())
 		})
 	})
 })
