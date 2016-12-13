@@ -48,8 +48,6 @@ func ParseDigestString(digest string) (Digest, error) {
 	default:
 		return nil, errors.New(fmt.Sprintf("Unrecognized digest algorithm: %s. Supported algorithms: sha1, sha256, sha512", pieces[0]))
 	}
-
-	return nil, errors.New(fmt.Sprintf("Parsing digest: %s", digest))
 }
 
 func PreferredDigest(m multipleDigestImpl) (Digest, error) {

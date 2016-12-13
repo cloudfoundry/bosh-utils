@@ -90,12 +90,12 @@ var _ = Describe("utils", func() {
 
 	Describe("ParseMultipleDigestString", func() {
 		Context("single digest", func() {
-			var verifyingDigest VerifyingDigest
+			var multiDigest MultipleDigest
 
 			BeforeEach(func() {
 				var err error
 
-				verifyingDigest, err = ParseMultipleDigestString("sha1:07e1306432667f916639d47481edc4f2ca456454")
+				multiDigest, err = ParseMultipleDigestString("sha1:07e1306432667f916639d47481edc4f2ca456454")
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -103,7 +103,7 @@ var _ = Describe("utils", func() {
 				actual, err := ParseDigestString("sha1:07e1306432667f916639d47481edc4f2ca456454")
 				Expect(err).ToNot(HaveOccurred())
 
-				verifyErr := verifyingDigest.Verify(actual)
+				verifyErr := Verify(multiDigest, actual)
 				Expect(verifyErr).ToNot(HaveOccurred())
 			})
 
@@ -112,7 +112,7 @@ var _ = Describe("utils", func() {
 				parsedDigest, err := ParseMultipleDigestString("07e1306432667f916639d47481edc4f2ca456454")
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(parsedDigest.Verify(actualDigest)).To(BeNil())
+				Expect(Verify(parsedDigest, actualDigest)).To(BeNil())
 			})
 		})
 
@@ -122,11 +122,11 @@ var _ = Describe("utils", func() {
 
 				Expect(err).To(BeNil())
 				digest1 := NewDigest(DigestAlgorithmSHA1, "07e1306432667f916639d47481edc4f2ca456454")
-				verifyDigest1Err := multipleDigest.Verify(digest1)
+				verifyDigest1Err := Verify(multipleDigest, digest1)
 				Expect(verifyDigest1Err).ToNot(HaveOccurred())
 
 				digest2 := NewDigest(DigestAlgorithmSHA256, "b1e66f505465c28d705cf587b041a6506cfe749f7aa4159d8a3f45cc53f1fb23")
-				verifyDigest2Err := multipleDigest.Verify(digest2)
+				verifyDigest2Err := Verify(multipleDigest, digest2)
 				Expect(verifyDigest2Err).ToNot(HaveOccurred())
 			})
 
@@ -135,7 +135,7 @@ var _ = Describe("utils", func() {
 				Expect(err).To(BeNil())
 
 				digest1 := NewDigest(DigestAlgorithmSHA1, "07e1306432667f916639d47481edc4f2ca456454")
-				Expect(multipleDigest.Verify(digest1)).NotTo(HaveOccurred())
+				Expect(Verify(multipleDigest, digest1)).NotTo(HaveOccurred())
 			})
 
 			It("returns an error if no digest is recongized", func() {
