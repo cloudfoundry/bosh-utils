@@ -1,13 +1,13 @@
 package retrystrategy_test
 
 import (
+	"fmt"
 	"errors"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	fakelogger "github.com/cloudfoundry/bosh-utils/logger/fakes"
-
 	. "github.com/cloudfoundry/bosh-utils/retrystrategy"
 )
 
@@ -28,13 +28,14 @@ var _ = Describe("AttemptRetryStrategy", func() {
 					AttemptErr:  nil,
 				},
 			})
+
 			attemptRetryStrategy := NewAttemptRetryStrategy(3, 0, retryable, logger)
 			err := attemptRetryStrategy.Try()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(logger.DebugCallCount()).To(Equal(1))
+
 			_, message, args := logger.DebugArgsForCall(0)
-			Expect(message).To(Equal("Making attempt #%d for %T"))
-			Expect(args[1]).To(Equal(retryable))
+			Expect(fmt.Sprintf(message, args...)).To(Equal("Making attempt #0 for *retrystrategy_test.simpleRetryable"))
 		})
 
 		Context("when there are errors during a try", func() {

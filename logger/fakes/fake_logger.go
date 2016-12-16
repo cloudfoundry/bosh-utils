@@ -3,6 +3,7 @@ package fakes
 
 import (
 	"sync"
+	"time"
 
 	"github.com/cloudfoundry/bosh-utils/logger"
 )
@@ -58,6 +59,20 @@ type FakeLogger struct {
 	ToggleForcedDebugStub        func()
 	toggleForcedDebugMutex       sync.RWMutex
 	toggleForcedDebugArgsForCall []struct{}
+	FlushStub        func() error
+	flushMutex       sync.RWMutex
+	flushArgsForCall []struct{}
+	flushReturns struct {
+		result1 error
+	}
+	FlushTimeoutStub        func(time.Duration) error
+	flushTimeoutMutex       sync.RWMutex
+	flushTimeoutArgsForCall []struct {
+		arg1 time.Duration
+	}
+	flushTimeoutReturns struct {
+		result1 error
+	}
 }
 
 func (fake *FakeLogger) Debug(tag string, msg string, args ...interface{}) {
@@ -246,6 +261,62 @@ func (fake *FakeLogger) ToggleForcedDebugCallCount() int {
 	fake.toggleForcedDebugMutex.RLock()
 	defer fake.toggleForcedDebugMutex.RUnlock()
 	return len(fake.toggleForcedDebugArgsForCall)
+}
+
+func (fake *FakeLogger) Flush() error {
+	fake.flushMutex.Lock()
+	fake.flushArgsForCall = append(fake.flushArgsForCall, struct{}{})
+	fake.flushMutex.Unlock()
+	if fake.FlushStub != nil {
+		return fake.FlushStub()
+	} else {
+		return fake.flushReturns.result1
+	}
+}
+
+func (fake *FakeLogger) FlushCallCount() int {
+	fake.flushMutex.RLock()
+	defer fake.flushMutex.RUnlock()
+	return len(fake.flushArgsForCall)
+}
+
+func (fake *FakeLogger) FlushReturns(result1 error) {
+	fake.FlushStub = nil
+	fake.flushReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeLogger) FlushTimeout(arg1 time.Duration) error {
+	fake.flushTimeoutMutex.Lock()
+	fake.flushTimeoutArgsForCall = append(fake.flushTimeoutArgsForCall, struct {
+		arg1 time.Duration
+	}{arg1})
+	fake.flushTimeoutMutex.Unlock()
+	if fake.FlushTimeoutStub != nil {
+		return fake.FlushTimeoutStub(arg1)
+	} else {
+		return fake.flushTimeoutReturns.result1
+	}
+}
+
+func (fake *FakeLogger) FlushTimeoutCallCount() int {
+	fake.flushTimeoutMutex.RLock()
+	defer fake.flushTimeoutMutex.RUnlock()
+	return len(fake.flushTimeoutArgsForCall)
+}
+
+func (fake *FakeLogger) FlushTimeoutArgsForCall(i int) time.Duration {
+	fake.flushTimeoutMutex.RLock()
+	defer fake.flushTimeoutMutex.RUnlock()
+	return fake.flushTimeoutArgsForCall[i].arg1
+}
+
+func (fake *FakeLogger) FlushTimeoutReturns(result1 error) {
+	fake.FlushTimeoutStub = nil
+	fake.flushTimeoutReturns = struct {
+		result1 error
+	}{result1}
 }
 
 var _ logger.Logger = new(FakeLogger)
