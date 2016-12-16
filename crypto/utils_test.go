@@ -23,7 +23,7 @@ var _ = Describe("utils", func() {
 				digest, err := ParseDigestString("sha256:b1e66f505465c28d705cf587b041a6506cfe749f7aa4159d8a3f45cc53f1fb23")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(digest.Algorithm()).To(Equal(DigestAlgorithmSHA256))
-				Expect(digest.String()).To(Equal("b1e66f505465c28d705cf587b041a6506cfe749f7aa4159d8a3f45cc53f1fb23"))
+				Expect(digest.String()).To(Equal("sha256:b1e66f505465c28d705cf587b041a6506cfe749f7aa4159d8a3f45cc53f1fb23"))
 			})
 		})
 
@@ -32,7 +32,7 @@ var _ = Describe("utils", func() {
 				digest, err := ParseDigestString("sha512:6f06a0c6c3827d827145b077cd8c8b7a15c75eb2bed809569296e6502ef0872c8e7ef91307a6994fcd2be235d3c41e09bfe1b6023df45697d88111df4349d64a")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(digest.Algorithm()).To(Equal(DigestAlgorithmSHA512))
-				Expect(digest.String()).To(Equal("6f06a0c6c3827d827145b077cd8c8b7a15c75eb2bed809569296e6502ef0872c8e7ef91307a6994fcd2be235d3c41e09bfe1b6023df45697d88111df4349d64a"))
+				Expect(digest.String()).To(Equal("sha512:6f06a0c6c3827d827145b077cd8c8b7a15c75eb2bed809569296e6502ef0872c8e7ef91307a6994fcd2be235d3c41e09bfe1b6023df45697d88111df4349d64a"))
 			})
 		})
 
