@@ -1,8 +1,6 @@
 package blobstore
 
 import (
-	"fmt"
-
 	boshcrypto "github.com/cloudfoundry/bosh-utils/crypto"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	"os"
@@ -20,30 +18,23 @@ func NewDigestVerifiableBlobstore(blobstore Blobstore, digestProvider boshcrypto
 	}
 }
 
-func (b digestVerifiableBlobstore) Get(blobID string, multiDigest boshcrypto.MultipleDigest) (string, error) {
-	fileName, err := b.blobstore.Get(blobID, multiDigest)
+func (b digestVerifiableBlobstore) Get(blobID string, digest boshcrypto.Digest) (string, error) {
+	fileName, err := b.blobstore.Get(blobID, digest)
 	if err != nil {
 		return "", bosherr.WrapError(err, "Getting blob from inner blobstore")
 	}
 
-	strongestDigest, err := boshcrypto.PreferredDigest(multiDigest)
-	if err != nil {
-		return "", err
-	}
 
 	file, err := os.Open(fileName)
 	if err != nil {
 		return "", err
 	}
+	defer file.Close()
 
-	actualDigest, err := b.digestProvider.CreateFromStream(file, strongestDigest.Algorithm())
-	if err != nil {
-		return "", err
-	}
+	err = digest.Verify(file)
 
-	err = strongestDigest.Verify(actualDigest)
 	if err != nil {
-		return "", bosherr.WrapError(err, fmt.Sprintf(`Checking downloaded blob "%s"`, blobID))
+		return "", bosherr.WrapErrorf(err, "Checking downloaded blob \"%s\"", blobID)
 	}
 
 	return fileName, nil

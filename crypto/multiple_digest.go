@@ -1,34 +1,84 @@
 package crypto
 
 import (
+	"strings"
+	"sort"
+	"io"
 	"errors"
 	"fmt"
-	"strings"
 )
 
-type MultipleDigestImpl struct {
+type MultipleDigest struct {
 	digests []Digest
 }
 
-func Verify(m MultipleDigest, digest Digest) error {
-	for _, candidateDigest := range m.Digests() {
-		if candidateDigest.Algorithm() == digest.Algorithm() {
-			return candidateDigest.Verify(digest)
-		}
+func NewMultipleDigest(digests ...Digest) MultipleDigest {
+
+	return MultipleDigest{digests}
+}
+
+type Digests []Digest
+type ByStrongest struct{ Digests }
+
+func (s Digests) Len() int {
+	return len(s)
+}
+func (s Digests) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s ByStrongest) Less(i, j int) bool {
+	if (s.Digests[i].Algorithm().Compare(s.Digests[j].Algorithm())) < 0 {
+		return true
+	}
+	return false
+}
+
+func (m MultipleDigest) String() string {
+	return m.strongestDigest().String()
+}
+
+func (m MultipleDigest) Algorithm() Algorithm {
+	if len(m.digests) == 0 {
+		return DigestAlgorithmSHA1
 	}
 
-	return errors.New(fmt.Sprintf("No digest found that matches %s", digest.Algorithm()))
+	return m.strongestDigest().Algorithm()
 }
 
-func (m MultipleDigestImpl) Digests() []Digest {
-	return m.digests
+func (m MultipleDigest) Verify(reader io.Reader) error {
+	err := m.validate()
+	if err != nil {
+		return err
+	}
+	return m.strongestDigest().Verify(reader)
 }
 
-func NewMultipleDigest(digests ...Digest) MultipleDigestImpl {
-	return MultipleDigestImpl{digests: digests}
+func (m MultipleDigest) validate() error {
+	if len(m.digests) == 0 {
+		return errors.New("no digests have been provided")
+	}
+
+	sort.Sort(ByStrongest{m.digests})
+	var previousDigest Digest
+	previousDigest = digestImpl{}
+	for _, value := range m.digests {
+		if value.Algorithm().Compare(previousDigest.Algorithm()) == 0 && value.String() != previousDigest.String() {
+			return errors.New(fmt.Sprintf("multiple digests of the same algorithm with different checksums. Algorthim: '%s', digests: '%v'", value.Algorithm(), m.digests))
+		}
+
+		previousDigest = value
+	}
+	return nil
 }
 
-func (m *MultipleDigestImpl) UnmarshalJSON(data []byte) error {
+func (m MultipleDigest) strongestDigest() (Digest) {
+	sort.Sort(ByStrongest{m.digests})
+
+	return m.digests[len(m.digests) - 1]
+}
+
+func (m *MultipleDigest) UnmarshalJSON(data []byte) error {
 	digestString := string(data)
 	digestString = strings.Replace(digestString, `"`, "", -1)
 	multiDigest, err := ParseMultipleDigestString(digestString)
@@ -37,6 +87,13 @@ func (m *MultipleDigestImpl) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	err = multiDigest.validate()
+	if err != nil {
+		return err
+	}
+
 	*m = multiDigest
+
 	return nil
 }
+
