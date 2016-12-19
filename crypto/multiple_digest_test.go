@@ -19,7 +19,7 @@ var _ = Describe("MultipleDigest", func() {
 		digest1 = NewDigest(DigestAlgorithmSHA1, "07e1306432667f916639d47481edc4f2ca456454")
 		digest2 = NewDigest(DigestAlgorithmSHA256, "07e1306432667f916639d47481edc4f2ca456454")
 
-		digest = NewMultipleDigest(digest1, digest2)
+		digest = MustNewMultipleDigest(digest1, digest2)
 	})
 
 	Describe("Verify", func() {
@@ -29,20 +29,19 @@ var _ = Describe("MultipleDigest", func() {
 
 		Context("for a multi digest containing no digests", func() {
 			BeforeEach(func() {
-				digest = NewMultipleDigest()
+				digest = MultipleDigest{}
 			})
 
 			It("does not Verify", func() {
 				Expect(digest.Verify(strings.NewReader("desired content"))).To(HaveOccurred())
 			})
-
 		})
 
 		Context("for a multi digest containing only SHA1 digest", func() {
 			BeforeEach(func() {
 				abcDigest, err := DigestAlgorithmSHA1.CreateDigest(strings.NewReader("desired content"))
 				Expect(err).ToNot(HaveOccurred())
-				digest = NewMultipleDigest(abcDigest)
+				digest = MustNewMultipleDigest(abcDigest)
 			})
 
 			Context("when the checksum matches", func() {
@@ -68,7 +67,7 @@ var _ = Describe("MultipleDigest", func() {
 					sha512DesiredContentDigest, err := DigestAlgorithmSHA512.CreateDigest(strings.NewReader("strong desired content"))
 					Expect(err).ToNot(HaveOccurred())
 
-					digest = NewMultipleDigest(sha1DesiredContentDigest, sha256DesiredContentDigest, sha512DesiredContentDigest)
+					digest = MustNewMultipleDigest(sha1DesiredContentDigest, sha256DesiredContentDigest, sha512DesiredContentDigest)
 				})
 
 				It("It favors the strongest digest and does not error", func() {
@@ -90,7 +89,7 @@ var _ = Describe("MultipleDigest", func() {
 						sha1DesiredContentDigestB, err := DigestAlgorithmSHA1.CreateDigest(strings.NewReader("digest content"))
 						Expect(err).ToNot(HaveOccurred())
 
-						digest = NewMultipleDigest(sha1DesiredContentDigestA, sha1DesiredContentDigestB)
+						digest = MustNewMultipleDigest(sha1DesiredContentDigestA, sha1DesiredContentDigestB)
 					})
 
 					It("should be verifiable", func() {
@@ -105,7 +104,7 @@ var _ = Describe("MultipleDigest", func() {
 						sha1DesiredContentDigestB, err := DigestAlgorithmSHA1.CreateDigest(strings.NewReader("digest content B"))
 						Expect(err).ToNot(HaveOccurred())
 
-						digest = NewMultipleDigest(sha1DesiredContentDigestA, sha1DesiredContentDigestB)
+						digest = MustNewMultipleDigest(sha1DesiredContentDigestA, sha1DesiredContentDigestB)
 					})
 
 					It("should not be verifiable", func() {
@@ -126,7 +125,7 @@ var _ = Describe("MultipleDigest", func() {
 				sha512DesiredContentDigest, err := DigestAlgorithmSHA512.CreateDigest(strings.NewReader("strong desired content"))
 				Expect(err).ToNot(HaveOccurred())
 
-				digest = NewMultipleDigest(sha1DesiredContentDigest, sha256DesiredContentDigest, sha512DesiredContentDigest)
+				digest = MustNewMultipleDigest(sha1DesiredContentDigest, sha256DesiredContentDigest, sha512DesiredContentDigest)
 			})
 
 			It("It favors the strongest digest and does not error", func() {

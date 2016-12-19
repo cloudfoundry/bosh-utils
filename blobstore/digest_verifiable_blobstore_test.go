@@ -29,7 +29,7 @@ var _ = Describe("checksumVerifiableBlobstore", func() {
 	)
 
 	BeforeEach(func() {
-		fixtureDigest = boshcrypto.NewMultipleDigest(boshcrypto.NewDigest(boshcrypto.DigestAlgorithmSHA1, fixtureSHA1))
+		fixtureDigest = boshcrypto.MustNewMultipleDigest(boshcrypto.NewDigest(boshcrypto.DigestAlgorithmSHA1, fixtureSHA1))
 
 		innerBlobstore = &fakeblob.FakeBlobstore{}
 		checksumProvider = boshcrypto.NewDigestProvider()
@@ -50,7 +50,7 @@ var _ = Describe("checksumVerifiableBlobstore", func() {
 		It("returns error if sha1 does not match", func() {
 			innerBlobstore.GetFileName = fixturePath
 
-			incorrectSha1 := boshcrypto.NewMultipleDigest(boshcrypto.NewDigest(boshcrypto.DigestAlgorithmSHA1, "some-incorrect-sha1"))
+			incorrectSha1 := boshcrypto.MustNewMultipleDigest(boshcrypto.NewDigest(boshcrypto.DigestAlgorithmSHA1, "some-incorrect-sha1"))
 
 			_, err := checksumVerifiableBlobstore.Get("fake-blob-id", incorrectSha1)
 			Expect(err).To(HaveOccurred())
@@ -67,7 +67,7 @@ var _ = Describe("checksumVerifiableBlobstore", func() {
 
 		Context("multiple algorithms", func() {
 			BeforeEach(func() {
-				fixtureDigest = boshcrypto.NewMultipleDigest(boshcrypto.NewDigest(boshcrypto.DigestAlgorithmSHA1, "incorrect-sha1"), boshcrypto.NewDigest(boshcrypto.DigestAlgorithmSHA256, fixtureSHA256))
+				fixtureDigest = boshcrypto.MustNewMultipleDigest(boshcrypto.NewDigest(boshcrypto.DigestAlgorithmSHA1, "incorrect-sha1"), boshcrypto.NewDigest(boshcrypto.DigestAlgorithmSHA256, fixtureSHA256))
 			})
 
 			It("uses sha256 (strongest available algorithm)", func() {
@@ -83,7 +83,7 @@ var _ = Describe("checksumVerifiableBlobstore", func() {
 
 		Context("sha256", func() {
 			BeforeEach(func() {
-				fixtureDigest = boshcrypto.NewMultipleDigest(boshcrypto.NewDigest(boshcrypto.DigestAlgorithmSHA256, fixtureSHA256))
+				fixtureDigest = boshcrypto.MustNewMultipleDigest(boshcrypto.NewDigest(boshcrypto.DigestAlgorithmSHA256, fixtureSHA256))
 			})
 
 			It("returns without an error if sha256 matches", func() {
@@ -99,7 +99,7 @@ var _ = Describe("checksumVerifiableBlobstore", func() {
 
 		Context("sha512", func() {
 			BeforeEach(func() {
-				fixtureDigest = boshcrypto.NewMultipleDigest(boshcrypto.NewDigest(boshcrypto.DigestAlgorithmSHA512, fixtureSHA512))
+				fixtureDigest = boshcrypto.MustNewMultipleDigest(boshcrypto.NewDigest(boshcrypto.DigestAlgorithmSHA512, fixtureSHA512))
 			})
 
 			It("returns without an error if sha512 matches", func() {
