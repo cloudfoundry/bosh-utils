@@ -24,7 +24,7 @@ jobs:
       - {put: version-semver, params: {file: version-semver/number}}
       - task: build-multidigest-binary
         file: bosh-utils/ci/tasks/build-multidigest-binary.yml
-      - {put: release-bucket-linux, params: {file: compiled-linux/verify-multidigest-linux-amd64}}
+      - {put: release-bucket-linux, params: {file: compiled-linux/verify-multidigest-*-linux-amd64}}
 
 resources:
   - name: bosh-utils
@@ -43,7 +43,7 @@ resources:
   - name: release-bucket-linux
     type: s3
     source:
-      regexp: verify-multidigest-linux-amd64
+      regexp: verify-multidigest-(.*)-linux-amd64
       bucket: {{aws_s3_release_bucket}}
       region_name: {{aws_s3_release_bucket_region}}
       access_key_id: {{aws_s3_release_bucket_access_key}}
