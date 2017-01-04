@@ -2,7 +2,7 @@
 
 set -e -x -u
 
-base=${pwd}
+base=$(pwd)
 export GOPATH=$(pwd)/gopath
 export PATH=/usr/local/ruby/bin:/usr/local/go/bin:$PATH
 
