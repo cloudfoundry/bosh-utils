@@ -50,7 +50,7 @@ var _ = Describe("Verify_multidigest", func() {
 		It("exits 1 when file does not exist", func() {
 			act("verify-multi-digest", "potato", "da39a3ee5e6b4b0d3255bfef95601890afd80709")
 			Eventually(session).Should(gexec.Exit(1))
-			Eventually(session.Err).Should(gbytes.Say("open potato: no such file or directory"))
+			Eventually(session.Err).Should(gbytes.Say("open potato:"))
 		})
 	})
 
