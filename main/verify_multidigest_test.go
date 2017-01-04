@@ -33,6 +33,14 @@ var _ = Describe("Verify_multidigest", func() {
 		os.Remove(tempFile.Name())
 	})
 
+	Describe("version option", func() {
+		It("has a version flag", func() {
+			act("--version")
+			Eventually(session).Should(gexec.Exit(0))
+			Eventually(session.Out).Should(gbytes.Say("version \\[DEV BUILD\\]"))
+		})
+	})
+
 	Context("when correct args are passed to verify-multi-digest command", func() {
 		It("exits 0", func() {
 			act("verify-multi-digest", tempFile.Name(), "da39a3ee5e6b4b0d3255bfef95601890afd80709")

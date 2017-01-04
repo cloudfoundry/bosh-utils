@@ -4,15 +4,30 @@ import (
 	"github.com/jessevdk/go-flags"
 	"os"
 	boshcrypto "github.com/cloudfoundry/bosh-utils/crypto"
+	"fmt"
 )
 
 type opts struct {
 	VerifyMultiDigestCommand MultiDigestCommand `command:"verify-multi-digest"`
+	VersionFlag func() error `long:"version"`
 }
 
 func main() {
 	o := opts{}
+	o.VersionFlag = func() error {
+		return &flags.Error{
+			Type:    flags.ErrHelp,
+			Message: fmt.Sprintf("version %s\n", VersionLabel),
+		}
+	}
+
 	_, err := flags.Parse(&o)
+
+	if typedErr, ok := err.(*flags.Error); ok {
+		if typedErr.Type == flags.ErrHelp {
+			err = nil
+		}
+	}
 
 	if err != nil {
 		os.Exit(1)
