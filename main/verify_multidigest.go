@@ -1,15 +1,15 @@
 package main
 
 import (
+	"fmt"
+	boshcrypto "github.com/cloudfoundry/bosh-utils/crypto"
 	"github.com/jessevdk/go-flags"
 	"os"
-	boshcrypto "github.com/cloudfoundry/bosh-utils/crypto"
-	"fmt"
 )
 
 type opts struct {
 	VerifyMultiDigestCommand MultiDigestCommand `command:"verify-multi-digest"`
-	VersionFlag func() error `long:"version"`
+	VersionFlag              func() error       `long:"version"`
 }
 
 func main() {
@@ -35,13 +35,12 @@ func main() {
 }
 
 type MultiDigestArgs struct {
-	File string
+	File   string
 	Digest string
 }
 
 type MultiDigestCommand struct {
-	Args MultiDigestArgs  `positional-args:"yes"`
-
+	Args MultiDigestArgs `positional-args:"yes"`
 }
 
 func (m MultiDigestCommand) Execute(args []string) error {

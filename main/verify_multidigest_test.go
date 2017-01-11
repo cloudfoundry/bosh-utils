@@ -3,13 +3,12 @@ package main_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os/exec"
+	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
 	"io/ioutil"
 	"os"
-	"github.com/onsi/gomega/gbytes"
+	"os/exec"
 )
-
 
 var _ = Describe("Verify_multidigest", func() {
 	var session *gexec.Session
