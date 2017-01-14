@@ -21,6 +21,6 @@ version="${semver}-${git_rev}-${timestamp}"
 echo "building ${filename} with version ${version}"
 sed -i 's/\[DEV BUILD\]/'"$version"'/' main/version.go
 
-bin/build-linux-amd64
+bin/build
 
 mv out/verify-multidigest $base/compiled-${GOOS}/${filename}

@@ -22,9 +22,12 @@ jobs:
       - get: version-semver
         params: {bump: patch}
       - {put: version-semver, params: {file: version-semver/number}}
-      - task: build-multidigest-binary
-        file: bosh-utils/ci/tasks/build-multidigest-binary.yml
+      - task: build-multidigest-binary-darwin
+        file: bosh-utils/ci/tasks/build-darwin-multidigest-binary.yml
+      - task: build-multidigest-binary-linux
+        file: bosh-utils/ci/tasks/build-linux-multidigest-binary.yml
       - {put: release-bucket-linux, params: {file: compiled-linux/verify-multidigest-*-linux-amd64}}
+      - {put: release-bucket-linux, params: {file: compiled-linux/verify-multidigest-*-darwin-amd64}}
 
 resources:
   - name: bosh-utils
