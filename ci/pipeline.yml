@@ -27,7 +27,7 @@ jobs:
       - task: build-multidigest-binary-linux
         file: bosh-utils/ci/tasks/build-linux-multidigest-binary.yml
       - {put: release-bucket-linux, params: {file: compiled-linux/verify-multidigest-*-linux-amd64}}
-      - {put: release-bucket-darwin, params: {file: compiled-linux/verify-multidigest-*-darwin-amd64}}
+      - {put: release-bucket-darwin, params: {file: compiled-darwin/verify-multidigest-*-darwin-amd64}}
 
 resources:
   - name: bosh-utils
