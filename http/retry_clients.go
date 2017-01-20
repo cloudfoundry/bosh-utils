@@ -17,12 +17,18 @@ type retryClient struct {
 	isResponseAttemptable func(*http.Response, error) (bool, error)
 }
 
+type RetryClient interface {
+	Client
+	GetWithHeaders(url string, headers map[string]string) (resp *http.Response, err error)
+	Get(url string) (resp *http.Response, err error)
+}
+
 func NewRetryClient(
 	delegate Client,
 	maxAttempts uint,
 	retryDelay time.Duration,
 	logger boshlog.Logger,
-) Client {
+) RetryClient {
 	return &retryClient{
 		delegate:              delegate,
 		maxAttempts:           maxAttempts,
@@ -37,7 +43,7 @@ func NewNetworkSafeRetryClient(
 	maxAttempts uint,
 	retryDelay time.Duration,
 	logger boshlog.Logger,
-) Client {
+) RetryClient {
 	return &retryClient{
 		delegate:    delegate,
 		maxAttempts: maxAttempts,
@@ -53,10 +59,35 @@ func NewNetworkSafeRetryClient(
 	}
 }
 
+func NewDefaultRetryClient(
+	maxAttempts uint,
+	retryDelay time.Duration,
+	logger boshlog.Logger,
+) RetryClient {
+	return NewRetryClient(&http.Client{}, maxAttempts, retryDelay, logger)
+}
+
 func (r *retryClient) Do(req *http.Request) (*http.Response, error) {
 	requestRetryable := NewRequestRetryable(req, r.delegate, r.logger, r.isResponseAttemptable)
 	retryStrategy := boshretry.NewAttemptRetryStrategy(int(r.maxAttempts), r.retryDelay, requestRetryable, r.logger)
 	err := retryStrategy.Try()
 
 	return requestRetryable.Response(), err
+}
+
+func (r *retryClient) GetWithHeaders(url string, headers map[string]string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	for key, value := range headers {
+		req.Header.Add(key, value)
+	}
+
+	return r.Do(req)
+}
+
+func (r *retryClient) Get(url string) (*http.Response, error) {
+	return r.GetWithHeaders(url, map[string]string{})
 }
