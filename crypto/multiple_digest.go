@@ -52,7 +52,7 @@ func (m MultipleDigest) validate() error {
 		algoName := digest.Algorithm().Name()
 
 		if _, found := algosUsed[algoName]; found {
-			return bosherr.Errorf("Multiple digests of the same algorithm '%s' found in digests '%s'", algoName, m.fullString())
+			return bosherr.Errorf("Multiple digests of the same algorithm '%s' found in digests '%s'", algoName, m.FullString())
 		}
 
 		algosUsed[algoName] = struct{}{}
@@ -79,6 +79,17 @@ func (m MultipleDigest) strongestDigest() Digest {
 	return m.digests[0]
 }
 
+func (m *MultipleDigest) DigestFor(algo Algorithm) (Digest, error){
+	for _, digest := range m.digests {
+		algoName := digest.Algorithm().Name()
+		if algoName == algo.Name() {
+			return digest, nil
+		}
+	}
+
+	return nil, errors.New("digest-for-algorithm-not-present")
+}
+
 func (m *MultipleDigest) UnmarshalJSON(data []byte) error {
 	digestString := strings.TrimSuffix(strings.TrimPrefix(string(data), `"`), `"`)
 
@@ -97,7 +108,7 @@ func (m *MultipleDigest) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (m MultipleDigest) fullString() string {
+func (m MultipleDigest) FullString() string {
 	var result []string
 
 	for _, digest := range m.digests {
@@ -112,7 +123,7 @@ func (m MultipleDigest) MarshalJSON() ([]byte, error) {
 		return nil, errors.New("no digests have been provided")
 	}
 
-	return []byte(fmt.Sprintf(`"%s"`, m.fullString())), nil
+	return []byte(fmt.Sprintf(`"%s"`, m.FullString())), nil
 }
 
 func (m MultipleDigest) parseMultipleDigestString(multipleDigest string) (MultipleDigest, error) {

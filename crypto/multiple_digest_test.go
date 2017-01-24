@@ -69,7 +69,7 @@ var _ = Describe("MultipleDigest", func() {
 				})
 			})
 
-			Context("foo", func() {
+			Context("algorithm precedence", func() {
 				It("uses sha256 over sha1", func() {
 					sha1DesiredContentDigest, err := DigestAlgorithmSHA1.CreateDigest(strings.NewReader("weak digest content"))
 					Expect(err).ToNot(HaveOccurred())
@@ -131,6 +131,46 @@ var _ = Describe("MultipleDigest", func() {
 					Expect(err).To(HaveOccurred())
 					Expect(err.Error()).To(Equal("Multiple digests of the same algorithm 'sha1' found in digests 'cf305610f87bdfb86b0cf6aa01abeeed7411d1cc;e136b264965d153f51136924a93a855b2e841139'"))
 				})
+			})
+		})
+	})
+
+	Describe("FullString", func() {
+		It("returns the digest matching the algorithm", func() {
+			digest1 := NewDigest(DigestAlgorithmSHA1, "sha1digestval")
+			digest2 := NewDigest(DigestAlgorithmSHA256, "sha256digestval")
+			digest := MustNewMultipleDigest(digest1, digest2)
+
+			fullString := digest.FullString()
+			Expect(fullString).To(Equal("sha1digestval;sha256:sha256digestval"))
+		})
+	})
+
+	Describe("DigestFor", func() {
+		Context("when the algorithm matches one of the digests in the multi", func () {
+			It("returns the digest matching the algorithm", func() {
+				digest1 := NewDigest(DigestAlgorithmSHA1, "sha1digestval")
+				digest2 := NewDigest(DigestAlgorithmSHA256, "sha256digestval")
+				digests := MustNewMultipleDigest(digest1, digest2)
+
+				digest, err := digests.DigestFor(DigestAlgorithmSHA1)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(digest).To(Equal(digest1))
+
+				digest, err = digests.DigestFor(DigestAlgorithmSHA256)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(digest).To(Equal(digest2))
+			})
+		})
+
+		Context("when the algorithm specified does not match any contained digests", func () {
+			It("returns an error", func () {
+				digest1 := NewDigest(DigestAlgorithmSHA1, "sha1digestval")
+				digest2 := NewDigest(DigestAlgorithmSHA256, "sha256digestval")
+				digests := MustNewMultipleDigest(digest1, digest2)
+
+				_, err := digests.DigestFor(DigestAlgorithmSHA512)
+				Expect(err).To(HaveOccurred())
 			})
 		})
 	})
