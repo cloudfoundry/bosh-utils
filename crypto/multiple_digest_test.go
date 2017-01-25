@@ -8,6 +8,10 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "github.com/cloudfoundry/bosh-utils/crypto"
+	fakesys "github.com/cloudfoundry/bosh-utils/system/fakes"
+	"os"
+	"io/ioutil"
+	"io"
 )
 
 var _ = Describe("MultipleDigest", func() {
@@ -110,7 +114,7 @@ var _ = Describe("MultipleDigest", func() {
 
 				err := digest.Verify(strings.NewReader("strong digest content"))
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(Equal("Computing digest from stream: Unable to create digest of unkown algorithm 'unknown1'"))
+				Expect(err.Error()).To(Equal("Computing digest from stream: Unable to create digest of unknown algorithm 'unknown1'"))
 			})
 
 			Context("when two of the digests are the same algorithm", func() {
@@ -135,13 +139,13 @@ var _ = Describe("MultipleDigest", func() {
 		})
 	})
 
-	Describe("FullString", func() {
-		It("returns the digest matching the algorithm", func() {
+	Describe("String", func() {
+		It("returns the concatenated digest string", func() {
 			digest1 := NewDigest(DigestAlgorithmSHA1, "sha1digestval")
 			digest2 := NewDigest(DigestAlgorithmSHA256, "sha256digestval")
 			digest := MustNewMultipleDigest(digest1, digest2)
 
-			fullString := digest.FullString()
+			fullString := digest.String()
 			Expect(fullString).To(Equal("sha1digestval;sha256:sha256digestval"))
 		})
 	})
@@ -172,6 +176,103 @@ var _ = Describe("MultipleDigest", func() {
 				_, err := digests.DigestFor(DigestAlgorithmSHA512)
 				Expect(err).To(HaveOccurred())
 			})
+		})
+	})
+
+	Describe("NewMultipleDigest", func() {
+		var (
+			readSeeker io.ReadSeeker
+			file *os.File
+		)
+
+		BeforeEach(func() {
+			file, err := ioutil.TempFile("", "multiple-digest")
+			Expect(err).ToNot(HaveOccurred())
+			file.Write([]byte("fake-readSeeker-2-contents"))
+			readSeeker = file
+		})
+
+		AfterEach(func() {
+			file.Close()
+		})
+
+		It("returns a multi digest with provided algorithms", func() {
+			algos := []Algorithm{
+				DigestAlgorithmSHA1,
+				DigestAlgorithmSHA256,
+			}
+			digest, err := NewMultipleDigest(readSeeker, algos)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(digest.String()).To(Equal("aa64cc884828ae6e8f3d1a24f889e5b43843981f;sha256:e0403fc138c62c89c6d9c81fe6982565d065af71677f8d29942e396406289f76"))
+		})
+
+		It("returns an error if an error occurs calculating the digest", func() {
+			algos := []Algorithm{
+				DigestAlgorithmSHA1,
+				DigestAlgorithmSHA256,
+				NewUnknownAlgorithm("such wow"),
+			}
+			_, err := NewMultipleDigest(readSeeker, algos)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("Unable to create digest of unknown algorithm 'such wow'"))
+		})
+
+		It("returns and error if no algorithms are supplied", func() {
+			algos := []Algorithm{}
+			_, err := NewMultipleDigest(readSeeker, algos)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("must provide at least one algorithm"))
+		})
+	})
+
+	Describe("NewMultipleDigestFromDir", func() {
+		var fs *fakesys.FakeFileSystem
+		BeforeEach(func() {
+			fs = fakesys.NewFakeFileSystem()
+
+			fs.RegisterOpenFile("/fake-templates-dir", &fakesys.FakeFile{
+				Stats: &fakesys.FakeFileStats{FileType: fakesys.FakeFileTypeDir},
+			})
+
+			fs.RegisterOpenFile("/fake-templates-dir/file-1", &fakesys.FakeFile{
+				Contents: []byte("fake-file-1-contents"),
+			})
+
+			fs.WriteFileString("/fake-templates-dir/file-1", "fake-file-1-contents")
+
+			fs.RegisterOpenFile("/fake-templates-dir/config/file-2", &fakesys.FakeFile{
+				Contents: []byte("fake-file-2-contents"),
+			})
+			fs.MkdirAll("/fake-templates-dir/config", os.ModePerm)
+			fs.WriteFileString("/fake-templates-dir/config/file-2", "fake-file-2-contents")
+		})
+
+		It("returns MultipleDigest for all the supplied algorithms", func() {
+			algos := []Algorithm{
+				DigestAlgorithmSHA1,
+				DigestAlgorithmSHA256,
+			}
+			digest, err := NewMultipleDigestFromDir("/fake-templates-dir", fs, algos)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(digest.String()).To(Equal("bc0646cd41b98cd6c878db7a0573eca345f78200;sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"))
+		})
+
+		It("returns an error when the algorithm fails to checksum the directory", func() {
+			algos := []Algorithm{
+				DigestAlgorithmSHA1,
+				DigestAlgorithmSHA256,
+				NewUnknownAlgorithm("such wow"),
+			}
+			_, err := NewMultipleDigestFromDir("/fake-templates-dir", fs, algos)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("Unable to create digest of unknown algorithm from directory 'such wow'"))
+		})
+
+		It("returns and error if no algorithms are supplied", func() {
+			algos := []Algorithm{}
+			_, err := NewMultipleDigestFromDir("/fake-templates-dir", fs, algos)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("must provide at least one algorithm"))
 		})
 	})
 
@@ -227,7 +328,7 @@ var _ = Describe("MultipleDigest", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(digest.Algorithm().Name()).To(Equal(DigestAlgorithmSHA256.Name()))
-			Expect(digest.String()).To(Equal("sha256:1bf4b70c96b9d4e8f473ac6b7e6b5b965ab3497287a86eb2ed1b263287c78038"))
+			Expect(digest.String()).To(Equal("abcdefg;sha256:1bf4b70c96b9d4e8f473ac6b7e6b5b965ab3497287a86eb2ed1b263287c78038"))
 			Expect(digest.Verify(strings.NewReader("content to be verified"))).ToNot(HaveOccurred())
 		})
 
@@ -263,7 +364,7 @@ var _ = Describe("MultipleDigest", func() {
 			err := json.Unmarshal([]byte(`"unknown1:val1;unknown2:val2"`), &digest)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(digest.Algorithm().Name()).To(Equal("unknown1"))
-			Expect(digest.String()).To(Equal("unknown1:val1"))
+			Expect(digest.String()).To(Equal("unknown1:val1;unknown2:val2"))
 		})
 
 		It("does not error when the json contains a valid digest and an unknown digest", func() {
@@ -271,7 +372,7 @@ var _ = Describe("MultipleDigest", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(digest.Algorithm().Name()).To(Equal(DigestAlgorithmSHA256.Name()))
-			Expect(digest.String()).To(Equal("sha256:1bf4b70c96b9d4e8f473ac6b7e6b5b965ab3497287a86eb2ed1b263287c78038"))
+			Expect(digest.String()).To(Equal("unknown1:val1;sha256:1bf4b70c96b9d4e8f473ac6b7e6b5b965ab3497287a86eb2ed1b263287c78038"))
 			Expect(digest.Verify(strings.NewReader("content to be verified"))).ToNot(HaveOccurred())
 		})
 
