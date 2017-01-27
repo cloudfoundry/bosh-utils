@@ -3,15 +3,17 @@ package crypto_test
 import (
 	"encoding/json"
 	"strings"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
 	. "github.com/cloudfoundry/bosh-utils/crypto"
 	fakesys "github.com/cloudfoundry/bosh-utils/system/fakes"
+	boshsys "github.com/cloudfoundry/bosh-utils/system"
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"os"
 	"io/ioutil"
 	"io"
+
+	"errors"
 )
 
 var _ = Describe("MultipleDigest", func() {
@@ -179,6 +181,61 @@ var _ = Describe("MultipleDigest", func() {
 		})
 	})
 
+	Describe("NewMultipleDigestFromPath", func() {
+		It("returns a multi digest with provided algorithms", func() {
+			file, err := ioutil.TempFile("", "multiple-digest")
+			Expect(err).ToNot(HaveOccurred())
+			defer file.Close()
+			file.Write([]byte("fake-readSeeker-2-contents"))
+			algos := []Algorithm{
+				DigestAlgorithmSHA1,
+				DigestAlgorithmSHA256,
+			}
+
+			logger := boshlog.NewLogger(boshlog.LevelNone)
+			fileSystem := boshsys.NewOsFileSystem(logger)
+			digest, err := NewMultipleDigestFromPath(file.Name(), fileSystem, algos)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(digest.String()).To(Equal("aa64cc884828ae6e8f3d1a24f889e5b43843981f;sha256:e0403fc138c62c89c6d9c81fe6982565d065af71677f8d29942e396406289f76"))
+		})
+
+		It("return an error when calculation the digest fails", func() {
+			file, err := ioutil.TempFile("", "multiple-digest")
+			Expect(err).ToNot(HaveOccurred())
+			defer file.Close()
+			file.Write([]byte("fake-readSeeker-2-contents"))
+			algos := []Algorithm{
+				DigestAlgorithmSHA1,
+				DigestAlgorithmSHA256,
+				NewUnknownAlgorithm("such wow"),
+			}
+
+			logger := boshlog.NewLogger(boshlog.LevelNone)
+			fileSystem := boshsys.NewOsFileSystem(logger)
+			_, err = NewMultipleDigestFromPath(file.Name(), fileSystem, algos)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("such wow"))
+		})
+
+		It("returns an error when the file cannot be opened", func() {
+			algos := []Algorithm{}
+			fs := fakesys.NewFakeFileSystem()
+			fs.OpenFileErr = errors.New("nope nope")
+
+			_, err := NewMultipleDigestFromPath("file-path", fs, algos)
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("nope nope"))
+		})
+
+		It("returns an error if no algorithms are supplied", func() {
+			algos := []Algorithm{}
+			_, err := NewMultipleDigestFromPath("file-path", fakesys.NewFakeFileSystem(), algos)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("must provide at least one algorithm"))
+		})
+	})
+
 	Describe("NewMultipleDigest", func() {
 		var (
 			readSeeker io.ReadSeeker
@@ -220,57 +277,6 @@ var _ = Describe("MultipleDigest", func() {
 		It("returns and error if no algorithms are supplied", func() {
 			algos := []Algorithm{}
 			_, err := NewMultipleDigest(readSeeker, algos)
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("must provide at least one algorithm"))
-		})
-	})
-
-	Describe("NewMultipleDigestFromDir", func() {
-		var fs *fakesys.FakeFileSystem
-		BeforeEach(func() {
-			fs = fakesys.NewFakeFileSystem()
-
-			fs.RegisterOpenFile("/fake-templates-dir", &fakesys.FakeFile{
-				Stats: &fakesys.FakeFileStats{FileType: fakesys.FakeFileTypeDir},
-			})
-
-			fs.RegisterOpenFile("/fake-templates-dir/file-1", &fakesys.FakeFile{
-				Contents: []byte("fake-file-1-contents"),
-			})
-
-			fs.WriteFileString("/fake-templates-dir/file-1", "fake-file-1-contents")
-
-			fs.RegisterOpenFile("/fake-templates-dir/config/file-2", &fakesys.FakeFile{
-				Contents: []byte("fake-file-2-contents"),
-			})
-			fs.MkdirAll("/fake-templates-dir/config", os.ModePerm)
-			fs.WriteFileString("/fake-templates-dir/config/file-2", "fake-file-2-contents")
-		})
-
-		It("returns MultipleDigest for all the supplied algorithms", func() {
-			algos := []Algorithm{
-				DigestAlgorithmSHA1,
-				DigestAlgorithmSHA256,
-			}
-			digest, err := NewMultipleDigestFromDir("/fake-templates-dir", fs, algos)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(digest.String()).To(Equal("bc0646cd41b98cd6c878db7a0573eca345f78200;sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"))
-		})
-
-		It("returns an error when the algorithm fails to checksum the directory", func() {
-			algos := []Algorithm{
-				DigestAlgorithmSHA1,
-				DigestAlgorithmSHA256,
-				NewUnknownAlgorithm("such wow"),
-			}
-			_, err := NewMultipleDigestFromDir("/fake-templates-dir", fs, algos)
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Unable to create digest of unknown algorithm from directory 'such wow'"))
-		})
-
-		It("returns and error if no algorithms are supplied", func() {
-			algos := []Algorithm{}
-			_, err := NewMultipleDigestFromDir("/fake-templates-dir", fs, algos)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("must provide at least one algorithm"))
 		})

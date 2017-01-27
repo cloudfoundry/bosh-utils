@@ -8,6 +8,7 @@ import (
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshsys "github.com/cloudfoundry/bosh-utils/system"
+	"os"
 )
 
 type MultipleDigest struct {
@@ -30,23 +31,17 @@ func MustParseMultipleDigest(json string) MultipleDigest {
 	return digest
 }
 
-func NewMultipleDigestFromDir(dirname string, fs boshsys.FileSystem, algos []Algorithm) (MultipleDigest, error) {
-	if len(algos) == 0 {
-		return MultipleDigest{}, errors.New("must provide at least one algorithm")
+func NewMultipleDigestFromPath(filePath string, fs boshsys.FileSystem, algos []Algorithm) (MultipleDigest, error) {
+	file, err := fs.OpenFile(filePath, os.O_RDONLY, 0)
+	if err != nil {
+		return MultipleDigest{}, bosherr.WrapErrorf(err, "Calculating digest of '%s'", filePath)
 	}
+	defer func() {
+		_ = file.Close()
+	}()
 
-	digests := []Digest{}
-	for _, algo := range algos {
-		digest, err := algo.CreateDigestFromDir(dirname, fs)
-		if err != nil {
-			return MultipleDigest{}, err
-		}
-		digests = append(digests, digest)
-	}
-
-	return MultipleDigest{digests}, nil
+	return NewMultipleDigest(file, algos)
 }
-
 
 func NewMultipleDigest(stream io.ReadSeeker, algos []Algorithm) (MultipleDigest, error) {
 	if len(algos) == 0 {
