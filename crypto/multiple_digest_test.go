@@ -59,7 +59,6 @@ var _ = Describe("MultipleDigest", func() {
 			file.Write([]byte("fake-contents"))
 		})
 
-
 		It("can read a file and verify its content aginst the digest", func() {
 			logger := boshlog.NewLogger(boshlog.LevelNone)
 			fileSystem := boshsys.NewOsFileSystem(logger)
