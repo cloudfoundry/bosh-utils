@@ -23,12 +23,20 @@ func MustNewMultipleDigest(digests ...Digest) MultipleDigest {
 }
 
 func MustParseMultipleDigest(json string) MultipleDigest {
-	var digest MultipleDigest
-	err := (&digest).UnmarshalJSON([]byte(json))
+	digest, err := ParseMultipleDigest(json)
 	if err != nil {
 		panic(fmt.Sprintf("Parsing multiple digest: %s", err))
 	}
 	return digest
+}
+
+func ParseMultipleDigest(json string) (MultipleDigest, error) {
+	var digest MultipleDigest
+	err := (&digest).UnmarshalJSON([]byte(json))
+	if err != nil {
+		return MultipleDigest{}, err
+	}
+	return digest, nil
 }
 
 func NewMultipleDigestFromPath(filePath string, fs boshsys.FileSystem, algos []Algorithm) (MultipleDigest, error) {

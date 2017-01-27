@@ -25,6 +25,28 @@ var _ = Describe("MultipleDigest", func() {
 		digest = MultipleDigest{}
 	})
 
+	Describe("ParseMultipleDigest", func() {
+		It("parses a sha1 json digest string", func() {
+			digest, err := ParseMultipleDigest("sha1string")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(digest.String()).To(Equal("sha1string"))
+			Expect(digest.Algorithm()).To(Equal(DigestAlgorithmSHA1))
+		})
+
+		It("parses a multiple digest json digest string", func() {
+			digest, err := ParseMultipleDigest("sha1string;sha512:sha512string")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(digest.String()).To(Equal("sha1string;sha512:sha512string"))
+			Expect(digest.Algorithm()).To(Equal(DigestAlgorithmSHA512))
+		})
+
+		It("returns error if unmarshalling fails", func() {
+			_, err := ParseMultipleDigest("")
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(Equal("No recognizable digest algorithm found. Supported algorithms: sha1, sha256, sha512"))
+		})
+	})
+
 	Describe("Verify", func() {
 		Context("for a multi digest containing no digests", func() {
 			It("returns error", func() {
