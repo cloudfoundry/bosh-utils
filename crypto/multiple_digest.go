@@ -90,6 +90,17 @@ func (m MultipleDigest) Verify(reader io.Reader) error {
 	return m.strongestDigest().Verify(reader)
 }
 
+func (m MultipleDigest) VerifyFilePath(filePath string, fs boshsys.FileSystem) error {
+	file, err := fs.OpenFile(filePath, os.O_RDONLY, 0)
+	if err != nil {
+		return bosherr.WrapErrorf(err, "Calculating digest of '%s'", filePath)
+	}
+	defer func() {
+		_ = file.Close()
+	}()
+	return m.Verify(file)
+}
+
 func (m MultipleDigest) validate() error {
 	if len(m.digests) == 0 {
 		return errors.New("Expected to find at least one digest")

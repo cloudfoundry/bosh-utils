@@ -14,6 +14,7 @@ import (
 	"io"
 
 	"errors"
+	"fmt"
 )
 
 var _ = Describe("MultipleDigest", func() {
@@ -44,6 +45,38 @@ var _ = Describe("MultipleDigest", func() {
 			_, err := ParseMultipleDigest("")
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(Equal("No recognizable digest algorithm found. Supported algorithms: sha1, sha256, sha512"))
+		})
+	})
+
+	Describe("VerifyFilePath", func() {
+		var file *os.File
+
+		BeforeEach(func() {
+			var err error
+			file, err = ioutil.TempFile("", "multiple-digest")
+			Expect(err).ToNot(HaveOccurred())
+			defer file.Close()
+			file.Write([]byte("fake-contents"))
+		})
+
+
+		It("can read a file and verify its content aginst the digest", func() {
+			logger := boshlog.NewLogger(boshlog.LevelNone)
+			fileSystem := boshsys.NewOsFileSystem(logger)
+			sha1Digest := NewDigest(DigestAlgorithmSHA1, "978ad524a02039f261773fe93d94973ae7de6470")
+
+			digest = MustNewMultipleDigest(sha1Digest)
+			err := digest.VerifyFilePath(file.Name(), fileSystem)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("returns an error if the file cannot be opened", func() {
+			fileSystem := fakesys.NewFakeFileSystem()
+			fileSystem.OpenFileErr = errors.New("nope")
+
+			err := digest.VerifyFilePath(file.Name(), fileSystem)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(Equal(fmt.Sprintf("Calculating digest of '%s': nope", file.Name())))
 		})
 	})
 

@@ -9,7 +9,6 @@ import (
 	"io"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
-	"github.com/cloudfoundry/bosh-utils/system"
 )
 
 var (
@@ -60,8 +59,4 @@ func (c unknownAlgorithmImpl) Name() string { return c.name }
 
 func (c unknownAlgorithmImpl) CreateDigest(reader io.Reader) (Digest, error) {
 	return nil, bosherr.Errorf("Unable to create digest of unknown algorithm '%s'", c.name)
-}
-
-func (c unknownAlgorithmImpl) CreateDigestFromDir(string, system.FileSystem) (Digest, error) {
-	return nil, bosherr.Errorf("Unable to create digest of unknown algorithm from directory '%s'", c.name)
 }
