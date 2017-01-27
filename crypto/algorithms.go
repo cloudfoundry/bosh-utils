@@ -10,8 +10,6 @@ import (
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	"github.com/cloudfoundry/bosh-utils/system"
-	"os"
-
 )
 
 var (
@@ -35,40 +33,6 @@ func (a algorithmSHAImpl) CreateDigest(reader io.Reader) (Digest, error) {
 	}
 
 	return NewDigest(a, fmt.Sprintf("%x", hash.Sum(nil))), nil
-}
-
-func (a algorithmSHAImpl) CreateDigestFromDir(dirPath string, fs system.FileSystem) (Digest, error) {
-	h := a.hashFunc()
-	err := fs.Walk(dirPath+"/", func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return bosherr.WrapErrorf(err, "Walking directory when calculating digest for %s", path)
-		}
-		if !info.IsDir() {
-			err := a.populateHash(fs, path, h)
-			if err != nil {
-				return bosherr.WrapErrorf(err, "Calculating directory digest for %s", path)
-			}
-		}
-		return nil
-	})
-	return NewDigest(a, fmt.Sprintf("%x", h.Sum(nil))), err
-}
-
-func (a algorithmSHAImpl) populateHash(fs system.FileSystem, filePath string, hash hash.Hash) error {
-	file, err := fs.OpenFile(filePath, os.O_RDONLY, 0)
-	if err != nil {
-		return bosherr.WrapErrorf(err, "Opening file '%s' for digest calculation", filePath)
-	}
-	defer func() {
-		_ = file.Close()
-	}()
-
-	_, err = io.Copy(hash, file)
-	if err != nil {
-		return bosherr.WrapError(err, "Copying file for digest calculation")
-	}
-
-	return nil
 }
 
 func (a algorithmSHAImpl) hashFunc() hash.Hash {
