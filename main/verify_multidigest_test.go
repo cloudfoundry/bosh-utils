@@ -96,7 +96,7 @@ var _ = Describe("Verify_multidigest", func() {
 			It("exits 1 when file does not exist", func() {
 				act("create-multi-digest", "sha1", "potato")
 				Eventually(session).Should(gexec.Exit(1))
-				Eventually(session.Err).Should(gbytes.Say("Calculating digest of 'potato': open potato: no such file or directory"))
+				Eventually(session.Err).Should(gbytes.Say("Calculating digest of 'potato': open potato:"))
 			})
 
 			It("exits 1 when the algorithm is unknown", func() {
