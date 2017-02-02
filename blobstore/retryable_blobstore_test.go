@@ -150,9 +150,9 @@ var _ = Describe("retryableBlobstore", func() {
 
 				tries := 0
 				expectedDigest := boshcrypto.MustParseMultipleDigest("some-shasum")
-				createBlobIDs :=  []string{"", "", "fake-last-blob-id"}
+				createBlobIDs := []string{"", "", "fake-last-blob-id"}
 
-				createDigests :=  []boshcrypto.MultipleDigest{
+				createDigests := []boshcrypto.MultipleDigest{
 					boshcrypto.MultipleDigest{},
 					boshcrypto.MultipleDigest{},
 					expectedDigest,
@@ -199,7 +199,7 @@ var _ = Describe("retryableBlobstore", func() {
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("fake-last-create-err"))
 
-				createFileNames := []string{"fake-file-name","fake-file-name","fake-file-name"}
+				createFileNames := []string{"fake-file-name", "fake-file-name", "fake-file-name"}
 				for call, createFileName := range createFileNames {
 					Expect(innerBlobstore.CreateArgsForCall(call)).To(Equal(createFileName))
 				}

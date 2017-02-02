@@ -54,7 +54,7 @@ func NewMultipleDigestFromPath(filePath string, fs boshsys.FileSystem, algos []A
 func NewMultipleDigest(stream io.ReadSeeker, algos []Algorithm) (MultipleDigest, error) {
 	if len(algos) == 0 {
 		return MultipleDigest{}, errors.New("must provide at least one algorithm")
- 	}
+	}
 
 	digests := []Digest{}
 	for _, algo := range algos {
@@ -71,7 +71,7 @@ func NewMultipleDigest(stream io.ReadSeeker, algos []Algorithm) (MultipleDigest,
 
 func (m MultipleDigest) Algorithm() Algorithm { return m.strongestDigest().Algorithm() }
 
-func (m MultipleDigest) String() string       {
+func (m MultipleDigest) String() string {
 	var result []string
 
 	for _, digest := range m.digests {
@@ -139,7 +139,7 @@ func (m MultipleDigest) strongestDigest() Digest {
 	return m.digests[0]
 }
 
-func (m *MultipleDigest) DigestFor(algo Algorithm) (Digest, error){
+func (m *MultipleDigest) DigestFor(algo Algorithm) (Digest, error) {
 	for _, digest := range m.digests {
 		algoName := digest.Algorithm().Name()
 		if algoName == algo.Name() {

@@ -2,16 +2,16 @@ package crypto_test
 
 import (
 	"encoding/json"
-	"strings"
+	. "github.com/cloudfoundry/bosh-utils/crypto"
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
+	boshsys "github.com/cloudfoundry/bosh-utils/system"
+	fakesys "github.com/cloudfoundry/bosh-utils/system/fakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/cloudfoundry/bosh-utils/crypto"
-	fakesys "github.com/cloudfoundry/bosh-utils/system/fakes"
-	boshsys "github.com/cloudfoundry/bosh-utils/system"
-	boshlog "github.com/cloudfoundry/bosh-utils/logger"
-	"os"
-	"io/ioutil"
 	"io"
+	"io/ioutil"
+	"os"
+	"strings"
 
 	"errors"
 	"fmt"
@@ -207,7 +207,7 @@ var _ = Describe("MultipleDigest", func() {
 	})
 
 	Describe("DigestFor", func() {
-		Context("when the algorithm matches one of the digests in the multi", func () {
+		Context("when the algorithm matches one of the digests in the multi", func() {
 			It("returns the digest matching the algorithm", func() {
 				digest1 := NewDigest(DigestAlgorithmSHA1, "sha1digestval")
 				digest2 := NewDigest(DigestAlgorithmSHA256, "sha256digestval")
@@ -223,8 +223,8 @@ var _ = Describe("MultipleDigest", func() {
 			})
 		})
 
-		Context("when the algorithm specified does not match any contained digests", func () {
-			It("returns an error", func () {
+		Context("when the algorithm specified does not match any contained digests", func() {
+			It("returns an error", func() {
 				digest1 := NewDigest(DigestAlgorithmSHA1, "sha1digestval")
 				digest2 := NewDigest(DigestAlgorithmSHA256, "sha256digestval")
 				digests := MustNewMultipleDigest(digest1, digest2)
@@ -293,7 +293,7 @@ var _ = Describe("MultipleDigest", func() {
 	Describe("NewMultipleDigest", func() {
 		var (
 			readSeeker io.ReadSeeker
-			file *os.File
+			file       *os.File
 		)
 
 		BeforeEach(func() {
