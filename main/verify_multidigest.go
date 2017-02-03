@@ -87,6 +87,6 @@ func (c CreateDigestCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(multipleDigest.String())
+	fmt.Printf("%s", multipleDigest.String())
 	return nil
 }

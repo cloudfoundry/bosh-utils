@@ -90,6 +90,16 @@ var _ = Describe("Verify_multidigest", func() {
 				Eventually(session).Should(gexec.Exit(0))
 				Eventually(session).Should(gbytes.Say("c4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6;sha256:571ca3b4ef92a81f8c062f2c2437b9116435d1575589a7b64a5c607d058fde0d"))
 			})
+
+			It("does not emit any newlines or other whitespace", func() {
+				act("create-multi-digest", "sha1,sha256", tempFile.Name())
+				Eventually(session).Should(gexec.Exit(0))
+				Eventually(session).Should(gbytes.Say(`\Ac4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6;sha256:571ca3b4ef92a81f8c062f2c2437b9116435d1575589a7b64a5c607d058fde0d\z`))
+
+				act("create-multi-digest", "sha1", tempFile.Name())
+				Eventually(session).Should(gexec.Exit(0))
+				Eventually(session).Should(gbytes.Say(`\Ac4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6\z`))
+			})
 		})
 
 		Context("when passing incorrect args", func() {
