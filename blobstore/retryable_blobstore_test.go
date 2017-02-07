@@ -149,7 +149,7 @@ var _ = Describe("retryableBlobstore", func() {
 			It("returns blobID and fingerprint without an error", func() {
 
 				tries := 0
-				expectedDigest := boshcrypto.MustParseMultipleDigest("some-shasum")
+				expectedDigest := boshcrypto.MustParseMultipleDigest("someshasum")
 				createBlobIDs := []string{"", "", "fake-last-blob-id"}
 
 				createDigests := []boshcrypto.MultipleDigest{

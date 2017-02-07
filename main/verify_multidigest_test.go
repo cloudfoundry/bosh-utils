@@ -52,9 +52,9 @@ var _ = Describe("Verify_multidigest", func() {
 
 		Context("when passing incorrect args", func() {
 			It("exits 1 when digest does not match", func() {
-				act("verify-multi-digest", tempFile.Name(), "incorrect-digest")
+				act("verify-multi-digest", tempFile.Name(), "incorrectdigest")
 				Eventually(session).Should(gexec.Exit(1))
-				Eventually(session.Err).Should(gbytes.Say("Expected stream to have digest 'incorrect-digest' but was 'c4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6'"))
+				Eventually(session.Err).Should(gbytes.Say("Expected stream to have digest 'incorrectdigest' but was 'c4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6'"))
 			})
 
 			It("exits 1 when file does not exist", func() {
