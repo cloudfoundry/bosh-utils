@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/cloudfoundry/bosh-cli/vendor/github.com/cloudfoundry/bosh-utils/crypto"
+	"github.com/cloudfoundry/bosh-utils/crypto"
 	"github.com/cloudfoundry/bosh-utils/system"
 )
 
