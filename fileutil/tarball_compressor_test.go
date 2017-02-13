@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -27,6 +28,13 @@ func fixtureSrcTgz() string {
 	pwd, err := os.Getwd()
 	Expect(err).NotTo(HaveOccurred())
 	return filepath.Join(pwd, "test_assets", "compressor-decompress-file-to-dir.tgz")
+}
+
+func makePathTarCompatible(path string) string {
+	if runtime.GOOS == "windows" {
+		path = strings.Replace("/"+string(path[0])+string(path[2:]), "\\", "/", -1)
+	}
+	return path
 }
 
 func createTestSymlink() (string, error) {
@@ -112,7 +120,7 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(tgzName)
 
-			tarballContents, _, _, err := cmdRunner.RunCommand("tar", "-tf", tgzName)
+			tarballContents, _, _, err := cmdRunner.RunCommand("tar", "-tf", makePathTarCompatible(tgzName))
 			Expect(err).ToNot(HaveOccurred())
 
 			contentElements := strings.Fields(strings.TrimSpace(tarballContents))
@@ -133,7 +141,7 @@ var _ = Describe("tarballCompressor", func() {
 				"./other_logs/more_logs/more.stdout.log",
 			))
 
-			_, _, _, err = cmdRunner.RunCommand("tar", "-xzpf", tgzName, "-C", dstDir)
+			_, _, _, err = cmdRunner.RunCommand("tar", "-xzpf", makePathTarCompatible(tgzName), "-C", makePathTarCompatible(dstDir))
 			Expect(err).ToNot(HaveOccurred())
 
 			content, err := fs.ReadFileString(dstDir + "/app.stdout.log")
@@ -162,7 +170,7 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(tgzName)
 
-			tarballContents, _, _, err := cmdRunner.RunCommand("tar", "-tf", tgzName)
+			tarballContents, _, _, err := cmdRunner.RunCommand("tar", "-tf", makePathTarCompatible(tgzName))
 			Expect(err).ToNot(HaveOccurred())
 
 			contentElements := strings.Fields(strings.TrimSpace(tarballContents))
@@ -178,7 +186,7 @@ var _ = Describe("tarballCompressor", func() {
 
 			_, _, _, err = cmdRunner.RunCommand("cp", tgzName, "/tmp")
 
-			_, _, _, err = cmdRunner.RunCommand("tar", "-xzpf", tgzName, "-C", dstDir)
+			_, _, _, err = cmdRunner.RunCommand("tar", "-xzpf", makePathTarCompatible(tgzName), "-C", makePathTarCompatible(dstDir))
 			Expect(err).ToNot(HaveOccurred())
 
 			content, err := fs.ReadFileString(dstDir + "/app.stdout.log")
@@ -221,7 +229,7 @@ var _ = Describe("tarballCompressor", func() {
 
 			err := compressor.DecompressFileToDir(fixtureSrcTgz(), dstDir, CompressorOptions{})
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring(dstDir))
+			Expect(err.Error()).To(ContainSubstring(makePathTarCompatible(dstDir)))
 		})
 
 		It("uses no same owner option", func() {
@@ -236,8 +244,8 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(cmdRunner.RunCommands[0]).To(Equal(
 				[]string{
 					"tar", "--no-same-owner",
-					"-xzvf", tarballPath,
-					"-C", dstDir,
+					"-xzvf", makePathTarCompatible(tarballPath),
+					"-C", makePathTarCompatible(dstDir),
 				},
 			))
 		})
@@ -258,8 +266,8 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(cmdRunner.RunCommands[0]).To(Equal(
 				[]string{
 					"tar", "--same-owner",
-					"-xzvf", tarballPath,
-					"-C", dstDir,
+					"-xzvf", makePathTarCompatible(tarballPath),
+					"-C", makePathTarCompatible(dstDir),
 				},
 			))
 		})
