@@ -108,10 +108,6 @@ func (r *requestRetryable) Attempt() (bool, error) {
 	r.response, err = r.delegate.Do(r.request)
 
 	attemptable, err := r.isResponseAttemptable(r.response, err)
-	if err != nil {
-		return attemptable, err
-	}
-
 	if !attemptable && r.seekableRequestBody != nil {
 		r.seekableRequestBody.Close()
 	}
