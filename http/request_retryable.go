@@ -107,7 +107,16 @@ func (r *requestRetryable) Attempt() (bool, error) {
 	r.logger.Debug(r.logTag, "[requestID=%s] Requesting (attempt=%d): %s", r.requestID, r.attempt, formatRequest(r.request))
 	r.response, err = r.delegate.Do(r.request)
 
-	return r.isResponseAttemptable(r.response, err)
+	attemptable, err := r.isResponseAttemptable(r.response, err)
+	if err != nil {
+		return attemptable, err
+	}
+
+	if !attemptable && r.seekableRequestBody != nil {
+		r.seekableRequestBody.Close()
+	}
+
+	return attemptable, err
 }
 
 func (r *requestRetryable) Response() *http.Response {
