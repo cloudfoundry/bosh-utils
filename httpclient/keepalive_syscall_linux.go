@@ -1,0 +1,6 @@
+package httpclient
+
+import "syscall"
+
+const KEEPALIVE_INTERVAL_PLATFORM_INDEPENDENT = syscall.TCP_KEEPINTVL
+const KEEPALIVE_GETSOCKOPT_PLATFORM_INDEPENDENT = 0x1
