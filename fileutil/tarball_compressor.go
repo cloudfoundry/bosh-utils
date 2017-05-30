@@ -29,7 +29,7 @@ func (c tarballCompressor) CompressSpecificFilesInDir(dir string, files []string
 
 	tarballPath := tarball.Name()
 
-	args := []string{"czf", tarballPath, "-C", dir}
+	args := []string{"czhf", tarballPath, "-C", dir}
 
 	for _, file := range files {
 		args = append(args, file)
