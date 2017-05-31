@@ -9,6 +9,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"errors"
 	"fmt"
 
 	. "github.com/cloudfoundry/bosh-utils/http"
@@ -128,6 +129,24 @@ var _ = Describe("RetryClients", func() {
 					Expect(fakeClient.Requests).To(ContainElement(req))
 				})
 			}
+
+			Context("underlying connection errors should not be influenced by request method", func() {
+				for _, method := range []string{"GET", "HEAD", "POST", "DELETE"} {
+					It(fmt.Sprintf("retries for maxAttempts with a %s request", method), func() {
+						fakeClient.SetNilResponse()
+						fakeClient.Error = errors.New("fake-err")
+
+						req := &http.Request{Method: method}
+						resp, err := retryClient.Do(req)
+						Expect(err).To(HaveOccurred())
+						Expect(err.Error()).To(ContainSubstring("fake-err"))
+						Expect(resp).To(BeNil())
+
+						Expect(fakeClient.CallCount).To(Equal(maxAttempts))
+						Expect(fakeClient.Requests).To(ContainElement(req))
+					})
+				}
+			})
 
 			timeoutCodes := []int{
 				http.StatusGatewayTimeout,

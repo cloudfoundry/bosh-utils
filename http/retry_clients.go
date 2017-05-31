@@ -44,9 +44,7 @@ func NewNetworkSafeRetryClient(
 		retryDelay:  retryDelay,
 		logger:      logger,
 		isResponseAttemptable: func(resp *http.Response, err error) (bool, error) {
-			isSafeMethod := resp.Request.Method == "GET" || resp.Request.Method == "HEAD"
-
-			if err != nil || (isSafeMethod && (resp.StatusCode == http.StatusGatewayTimeout || resp.StatusCode == http.StatusServiceUnavailable)) {
+			if err != nil || ((resp.Request.Method == "GET" || resp.Request.Method == "HEAD") && (resp.StatusCode == http.StatusGatewayTimeout || resp.StatusCode == http.StatusServiceUnavailable)) {
 				return true, errors.WrapError(err, "Retry")
 			}
 
