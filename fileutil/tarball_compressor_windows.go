@@ -57,7 +57,7 @@ func (c tarballCompressor) DecompressFileToDir(tarballPath string, dir string, o
 		return bosherr.WrapError(err, "Converting dir path failed")
 	}
 
-	_, _, _, err = c.cmdRunner.RunCommand("tar", sameOwnerOption, "-xzvf", tarballPath, "-C", dir)
+	_, _, _, err = c.cmdRunner.RunCommand("tar", sameOwnerOption, "-xzf", tarballPath, "-C", dir)
 	if err != nil {
 		return bosherr.WrapError(err, "Shelling out to tar")
 	}
