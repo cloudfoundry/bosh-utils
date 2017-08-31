@@ -54,31 +54,26 @@ func (w *blockingWriter) String() string {
 var _ = Describe("Logger", func() {
 	var (
 		outBuf = new(bytes.Buffer)
-		errBuf = new(bytes.Buffer)
 	)
 	BeforeEach(func() {
 		outBuf.Reset()
-		errBuf.Reset()
 	})
 
 	Describe("Async Logger", func() {
 		It("logs the formatted message to Logger.err at the debug level", func() {
-			logger := NewAsyncWriterLogger(LevelDebug, outBuf, errBuf)
+			logger := NewAsyncWriterLogger(LevelDebug, outBuf)
 			logger.Debug("TAG", "some %s info to log", "awesome")
 			logger.Flush()
 
 			expectedContent := expectedLogFormat("TAG", "DEBUG - some awesome info to log")
-			Expect(errBuf).To(MatchRegexp(expectedContent))
-			Expect(outBuf).ToNot(MatchRegexp(expectedContent))
+			Expect(outBuf).To(MatchRegexp(expectedContent))
 		})
 
 		It("does not block when its writer is blocked", func() {
 			out := new(blockingWriter)
-			err := new(blockingWriter)
-			logger := NewAsyncWriterLogger(LevelDebug, out, err)
+			logger := NewAsyncWriterLogger(LevelDebug, out)
 
 			out.Lock()
-			err.Lock()
 			ch := make(chan struct{}, 1)
 			go func() {
 				for i := 0; i < 10; i++ {
@@ -89,53 +84,52 @@ var _ = Describe("Logger", func() {
 			}()
 			Eventually(ch).Should(Receive())
 			Expect(out.buf.Len()).To(Equal(0))
-			Expect(err.buf.Len()).To(Equal(0))
 		})
 
 		It("copies queued log messages", func() {
 			const s0 = "ABCDEFGHIJ"
 			const s1 = "abcdefghij"
 
-			errBuf := new(blockingWriter)
-			logger := NewAsyncWriterLogger(LevelDebug, outBuf, errBuf)
+			outBuf := new(blockingWriter)
+			logger := NewAsyncWriterLogger(LevelDebug, outBuf)
 
-			errBuf.Lock()
+			outBuf.Lock()
 			logger.Debug("TAG", s0)
 			logger.Debug("TAG", s1)
-			errBuf.Unlock()
+			outBuf.Unlock()
 
 			Expect(logger.Flush()).To(Succeed())
 
-			lines := strings.Split(strings.TrimSpace(errBuf.buf.String()), "\n")
+			lines := strings.Split(strings.TrimSpace(outBuf.buf.String()), "\n")
 			Expect(lines).To(HaveLen(2))
 			Expect(lines[0]).To(HaveSuffix(s0))
 			Expect(lines[1]).To(HaveSuffix(s1))
 		})
 
 		It("continuously flushes queued log messages", func() {
-			errBuf := new(blockingWriter)
-			logger := NewAsyncWriterLogger(LevelDebug, outBuf, errBuf)
+			outBuf := new(blockingWriter)
+			logger := NewAsyncWriterLogger(LevelDebug, outBuf)
 
-			errBuf.Lock()
+			outBuf.Lock()
 			for i := 0; i < 10; i++ {
 				logger.Debug("TAG", "Queued log message")
 			}
-			Expect(errBuf.buf.Len()).To(Equal(0))
-			errBuf.Unlock()
-			Eventually(errBuf.Len).ShouldNot(Equal(0))
+			Expect(outBuf.buf.Len()).To(Equal(0))
+			outBuf.Unlock()
+			Eventually(outBuf.Len).ShouldNot(Equal(0))
 		})
 
 		It("flushes with a timeout", func() {
-			errBuf := new(blockingWriter)
-			logger := NewAsyncWriterLogger(LevelDebug, outBuf, errBuf)
+			outBuf := new(blockingWriter)
+			logger := NewAsyncWriterLogger(LevelDebug, outBuf)
 			logger.Debug("TAG", "something")
 
-			errBuf.Lock()
+			outBuf.Lock()
 			Expect(logger.FlushTimeout(time.Millisecond * 10)).ToNot(Succeed())
 
-			errBuf.Unlock()
+			outBuf.Unlock()
 			Expect(logger.FlushTimeout(time.Millisecond * 10)).To(Succeed())
-			Expect(strings.TrimSpace(errBuf.buf.String())).To(HaveSuffix("something"))
+			Expect(strings.TrimSpace(outBuf.buf.String())).To(HaveSuffix("something"))
 		})
 
 		It("flush doesn't block writes", func() {
@@ -146,7 +140,7 @@ var _ = Describe("Logger", func() {
 			)
 
 			out := &intervalWriter{dur: WriteInterval}
-			logger := NewAsyncWriterLogger(LevelDebug, out, out)
+			logger := NewAsyncWriterLogger(LevelDebug, out)
 
 			// add some messages to the queue
 			out.Lock()
@@ -175,7 +169,7 @@ var _ = Describe("Logger", func() {
 			)
 
 			out := &intervalWriter{dur: WriteInterval}
-			logger := NewAsyncWriterLogger(LevelDebug, out, out)
+			logger := NewAsyncWriterLogger(LevelDebug, out)
 
 			// add some messages to the queue
 			out.Lock()
