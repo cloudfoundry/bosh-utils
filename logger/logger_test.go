@@ -137,8 +137,8 @@ var _ = Describe("Logger", func() {
 			logger.Debug("TAG", "some %s info to log", "awesome")
 
 			expectedContent := expectedLogFormat("TAG", "DEBUG - some awesome info to log")
-			Expect(outBuf).To(MatchRegexp(expectedContent))
-			Expect(errBuf).ToNot(MatchRegexp(expectedContent))
+			Expect(errBuf).To(MatchRegexp(expectedContent))
+			Expect(outBuf).ToNot(MatchRegexp(expectedContent))
 		})
 	})
 
@@ -147,12 +147,12 @@ var _ = Describe("Logger", func() {
 			logger := NewWriterLogger(LevelDebug, outBuf, errBuf)
 			logger.DebugWithDetails("TAG", "some info to log", "awesome")
 			expectedContent := expectedLogFormat("TAG", "DEBUG - some info to log")
-			Expect(outBuf).To(MatchRegexp(expectedContent))
-			Expect(errBuf).ToNot(MatchRegexp(expectedContent))
+			Expect(errBuf).To(MatchRegexp(expectedContent))
+			Expect(outBuf).ToNot(MatchRegexp(expectedContent))
 
 			expectedDetails := "\n********************\nawesome\n********************"
-			Expect(outBuf).To(ContainSubstring(expectedDetails))
-			Expect(errBuf).ToNot(ContainSubstring(expectedDetails))
+			Expect(errBuf).To(ContainSubstring(expectedDetails))
+			Expect(outBuf).ToNot(ContainSubstring(expectedDetails))
 		})
 	})
 
@@ -216,7 +216,8 @@ var _ = Describe("Logger", func() {
 		logger.Warn("WARN", "some warn log")
 		logger.Error("ERROR", "some error log")
 
-		Expect(outBuf).To(ContainSubstring("DEBUG"))
+		Expect(errBuf).To(ContainSubstring("DEBUG"))
+		Expect(outBuf).ToNot(ContainSubstring("DEBUG"))
 		Expect(outBuf).To(ContainSubstring("INFO"))
 		Expect(errBuf).To(ContainSubstring("WARN"))
 		Expect(errBuf).To(ContainSubstring("ERROR"))
@@ -230,6 +231,7 @@ var _ = Describe("Logger", func() {
 		logger.Warn("WARN", "some warn log")
 		logger.Error("ERROR", "some error log")
 
+		Expect(errBuf).ToNot(ContainSubstring("DEBUG"))
 		Expect(outBuf).ToNot(ContainSubstring("DEBUG"))
 		Expect(outBuf).To(ContainSubstring("INFO"))
 		Expect(errBuf).To(ContainSubstring("WARN"))
@@ -244,6 +246,7 @@ var _ = Describe("Logger", func() {
 		logger.Warn("WARN", "some warn log")
 		logger.Error("ERROR", "some error log")
 
+		Expect(errBuf).ToNot(ContainSubstring("DEBUG"))
 		Expect(outBuf).ToNot(ContainSubstring("DEBUG"))
 		Expect(outBuf).ToNot(ContainSubstring("INFO"))
 		Expect(errBuf).To(ContainSubstring("WARN"))
@@ -258,6 +261,7 @@ var _ = Describe("Logger", func() {
 		logger.Warn("WARN", "some warn log")
 		logger.Error("ERROR", "some error log")
 
+		Expect(errBuf).ToNot(ContainSubstring("DEBUG"))
 		Expect(outBuf).ToNot(ContainSubstring("DEBUG"))
 		Expect(outBuf).ToNot(ContainSubstring("INFO"))
 		Expect(errBuf).ToNot(ContainSubstring("WARN"))
@@ -275,7 +279,8 @@ var _ = Describe("Logger", func() {
 				logger.Warn("TOGGLED_WARN", "some warn log")
 				logger.Error("TOGGLED_ERROR", "some error log")
 
-				Expect(outBuf).To(ContainSubstring("TOGGLED_DEBUG"))
+				Expect(errBuf).To(ContainSubstring("TOGGLED_DEBUG"))
+				Expect(outBuf).ToNot(ContainSubstring("TOGGLED_DEBUG"))
 				Expect(outBuf).To(ContainSubstring("TOGGLED_INFO"))
 				Expect(errBuf).To(ContainSubstring("TOGGLED_WARN"))
 				Expect(errBuf).To(ContainSubstring("TOGGLED_ERROR"))
@@ -291,6 +296,7 @@ var _ = Describe("Logger", func() {
 				logger.Warn("STANDARD_WARN", "some warn log")
 				logger.Error("STANDARD_ERROR", "some error log")
 
+				Expect(errBuf).ToNot(ContainSubstring("STANDARD_DEBUG"))
 				Expect(outBuf).ToNot(ContainSubstring("STANDARD_DEBUG"))
 				Expect(outBuf).ToNot(ContainSubstring("STANDARD_INFO"))
 				Expect(errBuf).ToNot(ContainSubstring("STANDARD_WARN"))
