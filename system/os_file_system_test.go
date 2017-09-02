@@ -181,8 +181,8 @@ var _ = Describe("OS FileSystem", func() {
 		})
 	})
 
-	Context("the file already exists and is not write only", func() {
-		It("writes to file", func() {
+	Describe("ConvergeFileContents", func() {
+		It("converges file", func() {
 			osFs := createOsFs()
 			testPath := filepath.Join(os.TempDir(), "subDir", "ConvergeFileContentsTestFile")
 
@@ -218,6 +218,61 @@ var _ = Describe("OS FileSystem", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(written).To(BeFalse())
 			Expect(readFile(file)).To(Equal("second write"))
+		})
+
+		It("does create file if dry run option is set", func() {
+			osFs := createOsFs()
+			testPath := filepath.Join(os.TempDir(), "subDir", "ConvergeFileContentsTestFile")
+
+			if _, err := os.Stat(testPath); err == nil {
+				Expect(os.Remove(testPath)).To(Succeed())
+			}
+
+			written, err := osFs.ConvergeFileContents(testPath, []byte("initial write"), ConvergeFileContentsOpts{DryRun: true})
+			defer os.Remove(testPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(written).To(BeTrue())
+
+			Expect(osFs.FileExists(testPath)).To(BeFalse())
+		})
+
+		It("does not converge file if dry run is set", func() {
+			osFs := createOsFs()
+			testPath := filepath.Join(os.TempDir(), "subDir", "ConvergeFileContentsTestFile")
+
+			if _, err := os.Stat(testPath); err == nil {
+				Expect(os.Remove(testPath)).To(Succeed())
+			}
+
+			written, err := osFs.ConvergeFileContents(testPath, []byte("initial write"))
+			defer os.Remove(testPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(written).To(BeTrue())
+
+			file, err := os.Open(testPath)
+			Expect(err).ToNot(HaveOccurred())
+			defer file.Close()
+
+			Expect(readFile(file)).To(Equal("initial write"))
+
+			written, err = osFs.ConvergeFileContents(testPath, []byte("second write"), ConvergeFileContentsOpts{DryRun: true})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(written).To(BeTrue())
+
+			file.Close()
+			file, err = os.Open(testPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(readFile(file)).To(Equal("initial write"))
+
+			// same length content
+			written, err = osFs.ConvergeFileContents(testPath, []byte("initial wNOTe"), ConvergeFileContentsOpts{DryRun: true})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(written).To(BeTrue())
+
+			file.Close()
+			file, err = os.Open(testPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(readFile(file)).To(Equal("initial write"))
 		})
 	})
 
