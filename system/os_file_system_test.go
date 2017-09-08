@@ -197,8 +197,6 @@ var _ = Describe("OS FileSystem", func() {
 
 			file, err := os.Open(testPath)
 			Expect(err).ToNot(HaveOccurred())
-			defer file.Close()
-
 			Expect(readFile(file)).To(Equal("initial write"))
 
 			written, err = osFs.ConvergeFileContents(testPath, []byte("second write"))
@@ -218,6 +216,7 @@ var _ = Describe("OS FileSystem", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(written).To(BeFalse())
 			Expect(readFile(file)).To(Equal("second write"))
+			file.Close()
 		})
 
 		It("does create file if dry run option is set", func() {
@@ -251,7 +250,6 @@ var _ = Describe("OS FileSystem", func() {
 
 			file, err := os.Open(testPath)
 			Expect(err).ToNot(HaveOccurred())
-			defer file.Close()
 
 			Expect(readFile(file)).To(Equal("initial write"))
 
@@ -273,6 +271,7 @@ var _ = Describe("OS FileSystem", func() {
 			file, err = os.Open(testPath)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(readFile(file)).To(Equal("initial write"))
+			file.Close()
 		})
 	})
 
