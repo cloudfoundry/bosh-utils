@@ -87,7 +87,7 @@ func GetPlatformCommand(cmdName string) Command {
 	return unixCommands[cmdName]
 }
 
-func parseEnvFields(envDump string) map[string]string {
+func parseEnvFields(envDump string, convertKeysToUpper bool) map[string]string {
 	fields := make(map[string]string)
 	envDump = strings.Replace(envDump, "\r", "", -1)
 	for _, line := range strings.Split(envDump, "\n") {
@@ -95,7 +95,11 @@ func parseEnvFields(envDump string) map[string]string {
 		if n := strings.IndexByte(line, '='); n != -1 {
 			key := line[:n]   // key
 			val := line[n+1:] // key
-			fields[key] = val
+			if convertKeysToUpper {
+				fields[strings.ToUpper(key)] = val
+			} else {
+				fields[key] = val
+			}
 		}
 	}
 	return fields
@@ -126,7 +130,7 @@ var _ = Describe("execCmdRunner", func() {
 			stdout, stderr, status, err := runner.RunComplexCommand(cmd)
 			Expect(err).ToNot(HaveOccurred())
 
-			envVars := parseEnvFields(stdout)
+			envVars := parseEnvFields(stdout, true)
 			Expect(envVars).To(HaveKeyWithValue("FOO", "BAR"))
 			Expect(envVars).To(HaveKey("PATH"))
 			Expect(stderr).To(BeEmpty())
@@ -142,7 +146,7 @@ var _ = Describe("execCmdRunner", func() {
 				stdout, stderr, status, err := runner.RunComplexCommand(cmd)
 				Expect(err).ToNot(HaveOccurred())
 
-				envVars := parseEnvFields(stdout)
+				envVars := parseEnvFields(stdout, true)
 				Expect(envVars).To(HaveKeyWithValue("FOO", "BAR"))
 				Expect(envVars).ToNot(HaveKey("PATH"))
 				Expect(stderr).To(BeEmpty())
@@ -161,7 +165,10 @@ var _ = Describe("execCmdRunner", func() {
 				return nil, err
 			}
 
-			envVars := parseEnvFields(stdout)
+			// don't upper case key names we want to assert that the lower case
+			// duplicates provided in Command.Env are used.  also, Windows does
+			// not care about key case.
+			envVars := parseEnvFields(stdout, false)
 			return envVars, nil
 		}
 
@@ -171,7 +178,6 @@ var _ = Describe("execCmdRunner", func() {
 			})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(envVars).To(HaveKeyWithValue("_FOO", "BAZZZ"))
-			Expect(envVars).To(HaveKey("PATH"))
 		})
 
 		It("performs a case-sensitive comparison of env vars when on *Nix", func() {
