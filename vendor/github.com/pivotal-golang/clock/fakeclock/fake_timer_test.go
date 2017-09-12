@@ -3,9 +3,9 @@ package fakeclock_test
 import (
 	"time"
 
+	"code.cloudfoundry.org/clock/fakeclock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-golang/clock/fakeclock"
 )
 
 var _ = Describe("FakeTimer", func() {
@@ -39,6 +39,16 @@ var _ = Describe("FakeTimer", func() {
 		Consistently(timeChan, Δ).ShouldNot(Receive())
 	})
 
+	Describe("Stop", func() {
+		It("is idempotent", func() {
+			timer := fakeClock.NewTimer(time.Second)
+			timer.Stop()
+			timer.Stop()
+			fakeClock.Increment(time.Second)
+			Consistently(timer.C()).ShouldNot(Receive())
+		})
+	})
+
 	Describe("WaitForWatcherAndIncrement", func() {
 		It("consistently fires timers that start asynchronously", func() {
 			received := make(chan time.Time)
@@ -64,6 +74,44 @@ var _ = Describe("FakeTimer", func() {
 			for i := 0; i < 100; i++ {
 				fakeClock.WaitForWatcherAndIncrement(duration)
 				Expect((<-received).Sub(initialTime)).To(Equal(duration * time.Duration(i+1)))
+			}
+		})
+
+		It("consistently fires timers that reset asynchronously", func() {
+			received := make(chan time.Time, 1)
+
+			stop := make(chan struct{})
+			defer close(stop)
+
+			duration := 10 * time.Second
+
+			timer := fakeClock.NewTimer(duration)
+
+			go func() {
+				for {
+					select {
+					case ticked := <-timer.C():
+						received <- ticked
+						timer.Reset(duration)
+					case <-stop:
+						return
+					}
+				}
+			}()
+
+			incrementClock := make(chan struct{})
+
+			go func() {
+				for {
+					<-incrementClock
+					fakeClock.WaitForWatcherAndIncrement(duration)
+				}
+			}()
+
+			for i := 0; i < 100; i++ {
+				Eventually(incrementClock).Should(BeSent(struct{}{}))
+				var timestamp time.Time
+				Eventually(received, 5*time.Second).Should(Receive(&timestamp))
 			}
 		})
 	})

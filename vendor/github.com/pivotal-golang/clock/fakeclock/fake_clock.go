@@ -4,11 +4,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pivotal-golang/clock"
+	"code.cloudfoundry.org/clock"
 )
 
 type timeWatcher interface {
 	timeUpdated(time.Time)
+	shouldFire(time.Time) bool
+	repeatable() bool
 }
 
 type FakeClock struct {
@@ -38,7 +40,7 @@ func (clock *FakeClock) Now() time.Time {
 }
 
 func (clock *FakeClock) Increment(duration time.Duration) {
-	clock.increment(duration, false)
+	clock.increment(duration, false, 0)
 }
 
 func (clock *FakeClock) IncrementBySeconds(seconds uint64) {
@@ -46,7 +48,11 @@ func (clock *FakeClock) IncrementBySeconds(seconds uint64) {
 }
 
 func (clock *FakeClock) WaitForWatcherAndIncrement(duration time.Duration) {
-	clock.increment(duration, true)
+	clock.WaitForNWatchersAndIncrement(duration, 1)
+}
+
+func (clock *FakeClock) WaitForNWatchersAndIncrement(duration time.Duration, numWatchers int) {
+	clock.increment(duration, true, numWatchers)
 }
 
 func (clock *FakeClock) NewTimer(d time.Duration) clock.Timer {
@@ -58,6 +64,10 @@ func (clock *FakeClock) NewTimer(d time.Duration) clock.Timer {
 
 func (clock *FakeClock) Sleep(d time.Duration) {
 	<-clock.NewTimer(d).C()
+}
+
+func (clock *FakeClock) After(d time.Duration) <-chan time.Time {
+	return clock.NewTimer(d).C()
 }
 
 func (clock *FakeClock) NewTicker(d time.Duration) clock.Ticker {
@@ -74,22 +84,31 @@ func (clock *FakeClock) WatcherCount() int {
 	return len(clock.watchers)
 }
 
-func (clock *FakeClock) increment(duration time.Duration, waitForWatchers bool) {
+func (clock *FakeClock) increment(duration time.Duration, waitForWatchers bool, numWatchers int) {
 	clock.cond.L.Lock()
+	defer clock.cond.L.Unlock()
 
-	for waitForWatchers && len(clock.watchers) == 0 {
+	for waitForWatchers && len(clock.watchers) < numWatchers {
 		clock.cond.Wait()
 	}
 
 	now := clock.now.Add(duration)
 	clock.now = now
 
-	watchers := make([]timeWatcher, 0, len(clock.watchers))
+	watchers := make([]timeWatcher, 0)
+	newWatchers := map[timeWatcher]struct{}{}
 	for w, _ := range clock.watchers {
-		watchers = append(watchers, w)
+		fire := w.shouldFire(now)
+		if fire {
+			watchers = append(watchers, w)
+		}
+
+		if !fire || w.repeatable() {
+			newWatchers[w] = struct{}{}
+		}
 	}
 
-	clock.cond.L.Unlock()
+	clock.watchers = newWatchers
 
 	for _, w := range watchers {
 		w.timeUpdated(now)
@@ -101,7 +120,8 @@ func (clock *FakeClock) addTimeWatcher(tw timeWatcher) {
 	clock.watchers[tw] = struct{}{}
 	clock.cond.L.Unlock()
 
-	tw.timeUpdated(clock.Now())
+	// force the timer to fire
+	clock.Increment(0)
 
 	clock.cond.Broadcast()
 }

@@ -3,9 +3,9 @@ package fakeclock_test
 import (
 	"time"
 
+	"code.cloudfoundry.org/clock/fakeclock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-golang/clock/fakeclock"
 )
 
 var _ = Describe("FakeClock", func() {
@@ -46,6 +46,25 @@ var _ = Describe("FakeClock", func() {
 
 			fakeClock.Increment(1 * time.Second)
 			Eventually(doneSleeping).Should(BeClosed())
+		})
+	})
+
+	Describe("After", func() {
+		It("waits and then sends the current time on the returned channel", func() {
+			timeChan := fakeClock.After(10 * time.Second)
+			Consistently(timeChan, Δ).ShouldNot(Receive())
+
+			fakeClock.Increment(5 * time.Second)
+			Consistently(timeChan, Δ).ShouldNot(Receive())
+
+			fakeClock.Increment(4 * time.Second)
+			Consistently(timeChan, Δ).ShouldNot(Receive())
+
+			fakeClock.Increment(1 * time.Second)
+			Eventually(timeChan).Should(Receive(Equal(initialTime.Add(10 * time.Second))))
+
+			fakeClock.Increment(10 * time.Second)
+			Consistently(timeChan, Δ).ShouldNot(Receive())
 		})
 	})
 
