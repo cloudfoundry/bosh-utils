@@ -6,6 +6,7 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	"golang.org/x/sys/unix"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 )
@@ -34,7 +35,7 @@ func (p *execProcess) Start() error {
 	if !p.keepAttached {
 		p.pgid = p.cmd.Process.Pid
 	} else {
-		p.pgid, err = syscall.Getpgid(p.pid)
+		p.pgid, err = unix.Getpgid(p.pid)
 		if err != nil {
 			p.logger.Error(execProcessLogTag, "Failed to retrieve pgid for command '%s'", cmdString)
 			p.pgid = -1
