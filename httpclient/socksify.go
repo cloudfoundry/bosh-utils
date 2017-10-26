@@ -22,19 +22,35 @@ func SOCKS5DialFuncFromEnvironment(origDialer DialFunc) DialFunc {
 		return origDialer
 	}
 
-	if strings.HasPrefix(allProxy, "ssh+") && strings.Contains(allProxy, "?private-key=") {
-		allProxy = strings.TrimPrefix(allProxy, "ssh+socks5://")
+	if strings.HasPrefix(allProxy, "ssh+") {
+		allProxy = strings.TrimPrefix(allProxy, "ssh+")
 
-		proxyBaseURL := strings.Split(allProxy, "?")[0]
-		proxySSHKeyPath := strings.Split(allProxy, "=")[1]
+		proxyURL, err := url.Parse(allProxy)
+		if err != nil {
+			return origDialer
+		}
 
-		proxySSHKey, err := ioutil.ReadFile(proxySSHKeyPath)
+		queryMap, err := url.ParseQuery(proxyURL.RawQuery)
+		if err != nil {
+			return origDialer
+		}
+
+		proxySSHKeyPath, ok := queryMap["private-key"]
+		if !ok {
+			return origDialer
+		}
+
+		if len(proxySSHKeyPath) == 0 {
+			return origDialer
+		}
+
+		proxySSHKey, err := ioutil.ReadFile(proxySSHKeyPath[0])
 		if err != nil {
 			return origDialer
 		}
 
 		socks5Proxy := proxy.NewSocks5Proxy(proxy.NewHostKeyGetter())
-		dialer, err := socks5Proxy.Dialer(string(proxySSHKey), proxyBaseURL)
+		dialer, err := socks5Proxy.Dialer(string(proxySSHKey), proxyURL.Host)
 		if err != nil {
 			return origDialer
 		}
