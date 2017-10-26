@@ -4,7 +4,7 @@
 [[projects]]
   branch = "master"
   name = "code.cloudfoundry.org/clock"
-  packages = ["."]
+  packages = [".","fakeclock"]
   revision = "2269160ae1757f96bbb8c6475e6fa36c805e73e0"
 
 [[projects]]
@@ -62,12 +62,6 @@
   revision = "e34e13867a42f12943d6d5448e90b294dc85601d"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/pivotal-golang/clock"
-  packages = ["fakeclock"]
-  revision = "2269160ae1757f96bbb8c6475e6fa36c805e73e0"
-
-[[projects]]
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
@@ -106,6 +100,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ef3c03e2ecc249eda4e537b2c026bbd633e5e7d037b7515fd36b4f264c66a810"
+  inputs-digest = "71b3c16999db0d39efac9b6e66d7fb97cef9205961daab984fee50e66c1c2934"
   solver-name = "gps-cdcl"
   solver-version = 1
