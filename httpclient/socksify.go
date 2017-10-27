@@ -49,13 +49,19 @@ func SOCKS5DialFuncFromEnvironment(origDialer DialFunc) DialFunc {
 			return origDialer
 		}
 
-		socks5Proxy := proxy.NewSocks5Proxy(proxy.NewHostKeyGetter())
-		dialer, err := socks5Proxy.Dialer(string(proxySSHKey), proxyURL.Host)
-		if err != nil {
-			return origDialer
-		}
-
+		var (
+			socks5Proxy *proxy.Socks5Proxy
+			dialer      proxy.DialFunc
+		)
 		return func(network, address string) (net.Conn, error) {
+			if socks5Proxy == nil {
+				var err error
+				socks5Proxy = proxy.NewSocks5Proxy(proxy.NewHostKeyGetter())
+				dialer, err = socks5Proxy.Dialer(string(proxySSHKey), proxyURL.Host)
+				if err != nil {
+					return origDialer(network, address)
+				}
+			}
 			return dialer(network, address)
 		}
 	}
