@@ -6,14 +6,12 @@ import (
 	"net"
 	"net/http"
 	"time"
+
+	proxy "github.com/cloudfoundry/socks5-proxy"
 )
 
 var (
 	DefaultClient = CreateDefaultClientInsecureSkipVerify()
-	defaultDialer = SOCKS5DialFuncFromEnvironment((&net.Dialer{
-		Timeout:   30 * time.Second,
-		KeepAlive: 30 * time.Second,
-	}).Dial)
 )
 
 type Client interface {
@@ -42,7 +40,10 @@ func (f factory) New(insecureSkipVerify bool, certPool *x509.CertPool) *http.Cli
 			},
 
 			Proxy: http.ProxyFromEnvironment,
-			Dial:  defaultDialer,
+			Dial: SOCKS5DialFuncFromEnvironment((&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}).Dial, proxy.NewSocks5Proxy(proxy.NewHostKeyGetter())),
 
 			TLSHandshakeTimeout: 30 * time.Second,
 			DisableKeepAlives:   true,

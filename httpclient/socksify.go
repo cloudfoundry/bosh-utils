@@ -6,17 +6,23 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	proxy "github.com/cloudfoundry/socks5-proxy"
 
 	goproxy "golang.org/x/net/proxy"
 )
 
+type ProxyDialer interface {
+	Dialer(string, string) (proxy.DialFunc, error)
+}
+
 type DialFunc func(network, address string) (net.Conn, error)
 
 func (f DialFunc) Dial(network, address string) (net.Conn, error) { return f(network, address) }
 
-func SOCKS5DialFuncFromEnvironment(origDialer DialFunc) DialFunc {
+func SOCKS5DialFuncFromEnvironment(origDialer DialFunc, socks5Proxy ProxyDialer) DialFunc {
 	allProxy := os.Getenv("BOSH_ALL_PROXY")
 	if len(allProxy) == 0 {
 		return origDialer
@@ -50,17 +56,26 @@ func SOCKS5DialFuncFromEnvironment(origDialer DialFunc) DialFunc {
 		}
 
 		var (
-			socks5Proxy *proxy.Socks5Proxy
-			dialer      proxy.DialFunc
+			dialer proxy.DialFunc
+			mut    sync.RWMutex
 		)
 		return func(network, address string) (net.Conn, error) {
-			if socks5Proxy == nil {
-				var err error
-				socks5Proxy = proxy.NewSocks5Proxy(proxy.NewHostKeyGetter())
-				dialer, err = socks5Proxy.Dialer(string(proxySSHKey), proxyURL.Host)
+			mut.RLock()
+			haveDialer := dialer != nil
+			mut.RUnlock()
+
+			if haveDialer {
+				return dialer(network, address)
+			}
+
+			mut.Lock()
+			defer mut.Unlock()
+			if dialer == nil {
+				proxyDialer, err := socks5Proxy.Dialer(string(proxySSHKey), proxyURL.Host)
 				if err != nil {
-					return origDialer(network, address)
+					return nil, bosherr.WrapErrorf(err, "Creating SOCKS5 dialer")
 				}
+				dialer = proxyDialer
 			}
 			return dialer(network, address)
 		}
