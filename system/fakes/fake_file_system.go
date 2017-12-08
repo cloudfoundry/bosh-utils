@@ -509,7 +509,7 @@ func (fs *FakeFileSystem) ConvergeFileContents(path string, content []byte, opts
 }
 
 func (fs *FakeFileSystem) ReadFileString(path string) (string, error) {
-	bytes, err := fs.ReadFile(path)
+	bytes, err := fs.readFile(path)
 	if err != nil {
 		return "", err
 	}
@@ -528,7 +528,15 @@ func (fs *FakeFileSystem) UnregisterReadFileError(path string) {
 	delete(fs.readFileErrorByPath, path)
 }
 
+func (fs *FakeFileSystem) ReadFileQuietly(path string) ([]byte, error) {
+	return fs.readFile(path)
+}
+
 func (fs *FakeFileSystem) ReadFile(path string) ([]byte, error) {
+	return fs.readFile(path)
+}
+
+func (fs *FakeFileSystem) readFile(path string) ([]byte, error) {
 	stats := fs.GetFileTestStat(path)
 	if stats != nil {
 		if fs.ReadFileError != nil {

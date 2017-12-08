@@ -343,14 +343,33 @@ var _ = Describe("OS FileSystem", func() {
 	})
 
 	It("read file", func() {
-		osFs := createOsFs()
+		logger := &loggerfakes.FakeLogger{}
+		osFs := NewOsFileSystem(logger)
 		testPath := filepath.Join(TempDir, "ReadFileTestFile")
 
 		osFs.WriteFileString(testPath, "some contents")
 		defer os.Remove(testPath)
 
 		content, err := osFs.ReadFile(testPath)
+
 		Expect(err).ToNot(HaveOccurred())
+		Expect(logger.DebugWithDetailsCallCount()).To(Equal(2))
+		Expect("some contents").To(Equal(string(content)))
+	})
+
+	It("read file quietly", func() {
+		logger := &loggerfakes.FakeLogger{}
+		osFs := NewOsFileSystem(logger)
+		testPath := filepath.Join(TempDir, "ReadFileTestFile")
+
+		osFs.WriteFileQuietly(testPath, []byte("some contents"))
+		defer os.Remove(testPath)
+
+		content, err := osFs.ReadFileQuietly(testPath)
+
+		Expect(err).ToNot(HaveOccurred())
+		//1 Write debug
+		Expect(logger.DebugWithDetailsCallCount()).To(Equal(0))
 		Expect("some contents").To(Equal(string(content)))
 	})
 

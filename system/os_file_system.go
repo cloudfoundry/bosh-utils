@@ -188,8 +188,15 @@ func (fs *osFileSystem) ReadFileString(path string) (content string, err error) 
 	content = string(bytes)
 	return
 }
-
 func (fs *osFileSystem) ReadFile(path string) (content []byte, err error) {
+	return fs.readFileHelper(path, true)
+}
+
+func (fs *osFileSystem) ReadFileQuietly(path string) (content []byte, err error) {
+	return fs.readFileHelper(path, false)
+}
+
+func (fs *osFileSystem) readFileHelper(path string, logDebug bool) (content []byte, err error) {
 	fs.logger.Debug(fs.logTag, "Reading file %s", path)
 
 	file, err := fs.OpenFile(path, os.O_RDONLY, 0)
@@ -205,8 +212,9 @@ func (fs *osFileSystem) ReadFile(path string) (content []byte, err error) {
 		err = bosherr.WrapErrorf(err, "Reading file content %s", path)
 		return
 	}
-
-	fs.logger.DebugWithDetails(fs.logTag, "Read content", content)
+	if logDebug {
+		fs.logger.DebugWithDetails(fs.logTag, "Read content", content)
+	}
 	return
 }
 
