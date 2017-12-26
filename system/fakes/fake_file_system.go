@@ -46,8 +46,9 @@ type FakeFileSystem struct {
 	openFileRegistry *FakeFileRegistry
 	OpenFileErr      error
 
-	ReadFileError       error
-	readFileErrorByPath map[string]error
+	ReadFileError             error
+	ReadFileWithOptsCallCount int
+	readFileErrorByPath       map[string]error
 
 	WriteFileError            error
 	WriteFileErrors           map[string]error
@@ -539,6 +540,11 @@ func (fs *FakeFileSystem) RegisterReadFileError(path string, err error) {
 
 func (fs *FakeFileSystem) UnregisterReadFileError(path string) {
 	delete(fs.readFileErrorByPath, path)
+}
+
+func (fs *FakeFileSystem) ReadFileWithOpts(path string, opts boshsys.ReadOpts) ([]byte, error) {
+	fs.ReadFileWithOptsCallCount++
+	return fs.ReadFile(path)
 }
 
 func (fs *FakeFileSystem) ReadFile(path string) ([]byte, error) {

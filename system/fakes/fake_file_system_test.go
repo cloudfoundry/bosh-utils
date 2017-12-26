@@ -309,6 +309,24 @@ var _ = Describe("FakeFileSystem", func() {
 		})
 	})
 
+	Describe("ReadFileWithOpts", func() {
+		It("reads the file", func() {
+			fs.WriteFileQuietly("foo", []byte("hello"))
+
+			writtenContent, err := fs.ReadFileWithOpts("foo", boshsys.ReadOpts{})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(writtenContent)).To(ContainSubstring("hello"))
+		})
+
+		It("Records the number of times the method was called", func() {
+			fs.WriteFileQuietly("foo", []byte("hello"))
+			fs.ReadFileWithOpts("foo", boshsys.ReadOpts{})
+			fs.ReadFileWithOpts("foo", boshsys.ReadOpts{Quiet: true})
+
+			Expect(fs.ReadFileWithOptsCallCount).To(Equal(2))
+		})
+	})
+
 	Describe("WriteFileQuietly", func() {
 		It("Writes the file", func() {
 			fs.WriteFileQuietly("foo", []byte("hello"))
