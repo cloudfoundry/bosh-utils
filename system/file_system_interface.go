@@ -40,6 +40,7 @@ type FileSystem interface {
 
 	FileExists(path string) bool
 	Stat(path string) (os.FileInfo, error)
+	StatWithOpts(path string, opts StatOpts) (os.FileInfo, error)
 	Lstat(path string) (os.FileInfo, error)
 
 	Rename(oldPath, newPath string) error

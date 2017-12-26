@@ -323,6 +323,30 @@ var _ = Describe("OS FileSystem", func() {
 		})
 	})
 
+	Context("we want to stat a file quietly, i.e. without logging", func() {
+		It("Stats the file but doesn't write any logs", func() {
+			logger := &loggerfakes.FakeLogger{}
+			osFs := NewOsFileSystem(logger)
+			testPath := filepath.Join(TempDir, "OpenFileTestFile")
+
+			file, err := osFs.OpenFile(testPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+			Expect(err).ToNot(HaveOccurred())
+			defer file.Close()
+			defer os.Remove(testPath)
+
+			fsInfo, err := osFs.StatWithOpts(testPath, StatOpts{Quiet: true})
+			Expect(err).ToNot(HaveOccurred())
+
+			// Go standard library
+			osInfo, err := os.Stat(testPath)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(os.SameFile(fsInfo, osInfo)).To(BeTrue())
+			Expect(logger.DebugCallCount()).To(Equal(0))
+			Expect(logger.DebugWithDetailsCallCount()).To(Equal(0))
+		})
+	})
+
 	Context("we want to write a file quietly, i.e. without logging", func() {
 		It("Still writes the file but doesn't write any logs", func() {
 			logger := &loggerfakes.FakeLogger{}
@@ -338,7 +362,6 @@ var _ = Describe("OS FileSystem", func() {
 
 			writtenContent, _ := osFs.ReadFileString(testPath)
 			Expect(writtenContent).To(Equal("test"))
-
 		})
 	})
 

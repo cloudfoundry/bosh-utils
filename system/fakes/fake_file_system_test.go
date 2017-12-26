@@ -376,6 +376,29 @@ var _ = Describe("FakeFileSystem", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(fileStat.ModTime()).To(Equal(setModTime))
 		})
+
+		It("records the invocation", func() {
+			err := fs.WriteFileString("somepath", "some file contents")
+			Expect(err).ToNot(HaveOccurred())
+
+			_, err = fs.Stat("somepath")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(fs.StatCallCount).To(Equal(1))
+		})
+	})
+
+	Describe("StatWithOpts", func() {
+		It("records the invocation", func() {
+			err := fs.WriteFileString("somepath", "some file contents")
+			Expect(err).ToNot(HaveOccurred())
+			statOpts := boshsys.StatOpts{Quiet: true}
+
+			_, err = fs.StatWithOpts("somepath", statOpts)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(fs.StatWithOptsCallCount).To(Equal(1))
+		})
 	})
 
 	Describe("Lstat", func() {

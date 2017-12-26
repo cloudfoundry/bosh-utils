@@ -84,9 +84,19 @@ func (fs *osFileSystem) OpenFile(path string, flag int, perm os.FileMode) (File,
 	return fs.openFile(path, flag, perm)
 }
 
-func (fs *osFileSystem) Stat(path string) (os.FileInfo, error) {
-	fs.logger.Debug(fs.logTag, "Stat '%s'", path)
+type StatOpts struct {
+	Quiet bool
+}
+
+func (fs *osFileSystem) StatWithOpts(path string, opts StatOpts) (os.FileInfo, error) {
+	if !opts.Quiet {
+		fs.logger.Debug(fs.logTag, "Stat '%s'", path)
+	}
 	return fsWrapper.Stat(path)
+}
+
+func (fs *osFileSystem) Stat(path string) (os.FileInfo, error) {
+	return fs.StatWithOpts(path, StatOpts{})
 }
 
 func (fs *osFileSystem) Lstat(path string) (os.FileInfo, error) {
