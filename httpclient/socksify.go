@@ -24,14 +24,18 @@ func (f DialFunc) Dial(network, address string) (net.Conn, error) { return f(net
 
 func SOCKS5DialFuncFromEnvironment(origDialer DialFunc, socks5Proxy ProxyDialer) DialFunc {
 	allProxy := os.Getenv("BOSH_ALL_PROXY")
-	if len(allProxy) == 0 {
+	return NewSOCKS5DialFunc(allProxy, origDialer, socks5Proxy)
+}
+
+func NewSOCKS5DialFunc(proxyString string, origDialer DialFunc, socks5Proxy ProxyDialer) DialFunc {
+	if len(proxyString) == 0 {
 		return origDialer
 	}
 
-	if strings.HasPrefix(allProxy, "ssh+") {
-		allProxy = strings.TrimPrefix(allProxy, "ssh+")
+	if strings.HasPrefix(proxyString, "ssh+") {
+		proxyString = strings.TrimPrefix(proxyString, "ssh+")
 
-		proxyURL, err := url.Parse(allProxy)
+		proxyURL, err := url.Parse(proxyString)
 		if err != nil {
 			return origDialer
 		}
@@ -81,7 +85,7 @@ func SOCKS5DialFuncFromEnvironment(origDialer DialFunc, socks5Proxy ProxyDialer)
 		}
 	}
 
-	proxyURL, err := url.Parse(allProxy)
+	proxyURL, err := url.Parse(proxyString)
 	if err != nil {
 		return origDialer
 	}
