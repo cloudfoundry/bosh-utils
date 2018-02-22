@@ -1,12 +1,17 @@
 package system
 
 import (
+	"fmt"
 	"os/exec"
 	"sort"
 	"strings"
 )
 
-func newExecCmd(name string, args ...string) *exec.Cmd {
+func newExecCmd(isScript bool, name string, args ...string) *exec.Cmd {
+	if isScript {
+		return exec.Command("powershell", append([]string{fmt.Sprintf("%s.ps1", name)}, args...)...)
+	}
+
 	return exec.Command(name, args...)
 }
 

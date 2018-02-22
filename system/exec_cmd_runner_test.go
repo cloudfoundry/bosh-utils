@@ -235,6 +235,19 @@ var _ = Describe("execCmdRunner", func() {
 			Expect(envVars).To(HaveKeyWithValue("_BAR", "alpha=first"))
 		})
 
+		It("executes scripts", func() {
+			cmd := Command{
+				Name:     "test_assets/script",
+				IsScript: true,
+			}
+
+			stdout, stderr, status, err := runner.RunComplexCommand(cmd)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(stdout).To(MatchRegexp(`^it works\r?\n$`))
+			Expect(stderr).To(BeEmpty())
+			Expect(status).To(Equal(0))
+		})
+
 		It("run complex command with stdin", func() {
 			input := "This is STDIN\nWith another line."
 			cmd := Command{
