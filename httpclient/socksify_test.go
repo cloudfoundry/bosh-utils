@@ -165,6 +165,7 @@ type FakeProxyDialer struct {
 	DialerCall struct {
 		CallCount int
 		Receives  struct {
+			Username string
 			Key string
 			URL string
 		}
@@ -176,10 +177,11 @@ type FakeProxyDialer struct {
 	mut sync.Mutex
 }
 
-func (p *FakeProxyDialer) Dialer(key, url string) (proxy.DialFunc, error) {
+func (p *FakeProxyDialer) Dialer(username, key, url string) (proxy.DialFunc, error) {
 	p.mut.Lock()
 	defer p.mut.Unlock()
 	p.DialerCall.CallCount++
+	p.DialerCall.Receives.Username = username
 	p.DialerCall.Receives.Key = key
 	p.DialerCall.Receives.URL = url
 
