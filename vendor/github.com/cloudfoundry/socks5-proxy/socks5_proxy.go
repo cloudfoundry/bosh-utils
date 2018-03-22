@@ -6,11 +6,12 @@ import (
 	"net"
 	"strconv"
 
-	socks5 "github.com/genevieve/go-socks5"
+	socks5 "github.com/cloudfoundry/go-socks5"
+
+	"log"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/net/context"
-	"log"
 )
 
 var netListen = net.Listen
@@ -36,12 +37,12 @@ func NewSocks5Proxy(hostKey hostKey, logger *log.Logger) *Socks5Proxy {
 	}
 }
 
-func (s *Socks5Proxy) Start(key, url string) error {
+func (s *Socks5Proxy) Start(username, key, url string) error {
 	if s.started {
 		return nil
 	}
 
-	dialer, err := s.Dialer("", key, url)
+	dialer, err := s.Dialer(username, key, url)
 	if err != nil {
 		return err
 	}

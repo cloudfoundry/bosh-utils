@@ -24,21 +24,21 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/cloudfoundry/go-socks5"
+  packages = ["."]
+  revision = "54f73bdb8a8e85a6611d3d29ab9bbf98c2a060d7"
+
+[[projects]]
+  branch = "master"
   name = "github.com/cloudfoundry/socks5-proxy"
   packages = ["."]
-  revision = "0c3440491f012604d9b0ca1f72b7550b88491378"
+  revision = "3c6b4eec9c2d16c1dac4c42bdb5f755ba09daff8"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/genevieve/go-socks5"
-  packages = ["."]
-  revision = "54f73bdb8a8e85a6611d3d29ab9bbf98c2a060d7"
 
 [[projects]]
   branch = "master"
