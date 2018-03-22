@@ -8,10 +8,10 @@ $env:PATH = $env:GOPATH + "/bin;C:/go/bin;C:/bin;" + $env:PATH
 
 cd $env:GOPATH/src/github.com/cloudfoundry/bosh-utils
 
-if ((Get-Command "go.exe" -ErrorAction SilentlyContinue) -eq $null)
+if ((Get-Command "go.exe" -ErrorAction SilentlyContinue) -eq $null -Or (go.exe version) -ne "go version go1.10 windows/amd64")
 {
-  Write-Host "Installing Go 1.7.3!"
-  Invoke-WebRequest https://storage.googleapis.com/golang/go1.7.3.windows-amd64.msi -OutFile go.msi
+  Write-Host "Installing Go 1.10!"
+  Invoke-WebRequest https://storage.googleapis.com/golang/go1.10.windows-amd64.msi -OutFile go.msi
 
   $p = Start-Process -FilePath "msiexec" -ArgumentList "/passive /norestart /i go.msi" -Wait -PassThru
 
@@ -31,6 +31,8 @@ if ((Get-Command "tar.exe" -ErrorAction SilentlyContinue) -eq $null)
 
   Write-Host "tar is installed!"
 }
+
+go.exe version
 
 go.exe install github.com/cloudfoundry/bosh-utils/vendor/github.com/onsi/ginkgo/ginkgo
 ginkgo.exe -r -keepGoing -skipPackage="vendor"
