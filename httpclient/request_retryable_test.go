@@ -19,40 +19,6 @@ import (
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 )
 
-type seekableReadClose struct {
-	Seeked     bool
-	closed     bool
-	content    []byte
-	readCloser io.ReadCloser
-}
-
-func NewSeekableReadClose(content []byte) *seekableReadClose {
-	return &seekableReadClose{
-		Seeked:     false,
-		content:    content,
-		readCloser: ioutil.NopCloser(bytes.NewReader(content)),
-	}
-}
-
-func (s *seekableReadClose) Seek(offset int64, whence int) (ret int64, err error) {
-	s.readCloser = ioutil.NopCloser(bytes.NewReader(s.content))
-	s.Seeked = true
-	return 0, nil
-}
-
-func (s *seekableReadClose) Read(p []byte) (n int, err error) {
-	return s.readCloser.Read(p)
-}
-
-func (s *seekableReadClose) Close() error {
-	if s.closed {
-		return errors.New("Can not close twice")
-	}
-
-	s.closed = true
-	return nil
-}
-
 var _ = Describe("RequestRetryable", func() {
 	Describe("Attempt", func() {
 		var (
@@ -91,20 +57,32 @@ var _ = Describe("RequestRetryable", func() {
 			Expect(server.ReceivedRequests()).To(HaveLen(1))
 		})
 
-		Context("when request returns an error", func() {
+		Context("when the request returns a non 2xx status code", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					ghttp.CombineHandlers(
 						ghttp.VerifyRequest("GET", "/"),
-						ghttp.RespondWith(503, "fake-response-error"),
+						ghttp.RespondWith(http.StatusServiceUnavailable, "fake-response-error"),
 					),
 				)
 			})
 
-			It("is retryable", func() {
+			It("is retryable and returns the response with correct status code", func() {
+				isRetryable, err := requestRetryable.Attempt()
+				Expect(err).NotTo(HaveOccurred())
+				Expect(requestRetryable.Response().StatusCode).To(Equal(http.StatusServiceUnavailable))
+				Expect(isRetryable).To(BeTrue())
+			})
+		})
+
+		Context("when the making a request to the server returns an error", func() {
+			BeforeEach(func() {
+				server.HTTPTestServer.Close()
+			})
+
+			It("is retryable and returns the error", func() {
 				isRetryable, err := requestRetryable.Attempt()
 				Expect(err).To(HaveOccurred())
-				Expect(err).To(MatchError(ContainSubstring("503 Service Unavailable")))
 				Expect(isRetryable).To(BeTrue())
 			})
 		})
@@ -154,7 +132,7 @@ var _ = Describe("RequestRetryable", func() {
 				})
 			})
 
-			Context("when it returns an error checking if response can be attempted again", func() {
+			Context("when checking if the request is retryable returns an error", func() {
 				BeforeEach(func() {
 					seekableReaderCloser = NewSeekableReadClose([]byte("hello from seekable"))
 					request.Body = seekableReaderCloser
@@ -175,53 +153,56 @@ var _ = Describe("RequestRetryable", func() {
 			})
 
 			Context("when the response status code is not between 200 and 300", func() {
-				var (
-					isRetryable bool
-					err         error
-				)
 				BeforeEach(func() {
 					server.AppendHandlers(
 						ghttp.CombineHandlers(
 							ghttp.VerifyRequest("GET", "/"),
-							ghttp.RespondWith(404, "fake-response-body"),
+							ghttp.RespondWith(http.StatusNotFound, "fake-response-body"),
 						),
 					)
-					isRetryable, err = requestRetryable.Attempt()
 				})
 
 				It("is retryable", func() {
-					Expect(err).To(HaveOccurred())
+					isRetryable, err := requestRetryable.Attempt()
+					Expect(err).NotTo(HaveOccurred())
 					Expect(isRetryable).To(BeTrue())
 
 					resp := requestRetryable.Response()
 					Expect(readString(resp.Body)).To(Equal("fake-response-body"))
-					Expect(resp.StatusCode).To(Equal(404))
+					Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
 				})
 
 				Context("when making another, successful, attempt", func() {
 					BeforeEach(func() {
-						server.RouteToHandler("GET", "/",
+						server.AppendHandlers(
 							ghttp.CombineHandlers(
+								ghttp.VerifyRequest("GET", "/"),
 								ghttp.VerifyBody([]byte("hello from seekable")),
-								ghttp.RespondWith(200, "fake-response-body"),
+								ghttp.RespondWith(http.StatusOK, "fake-response-body"),
 							),
 						)
 						seekableReaderCloser.Seeked = false
-						_, err = requestRetryable.Attempt()
+
+						isRetryable, err := requestRetryable.Attempt()
+						Expect(isRetryable).To(BeTrue())
+						Expect(err).NotTo(HaveOccurred())
+						Expect(requestRetryable.Response().StatusCode).To(Equal(http.StatusNotFound))
 					})
 
 					It("seeks back to the beginning and on the original request body", func() {
+						_, err := requestRetryable.Attempt()
 						Expect(err).ToNot(HaveOccurred())
 
 						Expect(seekableReaderCloser.Seeked).To(BeTrue())
 						Expect(server.ReceivedRequests()).To(HaveLen(2))
 
 						resp := requestRetryable.Response()
-						Expect(resp.StatusCode).To(Equal(200))
+						Expect(resp.StatusCode).To(Equal(http.StatusOK))
 						Expect(readString(resp.Body)).To(Equal("fake-response-body"))
 					})
 
 					It("closes file handles", func() {
+						_, err := requestRetryable.Attempt()
 						Expect(err).ToNot(HaveOccurred())
 						Expect(seekableReaderCloser.closed).To(BeTrue())
 					})
@@ -234,42 +215,47 @@ var _ = Describe("RequestRetryable", func() {
 				server.RouteToHandler("GET", "/",
 					ghttp.CombineHandlers(
 						ghttp.VerifyBody([]byte("fake-request-body")),
-						ghttp.RespondWith(404, "fake-response-body"),
+						ghttp.RespondWith(http.StatusNotFound, "fake-response-body"),
 					),
 				)
 			})
 
 			It("is retryable", func() {
 				isRetryable, err := requestRetryable.Attempt()
-				Expect(err).To(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 				Expect(isRetryable).To(BeTrue())
 
 				resp := requestRetryable.Response()
 				Expect(readString(resp.Body)).To(Equal("fake-response-body"))
-				Expect(resp.StatusCode).To(Equal(404))
+				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
 			})
 
 			It("re-populates the request body on subsequent attempts", func() {
-				_, err := requestRetryable.Attempt()
-				Expect(err).To(HaveOccurred())
+				isRetryable, err := requestRetryable.Attempt()
+				Expect(err).NotTo(HaveOccurred())
+				Expect(isRetryable).To(BeTrue())
 
-				_, err = requestRetryable.Attempt()
-				Expect(err).To(HaveOccurred())
+				isRetryable, err = requestRetryable.Attempt()
+				Expect(err).NotTo(HaveOccurred())
+				Expect(isRetryable).To(BeTrue())
 
 				resp := requestRetryable.Response()
 				Expect(readString(resp.Body)).To(Equal("fake-response-body"))
-				Expect(resp.StatusCode).To(Equal(404))
+				Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
 
 				Expect(server.ReceivedRequests()).To(HaveLen(2))
 			})
 
 			It("closes the previous response body on subsequent attempts", func() {
-				_, err := requestRetryable.Attempt()
-				Expect(err).To(HaveOccurred())
+				isRetryable, err := requestRetryable.Attempt()
+				Expect(err).NotTo(HaveOccurred())
+				Expect(isRetryable).To(BeTrue())
+
 				originalRespBody := requestRetryable.Response().Body
 
-				_, err = requestRetryable.Attempt()
-				Expect(err).To(HaveOccurred())
+				isRetryable, err = requestRetryable.Attempt()
+				Expect(err).NotTo(HaveOccurred())
+				Expect(isRetryable).To(BeTrue())
 
 				_, err = originalRespBody.Read(nil)
 				Expect(err).To(HaveOccurred())
@@ -281,21 +267,55 @@ var _ = Describe("RequestRetryable", func() {
 				// prior requests body; ref https://marc.ttias.be/golang-nuts/2016-02/msg00256.php
 				// This should not be necessary when the following CL gets accepted:
 				// https://go-review.googlesource.com/c/go/+/62891
-				_, err := requestRetryable.Attempt()
-				Expect(err).To(HaveOccurred())
+				isRetryable, err := requestRetryable.Attempt()
+				Expect(err).NotTo(HaveOccurred())
+				Expect(isRetryable).To(BeTrue())
 
-				_, err = requestRetryable.Attempt()
-				Expect(err).To(HaveOccurred())
-
-				Expect(err).NotTo(MatchError("request canceled"))
+				isRetryable, err = requestRetryable.Attempt()
+				Expect(err).NotTo(HaveOccurred())
+				Expect(isRetryable).To(BeTrue())
 				// we expect to see 404 here because we don't want to see request
 				// canceled, this is to avoid having a false positive if messages
 				// change in the future
-				Expect(err).To(MatchError(ContainSubstring("404 Not Found")))
+				Expect(requestRetryable.Response().StatusCode).To(Equal(http.StatusNotFound))
 			})
 		})
 	})
 })
+
+type seekableReadClose struct {
+	Seeked     bool
+	closed     bool
+	content    []byte
+	readCloser io.ReadCloser
+}
+
+func NewSeekableReadClose(content []byte) *seekableReadClose {
+	return &seekableReadClose{
+		Seeked:     false,
+		content:    content,
+		readCloser: ioutil.NopCloser(bytes.NewReader(content)),
+	}
+}
+
+func (s *seekableReadClose) Seek(offset int64, whence int) (ret int64, err error) {
+	s.readCloser = ioutil.NopCloser(bytes.NewReader(s.content))
+	s.Seeked = true
+	return 0, nil
+}
+
+func (s *seekableReadClose) Read(p []byte) (n int, err error) {
+	return s.readCloser.Read(p)
+}
+
+func (s *seekableReadClose) Close() error {
+	if s.closed {
+		return errors.New("Can not close twice")
+	}
+
+	s.closed = true
+	return nil
+}
 
 func readString(body io.ReadCloser) string {
 	defer body.Close()

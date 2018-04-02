@@ -24,7 +24,7 @@ var _ = Describe("AttemptRetryStrategy", func() {
 		It("includes type of retryable in log message", func() {
 			retryable := newSimpleRetryable([]attemptOutput{
 				{
-					IsRetryable: true,
+					IsRetryable: false,
 					AttemptErr:  nil,
 				},
 			})
@@ -38,27 +38,53 @@ var _ = Describe("AttemptRetryStrategy", func() {
 			Expect(fmt.Sprintf(message, args...)).To(Equal("Making attempt #0 for *retrystrategy_test.simpleRetryable"))
 		})
 
-		Context("when there are errors during a try", func() {
-			It("retries until the max attempts are used up", func() {
-				retryable := newSimpleRetryable([]attemptOutput{
-					{
-						IsRetryable: true,
-						AttemptErr:  errors.New("first-error"),
-					},
-					{
-						IsRetryable: true,
-						AttemptErr:  errors.New("second-error"),
-					},
-					{
-						IsRetryable: true,
-						AttemptErr:  errors.New("third-error"),
-					},
+		Context("when the request is retryable", func() {
+			Context("and the request has errored", func() {
+				It("retries until the max attempts are used and returns an error", func() {
+					retryable := newSimpleRetryable([]attemptOutput{
+						{
+							IsRetryable: true,
+							AttemptErr:  errors.New("one"),
+						},
+						{
+							IsRetryable: true,
+							AttemptErr:  errors.New("two"),
+						},
+						{
+							IsRetryable: true,
+							AttemptErr:  errors.New("three"),
+						},
+					})
+
+					attemptRetryStrategy := NewAttemptRetryStrategy(3, 0, retryable, logger)
+					err := attemptRetryStrategy.Try()
+					Expect(err).To(HaveOccurred())
+					Expect(err).To(MatchError("three"))
+					Expect(retryable.Attempts).To(Equal(3))
 				})
-				attemptRetryStrategy := NewAttemptRetryStrategy(3, 0, retryable, logger)
-				err := attemptRetryStrategy.Try()
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring("third-error"))
-				Expect(retryable.Attempts).To(Equal(3))
+			})
+
+			Context("and the attempt does not error", func() {
+				It("retries until the max attempts are used and does not return an error", func() {
+					retryable := newSimpleRetryable([]attemptOutput{
+						{
+							IsRetryable: true,
+							AttemptErr:  nil,
+						},
+						{
+							IsRetryable: true,
+							AttemptErr:  nil,
+						},
+						{
+							IsRetryable: true,
+							AttemptErr:  nil,
+						},
+					})
+					attemptRetryStrategy := NewAttemptRetryStrategy(3, 0, retryable, logger)
+					err := attemptRetryStrategy.Try()
+					Expect(err).NotTo(HaveOccurred())
+					Expect(retryable.Attempts).To(Equal(3))
+				})
 			})
 		})
 
@@ -80,19 +106,18 @@ var _ = Describe("AttemptRetryStrategy", func() {
 				Expect(err.Error()).To(ContainSubstring("second-error"))
 				Expect(retryable.Attempts).To(Equal(2))
 			})
-		})
 
-		Context("when there are no errors", func() {
-			It("does not retry", func() {
+			It("stops trying", func() {
 				retryable := newSimpleRetryable([]attemptOutput{
 					{
-						IsRetryable: true,
+						IsRetryable: false,
 						AttemptErr:  nil,
 					},
 				})
-				attemptRetryStrategy := NewAttemptRetryStrategy(3, 0, retryable, logger)
+
+				attemptRetryStrategy := NewAttemptRetryStrategy(10, 0, retryable, logger)
 				err := attemptRetryStrategy.Try()
-				Expect(err).ToNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 				Expect(retryable.Attempts).To(Equal(1))
 			})
 		})
