@@ -29,19 +29,19 @@ var _ = Describe("TimeoutRetryStrategy", func() {
 			It("retries until the timeout", func() {
 				retryable := newSimpleRetryable([]attemptOutput{
 					{
-						IsRetryable: true,
+						ShouldRetry: true,
 						AttemptErr:  errors.New("first-error"),
 					},
 					{
-						IsRetryable: true,
+						ShouldRetry: true,
 						AttemptErr:  errors.New("second-error"),
 					},
 					{
-						IsRetryable: true,
+						ShouldRetry: true,
 						AttemptErr:  errors.New("third-error"),
 					},
 					{
-						IsRetryable: true,
+						ShouldRetry: true,
 						AttemptErr:  errors.New("fourth-error"),
 					},
 				})
@@ -61,15 +61,15 @@ var _ = Describe("TimeoutRetryStrategy", func() {
 			It("stops without a trailing delay", func() {
 				retryable := newSimpleRetryable([]attemptOutput{
 					{
-						IsRetryable: true,
+						ShouldRetry: true,
 						AttemptErr:  errors.New("first-error"),
 					},
 					{
-						IsRetryable: true,
+						ShouldRetry: true,
 						AttemptErr:  errors.New("second-error"),
 					},
 					{
-						IsRetryable: true,
+						ShouldRetry: true,
 						AttemptErr:  errors.New("third-error"),
 					},
 				})
@@ -92,11 +92,11 @@ var _ = Describe("TimeoutRetryStrategy", func() {
 			It("stops trying", func() {
 				retryable := newSimpleRetryable([]attemptOutput{
 					{
-						IsRetryable: true,
+						ShouldRetry: true,
 						AttemptErr:  errors.New("first-error"),
 					},
 					{
-						IsRetryable: false,
+						ShouldRetry: false,
 						AttemptErr:  errors.New("second-error"),
 					},
 				})
@@ -114,21 +114,52 @@ var _ = Describe("TimeoutRetryStrategy", func() {
 		})
 
 		Context("when there are no errors", func() {
-			It("does not retry", func() {
-				retryable := newSimpleRetryable([]attemptOutput{
-					{
-						IsRetryable: true,
-						AttemptErr:  nil,
-					},
-				})
-				timeoutRetryStrategy := NewTimeoutRetryStrategy(5*time.Second, 1*time.Second, retryable, fakeTimeService, logger)
-				doneChan := incrementSleepInBackground(fakeTimeService, time.Second)
-				err := timeoutRetryStrategy.Try()
-				close(doneChan)
-				Expect(fakeTimeService.WatcherCount()).To(Equal(0))
+			Context("and it should not be retried", func() {
+				It("does not retry", func() {
+					retryable := newSimpleRetryable([]attemptOutput{
+						{
+							ShouldRetry: false,
+							AttemptErr:  nil,
+						},
+					})
 
-				Expect(err).ToNot(HaveOccurred())
-				Expect(retryable.Attempts).To(Equal(1))
+					timeoutRetryStrategy := NewTimeoutRetryStrategy(5*time.Second, 1*time.Second, retryable, fakeTimeService, logger)
+					doneChan := incrementSleepInBackground(fakeTimeService, time.Second)
+					err := timeoutRetryStrategy.Try()
+					close(doneChan)
+					Expect(fakeTimeService.WatcherCount()).To(Equal(0))
+
+					Expect(err).ToNot(HaveOccurred())
+					Expect(retryable.Attempts).To(Equal(1))
+				})
+			})
+
+			Context("and it should be retried", func() {
+				It("does retry", func() {
+					retryable := newSimpleRetryable([]attemptOutput{
+						{
+							ShouldRetry: true,
+							AttemptErr:  nil,
+						},
+						{
+							ShouldRetry: true,
+							AttemptErr:  nil,
+						},
+						{
+							ShouldRetry: false,
+							AttemptErr:  nil,
+						},
+					})
+
+					timeoutRetryStrategy := NewTimeoutRetryStrategy(5*time.Second, 1*time.Second, retryable, fakeTimeService, logger)
+					doneChan := incrementSleepInBackground(fakeTimeService, time.Second)
+					err := timeoutRetryStrategy.Try()
+					close(doneChan)
+					Expect(fakeTimeService.WatcherCount()).To(Equal(0))
+
+					Expect(err).ToNot(HaveOccurred())
+					Expect(retryable.Attempts).To(Equal(3))
+				})
 			})
 		})
 	})

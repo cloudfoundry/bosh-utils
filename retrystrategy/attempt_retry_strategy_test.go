@@ -24,7 +24,7 @@ var _ = Describe("AttemptRetryStrategy", func() {
 		It("includes type of retryable in log message", func() {
 			retryable := newSimpleRetryable([]attemptOutput{
 				{
-					IsRetryable: false,
+					ShouldRetry: false,
 					AttemptErr:  nil,
 				},
 			})
@@ -43,15 +43,15 @@ var _ = Describe("AttemptRetryStrategy", func() {
 				It("retries until the max attempts are used and returns an error", func() {
 					retryable := newSimpleRetryable([]attemptOutput{
 						{
-							IsRetryable: true,
+							ShouldRetry: true,
 							AttemptErr:  errors.New("one"),
 						},
 						{
-							IsRetryable: true,
+							ShouldRetry: true,
 							AttemptErr:  errors.New("two"),
 						},
 						{
-							IsRetryable: true,
+							ShouldRetry: true,
 							AttemptErr:  errors.New("three"),
 						},
 					})
@@ -68,15 +68,15 @@ var _ = Describe("AttemptRetryStrategy", func() {
 				It("retries until the max attempts are used and does not return an error", func() {
 					retryable := newSimpleRetryable([]attemptOutput{
 						{
-							IsRetryable: true,
+							ShouldRetry: true,
 							AttemptErr:  nil,
 						},
 						{
-							IsRetryable: true,
+							ShouldRetry: true,
 							AttemptErr:  nil,
 						},
 						{
-							IsRetryable: true,
+							ShouldRetry: true,
 							AttemptErr:  nil,
 						},
 					})
@@ -92,11 +92,11 @@ var _ = Describe("AttemptRetryStrategy", func() {
 			It("stops trying", func() {
 				retryable := newSimpleRetryable([]attemptOutput{
 					{
-						IsRetryable: true,
+						ShouldRetry: true,
 						AttemptErr:  errors.New("first-error"),
 					},
 					{
-						IsRetryable: false,
+						ShouldRetry: false,
 						AttemptErr:  errors.New("second-error"),
 					},
 				})
@@ -110,7 +110,7 @@ var _ = Describe("AttemptRetryStrategy", func() {
 			It("stops trying", func() {
 				retryable := newSimpleRetryable([]attemptOutput{
 					{
-						IsRetryable: false,
+						ShouldRetry: false,
 						AttemptErr:  nil,
 					},
 				})

@@ -18,7 +18,7 @@ type simpleRetryable struct {
 }
 
 type attemptOutput struct {
-	IsRetryable bool
+	ShouldRetry bool
 	AttemptErr  error
 }
 
@@ -34,7 +34,7 @@ func (r *simpleRetryable) Attempt() (bool, error) {
 	if len(r.attemptOutputs) > 0 {
 		attemptOutput := r.attemptOutputs[0]
 		r.attemptOutputs = r.attemptOutputs[1:]
-		return attemptOutput.IsRetryable, attemptOutput.AttemptErr
+		return attemptOutput.ShouldRetry, attemptOutput.AttemptErr
 	}
 
 	return true, nil
