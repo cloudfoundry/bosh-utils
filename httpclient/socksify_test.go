@@ -58,6 +58,7 @@ var _ = Describe("Socksify", func() {
 				_, err := dialFunc("", "")
 				Expect(err).To(MatchError("proxy dialer"))
 				Expect(proxyDialer.DialerCall.CallCount).To(Equal(1))
+				Expect(proxyDialer.DialerCall.Receives.Username).To(Equal(""))
 				Expect(proxyDialer.DialerCall.Receives.Key).To(Equal("some-key"))
 				Expect(proxyDialer.DialerCall.Receives.URL).To(Equal("localhost:12345"))
 			})
@@ -68,6 +69,7 @@ var _ = Describe("Socksify", func() {
 				_, err = dialFunc("", "")
 				Expect(err).To(MatchError("proxy dialer"))
 				Expect(proxyDialer.DialerCall.CallCount).To(Equal(1))
+				Expect(proxyDialer.DialerCall.Receives.Username).To(Equal(""))
 				Expect(proxyDialer.DialerCall.Receives.Key).To(Equal("some-key"))
 				Expect(proxyDialer.DialerCall.Receives.URL).To(Equal("localhost:12345"))
 			})
@@ -85,6 +87,7 @@ var _ = Describe("Socksify", func() {
 					Expect(err).To(MatchError("proxy dialer"))
 				}
 				Expect(proxyDialer.DialerCall.CallCount).To(Equal(1))
+				Expect(proxyDialer.DialerCall.Receives.Username).To(Equal(""))
 				Expect(proxyDialer.DialerCall.Receives.Key).To(Equal("some-key"))
 				Expect(proxyDialer.DialerCall.Receives.URL).To(Equal("localhost:12345"))
 			})
@@ -165,8 +168,9 @@ type FakeProxyDialer struct {
 	DialerCall struct {
 		CallCount int
 		Receives  struct {
-			Key string
-			URL string
+			Username string
+			Key      string
+			URL      string
 		}
 		Returns struct {
 			DialFunc proxy.DialFunc
@@ -176,10 +180,12 @@ type FakeProxyDialer struct {
 	mut sync.Mutex
 }
 
-func (p *FakeProxyDialer) Dialer(key, url string) (proxy.DialFunc, error) {
+func (p *FakeProxyDialer) Dialer(username, key, url string) (proxy.DialFunc, error) {
 	p.mut.Lock()
 	defer p.mut.Unlock()
+
 	p.DialerCall.CallCount++
+	p.DialerCall.Receives.Username = username
 	p.DialerCall.Receives.Key = key
 	p.DialerCall.Receives.URL = url
 
