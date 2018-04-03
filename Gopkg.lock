@@ -29,7 +29,6 @@
   revision = "7dc373669fa10ddf827c37c595dee30a2f001be9"
 
 [[projects]]
-  branch = "master"
   name = "github.com/cloudfoundry/socks5-proxy"
   packages = ["."]
   revision = "6afb711f4b32a266b51160288e98fd3c4b28f0cb"
@@ -192,6 +191,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9da7fa4f4a6905e45e69a218ab88dacdfbcdbdec6310d0bf4e2781bb9a3a5885"
+  inputs-digest = "952feb94ae8197e9d3ecc923b6fc5ddd6a30b15b339138890c94d0ccc58e7053"
   solver-name = "gps-cdcl"
   solver-version = 1
