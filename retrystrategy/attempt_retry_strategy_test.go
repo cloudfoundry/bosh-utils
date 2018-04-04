@@ -35,7 +35,7 @@ var _ = Describe("AttemptRetryStrategy", func() {
 			Expect(logger.DebugCallCount()).To(Equal(1))
 
 			_, message, args := logger.DebugArgsForCall(0)
-			Expect(fmt.Sprintf(message, args...)).To(Equal("Making attempt #0 for *retrystrategy_test.simpleRetryable"))
+			Expect(fmt.Sprintf(message, args...)).To(Equal("Making attempt #1 for *retrystrategy_test.simpleRetryable"))
 		})
 
 		Context("when there are errors during a try", func() {
