@@ -540,6 +540,30 @@ var _ = Describe("HTTPClient", func() {
 			Expect(err.Error()).To(ContainSubstring("Get https://foo:<redacted>@10.10.0.0:8080/path"))
 		})
 
+		It("get 404 response from error message", func() {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/path"),
+					ghttp.RespondWith(http.StatusNotFound, []byte("get-response")),
+				),
+			)
+
+			url := server.URL() + "/path"
+
+			response, err := httpClient.Get(url)
+			Expect(err).ToNot(HaveOccurred())
+
+			defer response.Body.Close()
+
+			responseBody, err := ioutil.ReadAll(response.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(responseBody).To(Equal([]byte("get-response")))
+			Expect(response.StatusCode).To(Equal(404))
+
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+		})
+
 		Describe("httpclient opts", func() {
 			var opts Opts
 
