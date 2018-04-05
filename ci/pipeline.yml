@@ -1,4 +1,10 @@
 ---
+groups:
+- name: bosh-utils
+  jobs:
+    - test-unit
+    - publish-multidigest-binary
+
 jobs:
   - name: test-unit
     public: true
