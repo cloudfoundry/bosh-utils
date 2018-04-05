@@ -4,6 +4,7 @@ required = ["github.com/onsi/ginkgo/ginkgo"]
   unused-packages = true
   go-tests = true
   non-go = true
+  go-tests = true
 
 [[constraint]]
   name = "github.com/bmatcuk/doublestar"

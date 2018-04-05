@@ -54,13 +54,35 @@ var _ = Describe("Socksify", func() {
 				dialFunc = SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
 			})
 
-			It("Returns a function that creates a socks5 proxy dialer", func() {
-				_, err := dialFunc("", "")
-				Expect(err).To(MatchError("proxy dialer"))
-				Expect(proxyDialer.DialerCall.CallCount).To(Equal(1))
-				Expect(proxyDialer.DialerCall.Receives.Username).To(Equal(""))
-				Expect(proxyDialer.DialerCall.Receives.Key).To(Equal("some-key"))
-				Expect(proxyDialer.DialerCall.Receives.URL).To(Equal("localhost:12345"))
+			Context("When no username is given in the URL", func() {
+				It("Returns a function that creates a socks5 proxy dialer for user ''", func() {
+					_, err := dialFunc("", "")
+					Expect(err).To(MatchError("proxy dialer"))
+					Expect(proxyDialer.DialerCall.CallCount).To(Equal(1))
+					Expect(proxyDialer.DialerCall.Receives.Username).To(Equal(""))
+					Expect(proxyDialer.DialerCall.Receives.Key).To(Equal("some-key"))
+					Expect(proxyDialer.DialerCall.Receives.URL).To(Equal("localhost:12345"))
+				})
+			})
+
+			Context("When a 'custom-username' is given in the URL", func() {
+				JustBeforeEach(func() {
+					tempDir, err := ioutil.TempDir("", "")
+					Expect(err).NotTo(HaveOccurred())
+					privateKeyPath := filepath.Join(tempDir, "test.key")
+					err = ioutil.WriteFile(privateKeyPath, []byte("some-key"), 0600)
+					Expect(err).NotTo(HaveOccurred())
+					os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf("ssh+socks5://custom-username@localhost:12345?private-key=%s", privateKeyPath))
+					dialFunc = SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
+				})
+				It("Returns a function that creates a socks5 proxy dialer for user 'custom-username'", func() {
+					_, err := dialFunc("", "")
+					Expect(err).To(MatchError("proxy dialer"))
+					Expect(proxyDialer.DialerCall.CallCount).To(Equal(1))
+					Expect(proxyDialer.DialerCall.Receives.Username).To(Equal("custom-username"))
+					Expect(proxyDialer.DialerCall.Receives.Key).To(Equal("some-key"))
+					Expect(proxyDialer.DialerCall.Receives.URL).To(Equal("localhost:12345"))
+				})
 			})
 
 			It("Can be called multiple times and only create the dialer once", func() {
