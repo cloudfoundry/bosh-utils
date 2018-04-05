@@ -33,10 +33,15 @@ var _ = Describe("Pool", func() {
 			},
 		)
 		Expect(err).ToNot(HaveOccurred())
+		close(resultsChan)
 
-		Expect(resultsChan).To(Receive(Equal(1)))
-		Expect(resultsChan).To(Receive(Equal(2)))
-		Expect(resultsChan).To(Receive(Equal(3)))
+		results := []int{}
+		for result := range resultsChan {
+			results = append(results, result)
+		}
+		Expect(results).To(ContainElement(1))
+		Expect(results).To(ContainElement(2))
+		Expect(results).To(ContainElement(3))
 	})
 
 	It("bubbles up any errors", func() {
