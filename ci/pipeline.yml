@@ -1,9 +1,21 @@
 ---
 groups:
-- name: bosh-utils
+- name: test-and-release
   jobs:
     - test-unit
     - publish-multidigest-binary
+
+- name: docker-images
+  jobs:
+    - build-go-dep-bumper
+    - build-bosh-utils-image
+
+- name: all
+  jobs:
+  - test-unit
+  - publish-multidigest-binary
+  - build-go-dep-bumper
+  - build-bosh-utils-image
 
 jobs:
   - name: test-unit
@@ -59,6 +71,28 @@ jobs:
           params: {file: compiled-darwin/verify-multidigest-*-darwin-amd64}
         - put: release-bucket-linux-ppc64le
           params: {file: compiled-linux-ppc64le/verify-multidigest-*-linux-ppc64le}
+
+  - name: build-bosh-utils-image
+    public: true
+    plan:
+      - get: bosh-utils
+        trigger: true
+      - put: bosh-utils-image
+        params:
+          build: "bosh-utils/ci/docker/bosh-utils"
+        get_params:
+          skip_download: true
+
+  - name: build-go-dep-bumper
+    public: true
+    plan:
+      - get: bosh-utils
+        trigger: true
+      - put: go-dep-bumper
+        params:
+          build: "bosh-utils/ci/docker/go-dep-bumper"
+        get_params:
+          skip_download: true
 
 resources:
   - name: bosh-utils
@@ -117,6 +151,22 @@ resources:
       bucket: {{aws_s3_release_bucket}}
       access_key_id: {{aws_s3_release_bucket_access_key}}
       secret_access_key: {{aws_s3_release_bucket_secret_key}}
+
+  - name: bosh-utils-image
+    type: docker-image
+    source:
+      repository: bosh/utils
+      email: ((dockerhub_email))
+      username: ((dockerhub_username))
+      password: ((dockerhub_password))
+
+  - name: go-dep-bumper
+    type: docker-image
+    source:
+      repository: bosh/go-dep-bumper
+      email: ((dockerhub_email))
+      username: ((dockerhub_username))
+      password: ((dockerhub_password))
 
 resource_types:
   - name: github-status
