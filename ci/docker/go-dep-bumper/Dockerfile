@@ -1,11 +1,37 @@
 FROM ubuntu:xenial
 
-RUN apt-get update && apt-get install -y git && apt-get clean
+# install basic utils {
+RUN \
+  apt-get update \
+  && apt-get install -y \
+    curl \
+    git \
+    jq \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+# }
 
-ADD https://dl.google.com/go/go1.10.1.linux-amd64.tar.gz /tmp
-RUN tar -xvzf /tmp/go1.10.1.linux-amd64.tar.gz -C /usr/local/
-ENV PATH /usr/local/go/bin:$PATH
+# golang {
+WORKDIR /usr/local
 
-ADD https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 /usr/bin/dep
-RUN chmod a+x /usr/bin/dep
+RUN \
+  GO_INFO=$(curl 'https://golang.org/dl/?mode=json' | jq '.[0].files[] | select(.os == "linux" and .arch == "amd64")') && \
+  GO_TAR="$(echo "$GO_INFO" | jq -r '.filename')" && \
+  GO_SHA="$(echo "$GO_INFO" | jq -r '.sha256')" && \
+  curl -fSL https://storage.googleapis.com/golang/$GO_TAR -o $GO_TAR \
+  && echo $GO_SHA $GO_TAR | sha256sum -c - \
+  && tar -xzf $GO_TAR \
+  && rm -f $GO_TAR
 
+ENV \
+  PATH=/usr/local/go/bin:$PATH \
+  GOPATH=/root/go \
+  GOROOT=/usr/local/go
+# }
+
+# install dep {
+RUN \
+  tag="$(curl https://github.com/golang/dep/releases/latest | grep --only-matching -E 'v[0-9]+\.[0-9]+\.[0-9]+')" \
+  && curl https://github.com/golang/dep/releases/download/$tag/dep-linux-amd64 -o /usr/bin/dep \
+  && chmod a+x /usr/bin/dep
+# }
