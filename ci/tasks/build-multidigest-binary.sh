@@ -13,8 +13,6 @@ filename="verify-multidigest-${semver}-${GOOS}-${GOARCH}"
 
 cd gopath/src/github.com/cloudfoundry/bosh-utils
 
-bin/require-ci-golang-version
-
 git_rev=`git rev-parse --short HEAD`
 version="${semver}-${git_rev}-${timestamp}"
 
