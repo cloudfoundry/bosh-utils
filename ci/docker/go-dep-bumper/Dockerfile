@@ -32,6 +32,6 @@ ENV \
 # install dep {
 RUN \
   tag="$(curl https://github.com/golang/dep/releases/latest | grep --only-matching -E 'v[0-9]+\.[0-9]+\.[0-9]+')" \
-  && curl https://github.com/golang/dep/releases/download/$tag/dep-linux-amd64 -o /usr/bin/dep \
+  && curl -L https://github.com/golang/dep/releases/download/$tag/dep-linux-amd64 -o /usr/bin/dep \
   && chmod a+x /usr/bin/dep
 # }
