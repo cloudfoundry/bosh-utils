@@ -300,6 +300,22 @@ var _ = Describe("FakeFileSystem", func() {
 				Expect(targetPath).To(Equal("foobarTarget"))
 			})
 		})
+
+		Context("when there is an error", func() {
+			It("return the error", func() {
+				fs.WriteFileString("foobarTarget", "asdfasdf")
+				Expect(fs.FileExists("foobarTarget")).To(Equal(true))
+
+				err := fs.Symlink("foobarTarget", "foobarSymlink")
+				Expect(err).ToNot(HaveOccurred())
+
+				fs.ReadlinkError = errors.New("can't read link")
+
+				_, err = fs.Readlink("foobarSymlink")
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal("can't read link"))
+			})
+		})
 	})
 
 	Describe("RegisterReadFileError", func() {
