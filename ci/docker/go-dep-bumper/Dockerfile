@@ -1,4 +1,4 @@
-FROM golang
+FROM golang:1
 
 # install basic utils {
 RUN \
