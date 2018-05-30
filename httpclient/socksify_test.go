@@ -30,6 +30,7 @@ var _ = Describe("Socksify", func() {
 		})
 		dialFunc = SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
 	})
+
 	Context("When BOSH_ALL_PROXY is not set", func() {
 		It("Returns the dialer that was passed in", func() {
 			_, err := dialFunc("", "")
@@ -119,9 +120,12 @@ var _ = Describe("Socksify", func() {
 					os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf("ssh+:cannot-start-with-colon"))
 					dialFunc = SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
 				})
-				It("returns the dialer that was passed in", func() {
+				It("returns a dialer that returns the url parsing error", func() {
 					_, err := dialFunc("", "")
-					Expect(err).To(MatchError("original dialer"))
+					Expect(err).To(MatchError(SatisfyAll(
+						ContainSubstring("Parsing BOSH_ALL_PROXY url"),
+						ContainSubstring(":cannot-start-with-colon"),
+					)))
 				})
 			})
 
@@ -130,9 +134,12 @@ var _ = Describe("Socksify", func() {
 					os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf("ssh+socks5://localhost:12345?foo=%%"))
 					dialFunc = SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
 				})
-				It("returns the dialer that was passed in", func() {
+				It("returns a dialer that returns the query param parsing error", func() {
 					_, err := dialFunc("", "")
-					Expect(err).To(MatchError("original dialer"))
+					Expect(err).To(MatchError(SatisfyAll(
+						ContainSubstring("Parsing BOSH_ALL_PROXY query params"),
+						ContainSubstring("%"),
+					)))
 				})
 			})
 
@@ -141,9 +148,12 @@ var _ = Describe("Socksify", func() {
 					os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf("ssh+socks5://localhost:12345?foo=bar"))
 					dialFunc = SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
 				})
-				It("returns the dialer that was passed in", func() {
+				It("returns a dialer that returns the param not found error", func() {
 					_, err := dialFunc("", "")
-					Expect(err).To(MatchError("original dialer"))
+					Expect(err).To(MatchError(SatisfyAll(
+						ContainSubstring("Parsing BOSH_ALL_PROXY query params"),
+						ContainSubstring("Required query param 'private-key' not found"),
+					)))
 				})
 			})
 
@@ -152,9 +162,12 @@ var _ = Describe("Socksify", func() {
 					os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf("ssh+socks5://localhost:12345?private-key=/no/file/here"))
 					dialFunc = SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
 				})
-				It("returns the dialer that was passed in", func() {
+				It("returns a dialer that returns the private key file not found error", func() {
 					_, err := dialFunc("", "")
-					Expect(err).To(MatchError("original dialer"))
+					Expect(err).To(MatchError(SatisfyAll(
+						ContainSubstring("Reading private key file for SOCKS5 Proxy"),
+						ContainSubstring("/no/file/here"),
+					)))
 				})
 			})
 		})
@@ -166,9 +179,12 @@ var _ = Describe("Socksify", func() {
 					os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf(":cannot-start-with-colon"))
 					dialFunc = SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
 				})
-				It("returns the dialer that was passed in", func() {
+				It("returns a dialer that returns the parsing error", func() {
 					_, err := dialFunc("", "")
-					Expect(err).To(MatchError("original dialer"))
+					Expect(err).To(MatchError(SatisfyAll(
+						ContainSubstring("Parsing BOSH_ALL_PROXY url"),
+						ContainSubstring(":cannot-start-with-colon"),
+					)))
 				})
 			})
 
@@ -177,9 +193,12 @@ var _ = Describe("Socksify", func() {
 					os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf("foo://cannot-start-with-colon"))
 					dialFunc = SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
 				})
-				It("returns the dialer that was passed in", func() {
+				It("returns a dialer returns the invalid proxy scheme error", func() {
 					_, err := dialFunc("", "")
-					Expect(err).To(MatchError("original dialer"))
+					Expect(err).To(MatchError(SatisfyAll(
+						ContainSubstring("Parsing BOSH_ALL_PROXY url"),
+						ContainSubstring("foo"),
+					)))
 				})
 			})
 		})
