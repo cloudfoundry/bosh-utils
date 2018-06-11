@@ -833,6 +833,8 @@ func (fs *FakeFileSystem) removeAll(path string) error {
 }
 
 func (fs *FakeFileSystem) Glob(pattern string) (matches []string, err error) {
+	fs.filesLock.Lock()
+	defer fs.filesLock.Unlock()
 	if fs.GlobStub != nil {
 		matches, err = fs.GlobStub(pattern)
 		if err != nil {
@@ -890,6 +892,8 @@ func (fs *FakeFileSystem) Walk(root string, walkFunc filepath.WalkFunc) error {
 }
 
 func (fs *FakeFileSystem) SetGlob(pattern string, matches ...[]string) {
+	fs.filesLock.Lock()
+	defer fs.filesLock.Unlock()
 	fs.globsMap[pattern] = matches
 }
 
