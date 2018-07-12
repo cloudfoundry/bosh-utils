@@ -32,7 +32,7 @@
   branch = "master"
   name = "github.com/cloudfoundry/socks5-proxy"
   packages = ["."]
-  revision = "3c6b4eec9c2d16c1dac4c42bdb5f755ba09daff8"
+  revision = "3659db090cb23a57807b53e2f8580b2427dc2659"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -192,6 +192,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9da7fa4f4a6905e45e69a218ab88dacdfbcdbdec6310d0bf4e2781bb9a3a5885"
+  inputs-digest = "3a94ee7d808580ffcb21cf326cc0c41012a534179c4b8003661aa0c985ce0a43"
   solver-name = "gps-cdcl"
   solver-version = 1
