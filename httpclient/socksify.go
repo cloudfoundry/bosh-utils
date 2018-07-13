@@ -11,7 +11,6 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	proxy "github.com/cloudfoundry/socks5-proxy"
 
-	"errors"
 	goproxy "golang.org/x/net/proxy"
 )
 
@@ -50,7 +49,7 @@ func SOCKS5DialFuncFromEnvironment(origDialer DialFunc, socks5Proxy ProxyDialer)
 		proxySSHKeyPath := queryMap.Get("private-key")
 		if proxySSHKeyPath == "" {
 			return errorDialFunc(
-				errors.New("Required query param 'private-key' not found"),
+				bosherr.Error("Required query param 'private-key' not found"),
 				"Parsing BOSH_ALL_PROXY query params",
 			)
 		}
