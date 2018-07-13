@@ -229,14 +229,27 @@ var _ = Describe("FakeFileSystem", func() {
 			})
 		})
 
+		Context("when the target is located in a parent directory", func() {
+			It("returns the target", func() {
+				err := fs.WriteFileString("/foobarbaz", "asdfghjk")
+				Expect(err).ToNot(HaveOccurred())
+
+				err = fs.Symlink("/a/b/../../foobarbaz", "foobar")
+				Expect(err).ToNot(HaveOccurred())
+
+				targetPath, err := fs.ReadAndFollowLink("foobar")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(targetPath).To(Equal("/foobarbaz"))
+			})
+		})
+
 		Context("when the target file does not exist", func() {
 			It("returns an error", func() {
 				err := fs.Symlink("non-existant-target", "foobar")
 				Expect(err).ToNot(HaveOccurred())
 
-				targetPath, err := fs.ReadAndFollowLink("foobar")
+				_, err = fs.ReadAndFollowLink("foobar")
 				Expect(err).To(HaveOccurred())
-				Expect(targetPath).To(Equal("non-existant-target"))
 			})
 		})
 
