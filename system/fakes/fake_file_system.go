@@ -655,7 +655,7 @@ func (fs *FakeFileSystem) ReadAndFollowLink(symlinkPath string) (string, error) 
 		return fs.fileRegistry.UnifiedPath("."), nil
 	}
 
-	symlinkPath = gopath.Join(symlinkPath)
+	symlinkPath = filepath.Join(symlinkPath)
 
 	stat := fs.GetFileTestStat(symlinkPath)
 	if stat == nil {
