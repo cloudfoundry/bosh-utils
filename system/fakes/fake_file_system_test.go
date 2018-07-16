@@ -231,15 +231,16 @@ var _ = Describe("FakeFileSystem", func() {
 
 		Context("when the target is located in a parent directory", func() {
 			It("returns the target", func() {
-				err := fs.WriteFileString("/foobarbaz", "asdfghjk")
+				sysRoot := os.Getenv("SYSTEMROOT")
+				err := fs.WriteFileString(path.Join(sysRoot, "foobarbaz"), "asdfghjk")
 				Expect(err).ToNot(HaveOccurred())
 
-				err = fs.Symlink("/a/b/../../foobarbaz", "foobar")
+				err = fs.Symlink(path.Join(sysRoot, "a", "b", "..", "..", "foobarbaz"), "foobar")
 				Expect(err).ToNot(HaveOccurred())
 
 				targetPath, err := fs.ReadAndFollowLink("foobar")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(targetPath).To(Equal("/foobarbaz"))
+				Expect(targetPath).To(Equal(path.Join(sysRoot, "foobarbaz")))
 			})
 		})
 
