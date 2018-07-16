@@ -240,7 +240,12 @@ var _ = Describe("FakeFileSystem", func() {
 
 				targetPath, err := fs.ReadAndFollowLink("foobar")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(targetPath).To(Equal(filepath.Join(sysRoot, "foobarbaz")))
+				absTarget, err := filepath.Abs(targetPath)
+				Expect(err).ToNot(HaveOccurred())
+				absExpected, err := filepath.Abs(filepath.Join(sysRoot, "foobarbaz"))
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(absTarget).To(Equal(absExpected))
 			})
 		})
 
