@@ -3,7 +3,7 @@ package fakes_test
 import (
 	"errors"
 	"os"
-	"path"
+	"path/filepath"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -129,7 +129,7 @@ var _ = Describe("FakeFileSystem", func() {
 
 		BeforeEach(func() {
 			for fixtureFile, contents := range fixtureFiles {
-				fs.WriteFileString(path.Join(fixtureDirPath, fixtureFile), contents)
+				fs.WriteFileString(filepath.Join(fixtureDirPath, fixtureFile), contents)
 			}
 		})
 
@@ -143,10 +143,10 @@ var _ = Describe("FakeFileSystem", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			for fixtureFile := range fixtureFiles {
-				srcContents, err := fs.ReadFile(path.Join(srcPath, fixtureFile))
+				srcContents, err := fs.ReadFile(filepath.Join(srcPath, fixtureFile))
 				Expect(err).ToNot(HaveOccurred())
 
-				dstContents, err := fs.ReadFile(path.Join(dstPath, fixtureFile))
+				dstContents, err := fs.ReadFile(filepath.Join(dstPath, fixtureFile))
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(srcContents).To(Equal(dstContents), "Copied file does not match source file: '%s", fixtureFile)
@@ -232,15 +232,15 @@ var _ = Describe("FakeFileSystem", func() {
 		Context("when the target is located in a parent directory", func() {
 			It("returns the target", func() {
 				sysRoot := os.Getenv("SYSTEMROOT")
-				err := fs.WriteFileString(path.Join(sysRoot, "foobarbaz"), "asdfghjk")
+				err := fs.WriteFileString(filepath.Join(sysRoot, "foobarbaz"), "asdfghjk")
 				Expect(err).ToNot(HaveOccurred())
 
-				err = fs.Symlink(path.Join(sysRoot, "a", "b", "..", "..", "foobarbaz"), "foobar")
+				err = fs.Symlink(filepath.Join(sysRoot, "a", "b", "..", "..", "foobarbaz"), "foobar")
 				Expect(err).ToNot(HaveOccurred())
 
 				targetPath, err := fs.ReadAndFollowLink("foobar")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(targetPath).To(Equal(path.Join(sysRoot, "foobarbaz")))
+				Expect(targetPath).To(Equal(filepath.Join(sysRoot, "foobarbaz")))
 			})
 		})
 
