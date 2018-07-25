@@ -114,6 +114,7 @@ var _ = Describe("RetryClients", func() {
 				http.StatusUnauthorized,
 				http.StatusForbidden,
 				http.StatusNotFound,
+				http.StatusInternalServerError,
 			}
 			for _, code := range directorErrorCodes {
 				code := code
