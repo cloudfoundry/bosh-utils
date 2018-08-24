@@ -44,3 +44,7 @@ required = ["github.com/onsi/ginkgo/ginkgo"]
 [[constraint]]
   branch = "master"
   name = "github.com/cloudfoundry/socks5-proxy"
+
+[[override]]
+  name = "gopkg.in/fsnotify.v1"
+  source = "https://github.com/fsnotify/fsnotify.git"
