@@ -288,11 +288,35 @@ func (fs *FakeFileSystem) MkdirAll(path string, perm os.FileMode) error {
 		return fs.mkdirAllErrorByPath[path]
 	}
 
+	return fs.mkdir(path, perm)
+}
+
+func (fs *FakeFileSystem) mkdir(path string, perm os.FileMode) error {
+	if path == "." {
+		return nil
+	}
+
+	if path != "/" {
+		parent := filepath.Dir(path)
+		// We can't use any functions which require the filesystem lock.
+		parentStats := fs.fileRegistry.Get(parent)
+
+		if parentStats != nil && parentStats.FileType != FakeFileTypeDir {
+			return fmt.Errorf("cannot create a directory in a file (%s)", path)
+		}
+
+		// Parent does not exist
+		if parentStats == nil {
+			if err := fs.mkdir(parent, perm); err != nil {
+				return err
+			}
+		}
+	}
+
 	stats := fs.getOrCreateFile(path)
 	stats.FileMode = perm
 	stats.FileType = FakeFileTypeDir
 	fs.fileRegistry.Register(path, stats)
-
 	return nil
 }
 

@@ -22,6 +22,91 @@ var _ = Describe("FakeFileSystem", func() {
 		fs = NewFakeFileSystem()
 	})
 
+	Describe("MkdirAll", func() {
+		It("creates a directory", func() {
+			err := fs.MkdirAll("/potato", 0750)
+			Expect(err).ToNot(HaveOccurred())
+
+			fi, err := fs.Stat("/potato")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(fi.IsDir()).To(BeTrue())
+			Expect(fi.Mode()).To(Equal(os.FileMode(0750)))
+		})
+
+		It("works with Windows style pathing", func() {
+			err := fs.MkdirAll("C:/potato", 0750)
+			Expect(err).ToNot(HaveOccurred())
+
+			fi, err := fs.Stat("C:/potato")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(fi.IsDir()).To(BeTrue())
+			Expect(fi.Mode()).To(Equal(os.FileMode(0750)))
+		})
+
+		It("can create the root directory", func() {
+			err := fs.MkdirAll("/", 0750)
+			Expect(err).ToNot(HaveOccurred())
+
+			fi, err := fs.Stat("/")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(fi.IsDir()).To(BeTrue())
+			Expect(fi.Mode()).To(Equal(os.FileMode(0750)))
+		})
+
+		It("creates all directories it needs to", func() {
+			segments := []string{"C:/potato", "with", "a", "subdirectory"}
+			err := fs.MkdirAll(filepath.Join(segments...), 0750)
+			Expect(err).ToNot(HaveOccurred())
+
+			var path string
+			for _, segment := range segments {
+				path = filepath.Join(path, segment)
+
+				fi, err := fs.Stat(path)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fi.IsDir()).To(BeTrue())
+				Expect(fi.Mode()).To(Equal(os.FileMode(0750)))
+			}
+		})
+
+		It("does not overwrite existing directories", func() {
+			err := fs.MkdirAll("/potato", 0700)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = fs.MkdirAll("/potato/subdir", 0750)
+			Expect(err).ToNot(HaveOccurred())
+
+			fi, err := fs.Stat("/potato")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(fi.IsDir()).To(BeTrue())
+			Expect(fi.Mode()).To(Equal(os.FileMode(0700)))
+		})
+
+		It("doesn't allow directories to be made in files", func() {
+			err := fs.WriteFileString("/potato", "I am a file")
+			Expect(err).ToNot(HaveOccurred())
+
+			err = fs.MkdirAll("/potato/subdir", 0750)
+			Expect(err).To(HaveOccurred())
+
+			err = fs.MkdirAll("/potato/subdir/another", 0750)
+			Expect(err).To(HaveOccurred())
+		})
+
+		It("handles relative paths", func() {
+			err := fs.MkdirAll("potato", 0750)
+			Expect(err).ToNot(HaveOccurred())
+
+			fi, err := fs.Stat("potato")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(fi.IsDir()).To(BeTrue())
+			Expect(fi.Mode()).To(Equal(os.FileMode(0750)))
+		})
+	})
+
 	Describe("RemoveAll", func() {
 		It("removes the specified file", func() {
 			fs.WriteFileString("foobar", "asdfghjk")
