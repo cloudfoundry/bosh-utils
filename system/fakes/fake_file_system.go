@@ -296,7 +296,7 @@ func (fs *FakeFileSystem) mkdir(path string, perm os.FileMode) error {
 		return nil
 	}
 
-	if path != "/" {
+	if !atRoot(path) {
 		parent := filepath.Dir(path)
 		// We can't use any functions which require the filesystem lock.
 		parentStats := fs.fileRegistry.Get(parent)
@@ -318,6 +318,17 @@ func (fs *FakeFileSystem) mkdir(path string, perm os.FileMode) error {
 	stats.FileType = FakeFileTypeDir
 	fs.fileRegistry.Register(path, stats)
 	return nil
+}
+
+func atRoot(path string) bool {
+	switch path {
+	case "/":
+		return true
+	case filepath.VolumeName(path) + "\\":
+		return true
+	default:
+		return false
+	}
 }
 
 func (fs *FakeFileSystem) RegisterOpenFile(path string, file *FakeFile) {
