@@ -133,26 +133,31 @@ var _ = Describe("FakeFileSystem", func() {
 			}
 		})
 
-		It("recursively copies directory contents", func() {
+		It("recursively copies directory and directory contents", func() {
 			srcPath := fixtureDirPath
-			dstPath, err := fs.TempDir("CopyDirTestDir")
+			tmpDir, err := fs.TempDir("CopyDirTestDir")
 			Expect(err).ToNot(HaveOccurred())
-			defer fs.RemoveAll(dstPath)
+			defer fs.RemoveAll(tmpDir)
 
-			err = fs.CopyDir(srcPath, dstPath)
+			destPath := filepath.Join(tmpDir, "dest")
+
+			err = fs.CopyDir(srcPath, destPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			for fixtureFile := range fixtureFiles {
 				srcContents, err := fs.ReadFile(filepath.Join(srcPath, fixtureFile))
 				Expect(err).ToNot(HaveOccurred())
 
-				dstContents, err := fs.ReadFile(filepath.Join(dstPath, fixtureFile))
+				dstContents, err := fs.ReadFile(filepath.Join(destPath, fixtureFile))
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(srcContents).To(Equal(dstContents), "Copied file does not match source file: '%s", fixtureFile)
 			}
 
-			err = fs.RemoveAll(dstPath)
+			_, err = fs.Stat(destPath)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = fs.RemoveAll(tmpDir)
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})

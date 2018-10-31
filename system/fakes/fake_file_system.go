@@ -709,12 +709,14 @@ func (fs *FakeFileSystem) CopyDir(srcPath, dstPath string) error {
 		return fs.CopyDirError
 	}
 
-	srcPath = fs.fileRegistry.UnifiedPath(srcPath) + "/"
+	srcPath = fs.fileRegistry.UnifiedPath(srcPath)
 	dstPath = fs.fileRegistry.UnifiedPath(dstPath)
 
 	for filePath, fileStats := range fs.fileRegistry.GetAll() {
-		if strings.HasPrefix(filePath, srcPath) {
-			dstPath := gopath.Join(dstPath, filePath[len(srcPath)-1:])
+		if filePath == srcPath {
+			fs.fileRegistry.Register(dstPath, fileStats)
+		} else if strings.HasPrefix(filePath, fmt.Sprintf("%s/", srcPath)) {
+			dstPath := gopath.Join(dstPath, filePath[len(srcPath):])
 			fs.fileRegistry.Register(dstPath, fileStats)
 		}
 	}
