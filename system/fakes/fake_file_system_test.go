@@ -245,6 +245,30 @@ var _ = Describe("FakeFileSystem", func() {
 			err = fs.RemoveAll(tmpDir)
 			Expect(err).ToNot(HaveOccurred())
 		})
+
+		It("preserves file permissions", func() {
+			srcPath, err := fs.TempDir("CopyDirTestSrc")
+			Expect(err).ToNot(HaveOccurred())
+
+			readOnly := filepath.Join(srcPath, "readonly.txt")
+			err = fs.WriteFileString(readOnly, "readonly")
+			Expect(err).ToNot(HaveOccurred())
+
+			err = fs.Chmod(readOnly, 0400)
+			Expect(err).ToNot(HaveOccurred())
+
+			dstPath, err := fs.TempDir("CopyDirTestDest")
+			Expect(err).ToNot(HaveOccurred())
+			defer fs.RemoveAll(dstPath)
+
+			err = fs.CopyDir(srcPath, dstPath)
+			Expect(err).ToNot(HaveOccurred())
+
+			fi, err := fs.Stat(filepath.Join(dstPath, "readonly.txt"))
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(fi.Mode()).To(Equal(os.FileMode(0400)))
+		})
 	})
 
 	Describe("GlobStub", func() {
