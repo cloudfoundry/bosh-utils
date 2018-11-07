@@ -1,13 +1,12 @@
 package blobstore
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
 	"strings"
-
-	"fmt"
 
 	boshcrypto "github.com/cloudfoundry/bosh-utils/crypto"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
@@ -29,8 +28,7 @@ func (m BlobManager) Fetch(blobID string) (boshsys.File, error, int) {
 		return nil, err, 500
 	}
 
-	blobPath := m.blobPath(blobID)
-	file, err := os.Open(blobPath)
+	file, err := os.Open(m.blobPath(blobID))
 	if err != nil {
 		return nil, bosherr.WrapError(err, "Reading blob"), statusForErr(err)
 	}
@@ -46,8 +44,7 @@ func (m BlobManager) Write(blobID string, r io.Reader) error {
 	blobPath := m.blobPath(blobID)
 	file, err := os.OpenFile(blobPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0640)
 	if err != nil {
-		err = bosherr.WrapError(err, "Opening blob store file")
-		return err
+		return bosherr.WrapError(err, "Opening blob store file")
 	}
 	defer file.Close()
 
@@ -67,8 +64,7 @@ func (m BlobManager) GetPath(blobID string, digest boshcrypto.Digest) (string, e
 		return "", bosherr.Errorf("Blob '%s' not found", blobID)
 	}
 
-	blobPath := m.blobPath(blobID)
-	tempFilePath, err := m.copyToTmpFile(blobPath)
+	tempFilePath, err := m.copyToTmpFile(m.blobPath(blobID))
 	if err != nil {
 		return "", err
 	}
@@ -79,8 +75,7 @@ func (m BlobManager) GetPath(blobID string, digest boshcrypto.Digest) (string, e
 	}
 	defer file.Close()
 
-	err = digest.Verify(file)
-	if err != nil {
+	if err := digest.Verify(file); err != nil {
 		return "", bosherr.WrapError(err, fmt.Sprintf("Checking blob '%s'", blobID))
 	}
 
@@ -91,8 +86,7 @@ func (m BlobManager) Delete(blobID string) error {
 	if err := m.createDirStructure(); err != nil {
 		return err
 	}
-	localBlobPath := m.blobPath(blobID)
-	return os.RemoveAll(localBlobPath)
+	return os.RemoveAll(m.blobPath(blobID))
 }
 
 func (m BlobManager) BlobExists(blobID string) bool {
