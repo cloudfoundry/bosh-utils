@@ -2,6 +2,7 @@ package blobstore
 
 import (
 	"io"
+	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -109,7 +110,7 @@ func (m BlobManager) BlobExists(blobID string) bool {
 }
 
 func (m BlobManager) copyToTmpFile(src string) (string, error) {
-	file, err := m.fs.TempFile("blob-manager-copyToTmpFile")
+	file, err := ioutil.TempFile(m.tmpPath(), "blob-manager-copyToTmpFile")
 	if err != nil {
 		return "", bosherr.WrapError(err, "Creating temporary file")
 	}
@@ -127,10 +128,12 @@ func (m BlobManager) copyToTmpFile(src string) (string, error) {
 }
 
 func (m BlobManager) createDirStructure() error {
-	if _, err := os.Stat(m.blobsPath()); os.IsNotExist(err) {
-		if err := os.MkdirAll(m.blobsPath(), 0750); err != nil {
-			return err
-		}
+	if err := mkdir(m.blobsPath()); err != nil {
+		return err
+	}
+
+	if err := mkdir(m.tmpPath()); err != nil {
+		return err
 	}
 
 	return nil
@@ -140,6 +143,18 @@ func (m BlobManager) blobsPath() string {
 	return path.Join(m.blobstorePath, "blobs")
 }
 
+func (m BlobManager) tmpPath() string {
+	return path.Join(m.blobstorePath, "tmp")
+}
+
 func (m BlobManager) blobPath(id string) string {
 	return path.Join(m.blobsPath(), id)
+}
+
+func mkdir(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return os.MkdirAll(path, 0750)
+	}
+
+	return nil
 }

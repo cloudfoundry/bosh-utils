@@ -143,6 +143,13 @@ var _ = Describe("Blob Manager", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(contents).To(Equal("data"))
 			})
+
+			It("puts the temporary file inside the work directory to make sure that no files leak out if it's mounted on a tmpfs", func() {
+				path, err := blobManager.GetPath(blobID, sampleDigest)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(path).To(HavePrefix(basePath))
+			})
 		})
 
 		Context("when file requested does not exist in blobsPath", func() {
