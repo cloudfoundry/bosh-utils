@@ -15,13 +15,11 @@ import (
 )
 
 type BlobManager struct {
-	fs      boshsys.FileSystem
 	workdir string
 }
 
 func NewBlobManager(fs boshsys.FileSystem, workdir string) BlobManager {
 	return BlobManager{
-		fs:      fs,
 		workdir: workdir,
 	}
 }
@@ -98,7 +96,7 @@ func (m BlobManager) Delete(blobID string) error {
 		return err
 	}
 	localBlobPath := m.blobPath(blobID)
-	return m.fs.RemoveAll(localBlobPath)
+	return os.RemoveAll(localBlobPath)
 }
 
 func (m BlobManager) BlobExists(blobID string) bool {
@@ -106,25 +104,29 @@ func (m BlobManager) BlobExists(blobID string) bool {
 		return false
 	}
 
-	return m.fs.FileExists(m.blobPath(blobID))
+	_, err := os.Stat(m.blobPath(blobID))
+	return !os.IsNotExist(err)
 }
 
-func (m BlobManager) copyToTmpFile(src string) (string, error) {
-	file, err := ioutil.TempFile(m.tmpPath(), "blob-manager-copyToTmpFile")
+func (m BlobManager) copyToTmpFile(srcPath string) (string, error) {
+	dest, err := ioutil.TempFile(m.tmpPath(), "blob-manager-copyToTmpFile")
 	if err != nil {
-		return "", bosherr.WrapError(err, "Creating temporary file")
+		return "", bosherr.WrapError(err, "Creating destination file")
 	}
-	defer file.Close()
+	defer dest.Close()
 
-	dest := file.Name()
-
-	err = m.fs.CopyFile(src, dest)
+	src, err := os.Open(srcPath)
 	if err != nil {
-		m.fs.RemoveAll(dest)
+		return "", bosherr.WrapError(err, "Opening source file")
+	}
+	defer src.Close()
+
+	if _, err := io.Copy(dest, src); err != nil {
+		os.RemoveAll(dest.Name())
 		return "", bosherr.WrapError(err, "Copying file")
 	}
 
-	return dest, nil
+	return dest.Name(), nil
 }
 
 func (m BlobManager) createDirStructure() error {
