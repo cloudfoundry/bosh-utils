@@ -26,7 +26,10 @@ func NewBlobManager(fs boshsys.FileSystem, blobstorePath string) BlobManager {
 }
 
 func (manager BlobManager) Fetch(blobID string) (boshsys.File, error, int) {
-	blobPath := path.Join(manager.blobstorePath, blobID)
+	if err := manager.createDirStructure(); err != nil {
+		return nil, err, 500
+	}
+	blobPath := manager.blobPath(blobID)
 
 	readOnlyFile, err := manager.fs.OpenFile(blobPath, os.O_RDONLY, os.ModeDir)
 	if err != nil {
@@ -41,7 +44,10 @@ func (manager BlobManager) Fetch(blobID string) (boshsys.File, error, int) {
 }
 
 func (manager BlobManager) Write(blobID string, reader io.Reader) error {
-	blobPath := path.Join(manager.blobstorePath, blobID)
+	if err := manager.createDirStructure(); err != nil {
+		return err
+	}
+	blobPath := manager.blobPath(blobID)
 
 	writeOnlyFile, err := manager.fs.OpenFile(blobPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
@@ -60,11 +66,15 @@ func (manager BlobManager) Write(blobID string, reader io.Reader) error {
 }
 
 func (manager BlobManager) GetPath(blobID string, digest boshcrypto.Digest) (string, error) {
+	if err := manager.createDirStructure(); err != nil {
+		return "", err
+	}
 	if !manager.BlobExists(blobID) {
 		return "", bosherr.Errorf("Blob '%s' not found", blobID)
 	}
 
-	tempFilePath, err := manager.copyToTmpFile(path.Join(manager.blobstorePath, blobID))
+	blobPath := manager.blobPath(blobID)
+	tempFilePath, err := manager.copyToTmpFile(blobPath)
 	if err != nil {
 		return "", err
 	}
@@ -85,12 +95,18 @@ func (manager BlobManager) GetPath(blobID string, digest boshcrypto.Digest) (str
 }
 
 func (manager BlobManager) Delete(blobID string) error {
-	localBlobPath := path.Join(manager.blobstorePath, blobID)
+	if err := manager.createDirStructure(); err != nil {
+		return err
+	}
+	localBlobPath := manager.blobPath(blobID)
 	return manager.fs.RemoveAll(localBlobPath)
 }
 
 func (manager BlobManager) BlobExists(blobID string) bool {
-	blobPath := path.Join(manager.blobstorePath, blobID)
+	if err := manager.createDirStructure(); err != nil {
+		return false
+	}
+	blobPath := manager.blobPath(blobID)
 	return manager.fs.FileExists(blobPath)
 }
 
@@ -111,4 +127,22 @@ func (manager BlobManager) copyToTmpFile(srcFileName string) (string, error) {
 	}
 
 	return destTmpFileName, nil
+}
+
+func (manager BlobManager) createDirStructure() error {
+	if _, err := os.Stat(manager.blobsPath()); os.IsNotExist(err) {
+		if err := os.MkdirAll(manager.blobsPath(), 0750); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (manager BlobManager) blobsPath() string {
+	return path.Join(manager.blobstorePath, "blobs")
+}
+
+func (manager BlobManager) blobPath(id string) string {
+	return path.Join(manager.blobsPath(), id)
 }
