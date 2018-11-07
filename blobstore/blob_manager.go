@@ -32,11 +32,7 @@ func (m BlobManager) Fetch(blobID string) (boshsys.File, error, int) {
 	blobPath := m.blobPath(blobID)
 	file, err := os.Open(blobPath)
 	if err != nil {
-		status := 500
-		if strings.Contains(err.Error(), "no such file") {
-			status = 404
-		}
-		return nil, bosherr.WrapError(err, "Reading blob"), status
+		return nil, bosherr.WrapError(err, "Reading blob"), statusForErr(err)
 	}
 
 	return file, nil, 200
@@ -151,6 +147,18 @@ func (m BlobManager) tmpPath() string {
 
 func (m BlobManager) blobPath(id string) string {
 	return path.Join(m.blobsPath(), id)
+}
+
+func statusForErr(err error) int {
+	if err == nil {
+		return 200
+	}
+
+	if strings.Contains(err.Error(), "no such file") {
+		return 404
+	}
+
+	return 500
 }
 
 func mkdir(path string) error {
