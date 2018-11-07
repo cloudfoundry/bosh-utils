@@ -31,8 +31,7 @@ func (m BlobManager) Fetch(blobID string) (boshsys.File, error, int) {
 	}
 
 	blobPath := m.blobPath(blobID)
-
-	file, err := m.fs.OpenFile(blobPath, os.O_RDONLY, os.ModeDir)
+	file, err := os.Open(blobPath)
 	if err != nil {
 		status := 500
 		if strings.Contains(err.Error(), "no such file") {
@@ -44,32 +43,31 @@ func (m BlobManager) Fetch(blobID string) (boshsys.File, error, int) {
 	return file, nil, 200
 }
 
-func (m BlobManager) Write(blobID string, reader io.Reader) error {
+func (m BlobManager) Write(blobID string, r io.Reader) error {
 	if err := m.createDirStructure(); err != nil {
 		return err
 	}
-	blobPath := m.blobPath(blobID)
 
-	writeOnlyFile, err := m.fs.OpenFile(blobPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	blobPath := m.blobPath(blobID)
+	file, err := os.OpenFile(blobPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0640)
 	if err != nil {
 		err = bosherr.WrapError(err, "Opening blob store file")
 		return err
 	}
+	defer file.Close()
 
-	defer func() {
-		_ = writeOnlyFile.Close()
-	}()
-	_, err = io.Copy(writeOnlyFile, reader)
+	_, err = io.Copy(file, r)
 	if err != nil {
-		err = bosherr.WrapError(err, "Updating blob")
+		return bosherr.WrapError(err, "Updating blob")
 	}
-	return err
+	return nil
 }
 
 func (m BlobManager) GetPath(blobID string, digest boshcrypto.Digest) (string, error) {
 	if err := m.createDirStructure(); err != nil {
 		return "", err
 	}
+
 	if !m.BlobExists(blobID) {
 		return "", bosherr.Errorf("Blob '%s' not found", blobID)
 	}
@@ -81,7 +79,6 @@ func (m BlobManager) GetPath(blobID string, digest boshcrypto.Digest) (string, e
 	}
 
 	file, err := os.Open(tempFilePath)
-
 	if err != nil {
 		return "", err
 	}
@@ -107,27 +104,26 @@ func (m BlobManager) BlobExists(blobID string) bool {
 	if err := m.createDirStructure(); err != nil {
 		return false
 	}
-	blobPath := m.blobPath(blobID)
-	return m.fs.FileExists(blobPath)
+
+	return m.fs.FileExists(m.blobPath(blobID))
 }
 
-func (m BlobManager) copyToTmpFile(srcFileName string) (string, error) {
+func (m BlobManager) copyToTmpFile(src string) (string, error) {
 	file, err := m.fs.TempFile("blob-manager-copyToTmpFile")
 	if err != nil {
 		return "", bosherr.WrapError(err, "Creating temporary file")
 	}
-
 	defer file.Close()
 
-	destTmpFileName := file.Name()
+	dest := file.Name()
 
-	err = m.fs.CopyFile(srcFileName, destTmpFileName)
+	err = m.fs.CopyFile(src, dest)
 	if err != nil {
-		m.fs.RemoveAll(destTmpFileName)
+		m.fs.RemoveAll(dest)
 		return "", bosherr.WrapError(err, "Copying file")
 	}
 
-	return destTmpFileName, nil
+	return dest, nil
 }
 
 func (m BlobManager) createDirStructure() error {
