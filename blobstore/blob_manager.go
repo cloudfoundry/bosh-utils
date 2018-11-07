@@ -15,14 +15,14 @@ import (
 )
 
 type BlobManager struct {
-	fs            boshsys.FileSystem
-	blobstorePath string
+	fs      boshsys.FileSystem
+	workdir string
 }
 
-func NewBlobManager(fs boshsys.FileSystem, blobstorePath string) BlobManager {
+func NewBlobManager(fs boshsys.FileSystem, workdir string) BlobManager {
 	return BlobManager{
-		fs:            fs,
-		blobstorePath: blobstorePath,
+		fs:      fs,
+		workdir: workdir,
 	}
 }
 
@@ -140,11 +140,11 @@ func (m BlobManager) createDirStructure() error {
 }
 
 func (m BlobManager) blobsPath() string {
-	return path.Join(m.blobstorePath, "blobs")
+	return path.Join(m.workdir, "blobs")
 }
 
 func (m BlobManager) tmpPath() string {
-	return path.Join(m.blobstorePath, "tmp")
+	return path.Join(m.workdir, "tmp")
 }
 
 func (m BlobManager) blobPath(id string) string {
