@@ -18,10 +18,11 @@ type BlobManager struct {
 	blobstorePath string
 }
 
-func NewBlobManager(fs boshsys.FileSystem, blobstorePath string) (manager BlobManager) {
-	manager.fs = fs
-	manager.blobstorePath = blobstorePath
-	return
+func NewBlobManager(fs boshsys.FileSystem, blobstorePath string) BlobManager {
+	return BlobManager{
+		fs:            fs,
+		blobstorePath: blobstorePath,
+	}
 }
 
 func (manager BlobManager) Fetch(blobID string) (boshsys.File, error, int) {
