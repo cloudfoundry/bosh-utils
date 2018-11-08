@@ -23,7 +23,7 @@ var _ = Describe("Blob Manager", func() {
 		blobManager BlobManager
 	)
 
-	blobID := "105d33ae-655c-493d-bf9f-1df5cf3ca847"
+	blobID := "blob-id"
 
 	BeforeEach(func() {
 		var err error
