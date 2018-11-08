@@ -39,16 +39,22 @@ var _ = Describe("Blob Manager", func() {
 		os.RemoveAll(basePath)
 	})
 
+	getBlob := func(id string) string {
+		file, err, status := blobManager.Fetch(id)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(status).To(Equal(200))
+
+		contents, err := fs.ReadFileString(file.Name())
+		Expect(err).ToNot(HaveOccurred())
+
+		return contents
+	}
+
 	It("can fetch what was written", func() {
 		err := blobManager.Write(blobID, strings.NewReader("new data"))
 		Expect(err).ToNot(HaveOccurred())
 
-		readOnlyFile, err, status := blobManager.Fetch(blobID)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(status).To(Equal(200))
-
-		contents, err := fs.ReadFileString(readOnlyFile.Name())
-		Expect(err).ToNot(HaveOccurred())
+		contents := getBlob(blobID)
 		Expect(contents).To(Equal("new data"))
 	})
 
@@ -59,12 +65,7 @@ var _ = Describe("Blob Manager", func() {
 		err = blobManager.Write(blobID, strings.NewReader("new data"))
 		Expect(err).ToNot(HaveOccurred())
 
-		readOnlyFile, err, status := blobManager.Fetch(blobID)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(status).To(Equal(200))
-
-		contents, err := fs.ReadFileString(readOnlyFile.Name())
-		Expect(err).ToNot(HaveOccurred())
+		contents := getBlob(blobID)
 		Expect(contents).To(Equal("new data"))
 	})
 
@@ -72,24 +73,14 @@ var _ = Describe("Blob Manager", func() {
 		err := blobManager.Write(blobID, strings.NewReader("data1"))
 		Expect(err).ToNot(HaveOccurred())
 
-		otherBlobId := "other-blob-id"
-		err = blobManager.Write(otherBlobId, strings.NewReader("data2"))
+		otherBlobID := "other-blob-id"
+		err = blobManager.Write(otherBlobID, strings.NewReader("data2"))
 		Expect(err).ToNot(HaveOccurred())
 
-		readOnlyFile, err, status := blobManager.Fetch(blobID)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(status).To(Equal(200))
-
-		contents, err := fs.ReadFileString(readOnlyFile.Name())
-		Expect(err).ToNot(HaveOccurred())
+		contents := getBlob(blobID)
 		Expect(contents).To(Equal("data1"))
 
-		otherFile, err, status := blobManager.Fetch(otherBlobId)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(status).To(Equal(200))
-
-		otherContents, err := fs.ReadFileString(otherFile.Name())
-		Expect(err).ToNot(HaveOccurred())
+		otherContents := getBlob(otherBlobID)
 		Expect(otherContents).To(Equal("data2"))
 	})
 
@@ -135,12 +126,7 @@ var _ = Describe("Blob Manager", func() {
 				err = fs.WriteFileString(path, "overwriting!")
 				Expect(err).NotTo(HaveOccurred())
 
-				readOnlyFile, err, status := blobManager.Fetch(blobID)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(status).To(Equal(200))
-
-				contents, err := fs.ReadFileString(readOnlyFile.Name())
-				Expect(err).ToNot(HaveOccurred())
+				contents := getBlob(blobID)
 				Expect(contents).To(Equal("data"))
 			})
 
