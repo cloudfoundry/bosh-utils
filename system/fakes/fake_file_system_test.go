@@ -315,6 +315,21 @@ var _ = Describe("FakeFileSystem", func() {
 			Expect(newStat.Groupname).To(Equal(oldStat.Groupname))
 			Expect(newStat.Flags).To(Equal(oldStat.Flags))
 		})
+
+		It("renames the contents of subdirectories", func() {
+			err := fs.MkdirAll("originaldir", 0700)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = fs.WriteFileString("originaldir/file.txt", "contents!")
+			Expect(err).ToNot(HaveOccurred())
+
+			err = fs.Rename("originaldir", "newdir")
+			Expect(err).ToNot(HaveOccurred())
+
+			contents, err := fs.ReadFileString("newdir/file.txt")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(contents).To(Equal("contents!"))
+		})
 	})
 
 	Describe("Symlink", func() {
