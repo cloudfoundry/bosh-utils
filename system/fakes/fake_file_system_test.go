@@ -463,21 +463,6 @@ var _ = Describe("FakeFileSystem", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(targetPath).To(Equal("foobarTarget"))
 			})
-			Context ("using absolute directory paths", func() {
-				It("returns the absolute path of target", func() {
-					err := fs.WriteFileString("/tmp/foobarbaz", "asdfghjk")
-					Expect(err).ToNot(HaveOccurred())
-					err = fs.Symlink("/tmp/foobarbaz", "/tmp/foobar")
-					Expect(err).ToNot(HaveOccurred())
-
-					targetPath, err := fs.Readlink("/tmp/foobar")
-					Expect(err).ToNot(HaveOccurred())
-					absFilepath, err := filepath.Abs("/tmp/foobarbaz")
-					Expect(err).ToNot(HaveOccurred())
-					Expect(targetPath).To(Equal(absFilepath))
-
-				})
-			})
 		})
 
 		Context("when there is an error", func() {
