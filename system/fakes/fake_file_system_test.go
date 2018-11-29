@@ -357,7 +357,7 @@ var _ = Describe("FakeFileSystem", func() {
 				Expect(targetPath).To(Equal("foobarbaz"))
 			})
 
-			Context("using absolute directory paths", func() {
+			Context ("using absolute directory paths", func() {
 				It("returns the absolute path of target", func() {
 					err := fs.WriteFileString("/tmp/foobarbaz", "asdfghjk")
 					Expect(err).ToNot(HaveOccurred())
@@ -369,6 +369,7 @@ var _ = Describe("FakeFileSystem", func() {
 					absFilepath, err := filepath.Abs("/tmp/foobarbaz")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(targetPath).To(Equal(absFilepath))
+
 				})
 			})
 		})
@@ -462,8 +463,7 @@ var _ = Describe("FakeFileSystem", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(targetPath).To(Equal("foobarTarget"))
 			})
-
-			Context("using absolute directory paths", func() {
+			Context ("using absolute directory paths", func() {
 				It("returns the absolute path of target", func() {
 					err := fs.WriteFileString("/tmp/foobarbaz", "asdfghjk")
 					Expect(err).ToNot(HaveOccurred())
@@ -475,6 +475,7 @@ var _ = Describe("FakeFileSystem", func() {
 					absFilepath, err := filepath.Abs("/tmp/foobarbaz")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(targetPath).To(Equal(absFilepath))
+
 				})
 			})
 		})
