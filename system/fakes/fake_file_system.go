@@ -402,8 +402,23 @@ func (fs *FakeFileSystem) StatHelper(path string) (os.FileInfo, error) {
 
 	return NewFakeFile(path, fs).Stat()
 }
+func (fs *FakeFileSystem) Readlink(symlinkPath string) (string, error) {
+	targetPath, err := fs.readlink(symlinkPath)
+	if err != nil {
+		return targetPath, err
+	}
 
-func (fs *FakeFileSystem) Readlink(path string) (string, error) {
+	//Converts internal path formatting (which is UNIX/Linux based) to native OS file system path
+	//This emulates the real behavior of how the real file system returns symlink
+	if strings.HasPrefix(targetPath, "/") {
+		absFilePath, err := filepath.Abs(targetPath)
+		return absFilePath, err
+	}
+
+	return targetPath, err
+}
+
+func (fs *FakeFileSystem) readlink(path string) (string, error) {
 	if fs.ReadlinkError != nil {
 		return "", fs.ReadlinkError
 	}
