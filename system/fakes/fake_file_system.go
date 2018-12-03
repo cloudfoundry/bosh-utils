@@ -301,7 +301,7 @@ func (fs *FakeFileSystem) mkdir(path string, perm os.FileMode) error {
 		// We can't use any functions which require the filesystem lock.
 		parentStats := fs.fileRegistry.Get(parent)
 
-		if parentStats != nil && parentStats.FileType != FakeFileTypeDir {
+		if parentStats != nil && parentStats.FileType == FakeFileTypeFile {
 			return fmt.Errorf("cannot create a directory in a file (%s)", path)
 		}
 
