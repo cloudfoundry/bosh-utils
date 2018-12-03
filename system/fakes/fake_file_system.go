@@ -428,7 +428,7 @@ func (fs *FakeFileSystem) readlink(path string) (string, error) {
 
 	stats := fs.fileRegistry.Get(path)
 	if stats == nil {
-		return "", errors.New(fmt.Sprintf("path '%s' does not exist", path))
+		return "", os.ErrNotExist
 	}
 
 	if stats.FileType != FakeFileTypeSymlink {
