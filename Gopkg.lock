@@ -3,62 +3,81 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:e6d502a383907444bca2c9527efdb88062fc12060c332d462067ddf9dffc6e7d"
   name = "code.cloudfoundry.org/clock"
   packages = [
     ".",
-    "fakeclock"
+    "fakeclock",
   ]
+  pruneopts = "NUT"
   revision = "2269160ae1757f96bbb8c6475e6fa36c805e73e0"
 
 [[projects]]
+  digest = "1:69b95d47eef70cba62af2aa3d33bd5f9ffe9fa0be66d79d79150c38796c6eac1"
   name = "github.com/bmatcuk/doublestar"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "b3608229437ba4dc33dae64d56a79a2a73f1f6b2"
   version = "v1.0.9"
 
 [[projects]]
   branch = "master"
+  digest = "1:58927c45bfdcd6550e5f1ab008eeeb6951474a232afa1dc690583f26c5f92cbd"
   name = "github.com/charlievieth/fs"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "7dc373669fa10ddf827c37c595dee30a2f001be9"
 
 [[projects]]
   branch = "master"
+  digest = "1:3d3a6beb04065e29628f9d4f8fefeca4cc96932a8b0b83a03e9a3405b3538c11"
   name = "github.com/cloudfoundry/go-socks5"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "54f73bdb8a8e85a6611d3d29ab9bbf98c2a060d7"
 
 [[projects]]
   branch = "master"
+  digest = "1:5f29a6db136978d1515aa9909eacc36beeed758fe7d191dfa19fb8a86e42a5ce"
   name = "github.com/cloudfoundry/socks5-proxy"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "3659db090cb23a57807b53e2f8580b2427dc2659"
 
 [[projects]]
+  digest = "1:a2c1d0e43bd3baaa071d1b9ed72c27d78169b2b269f71c105ac4ba34b1be4a39"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
+  pruneopts = "NUT"
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:b1ef763b6334cf7eb68249217b77955fdae4d2475e13d7d38eb4b452f0633944"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
+  pruneopts = "NUT"
   revision = "17ce1425424ab154092bbb43af630bd647f3bb0d"
 
 [[projects]]
+  digest = "1:914f8eaa63b88fe6bcd656d81b3f3ccd2e8422df1787a6abe32554e4b75c0556"
   name = "github.com/jessevdk/go-flags"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "96dc06278ce32a0e9d957d590bb987c81ee66407"
   version = "v1.3.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:16bbae9910129be5a18b951eabacd54414d3faea094dfab92bb3c84884d46b11"
   name = "github.com/nu7hatch/gouuid"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 
 [[projects]]
+  digest = "1:4b7ad06825a5ef932f35a66ac4a959facd323d70ed2106c7e2f3fcca07d66cc3"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -85,12 +104,14 @@
     "reporters/stenographer",
     "reporters/stenographer/support/go-colorable",
     "reporters/stenographer/support/go-isatty",
-    "types"
+    "types",
   ]
+  pruneopts = "NUT"
   revision = "9eda700730cba42af70d53180f9dcce9266bc2bc"
   version = "v1.4.0"
 
 [[projects]]
+  digest = "1:c1f231e749cfbfb59870c4399faf664dd2fb8d7350569149eddaf526450b51c9"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -107,60 +128,74 @@
     "matchers/support/goraph/edge",
     "matchers/support/goraph/node",
     "matchers/support/goraph/util",
-    "types"
+    "types",
   ]
-  revision = "c893efa28eb45626cdaa76c9f653b62488858837"
-  version = "v1.2.0"
+  pruneopts = "NUT"
+  revision = "65fb64232476ad9046e57c26cd0bff3d3a8dc6cd"
+  version = "v1.4.3"
 
 [[projects]]
   branch = "master"
+  digest = "1:59eb15a18373758cf4e964d15282dae2687d5dd0835099f6200821ca479c6514"
   name = "github.com/pivotal-cf/paraphernalia"
   packages = ["secure/tlsconfig"]
+  pruneopts = "NUT"
   revision = "e34e13867a42f12943d6d5448e90b294dc85601d"
 
 [[projects]]
+  digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
+  pruneopts = "NUT"
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:b5c8b4a0ad5f65a85eb2a9f89e30c638ef8b99f8a3f078467cea778869757666"
   name = "github.com/stretchr/testify"
   packages = ["assert"]
+  pruneopts = "NUT"
   revision = "69483b4bd14f5845b5a1e55bca19e954e827f1d0"
   version = "v1.1.4"
 
 [[projects]]
   branch = "master"
+  digest = "1:932c51bc69b71b4f207f7fe48eef9cebf9a318d53e8ad43d2a469c955f6d0a95"
   name = "golang.org/x/crypto"
   packages = [
     "curve25519",
     "ed25519",
     "ed25519/internal/edwards25519",
-    "ssh"
+    "ssh",
   ]
+  pruneopts = "NUT"
   revision = "2509b142fb2b797aa7587dad548f113b2c0f20ce"
 
 [[projects]]
   branch = "master"
+  digest = "1:999702ee97ddbb8b1192176a1aadd3ee3eb2d523e0452d9a48cfed0184ba3df2"
   name = "golang.org/x/net"
   packages = [
     "context",
     "html",
     "html/atom",
     "html/charset",
-    "proxy"
+    "proxy",
   ]
+  pruneopts = "NUT"
   revision = "66aacef3dd8a676686c7ae3716979581e8b03c47"
 
 [[projects]]
   branch = "master"
+  digest = "1:e2deb8ce9667694902730153ad32302b1f9be9a64ce5e8f1d195c0938ab179d6"
   name = "golang.org/x/sys"
   packages = ["unix"]
+  pruneopts = "NUT"
   revision = "7a85bfad8bb9558204b9cc9b3624680d2d443a35"
 
 [[projects]]
   branch = "master"
+  digest = "1:9075d7a109601cf99e20150832299c84d17eb25799e11570c9d16739d8c290da"
   name = "golang.org/x/text"
   packages = [
     "encoding",
@@ -179,19 +214,86 @@
     "language",
     "runes",
     "transform",
-    "unicode/cldr"
+    "unicode/cldr",
   ]
+  pruneopts = "NUT"
   revision = "acd49d43e9b95df46670431bf5c7ae59586daad8"
 
 [[projects]]
   branch = "v2"
+  digest = "1:c85dc78b3426641ebf2a0bbf5b731b5c4613ddb5987dbe218f7e75468dcd56f5"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "eb3733d160e74a9c7e442f435eb3bea458e1d19f"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3a94ee7d808580ffcb21cf326cc0c41012a534179c4b8003661aa0c985ce0a43"
+  input-imports = [
+    "code.cloudfoundry.org/clock",
+    "code.cloudfoundry.org/clock/fakeclock",
+    "github.com/bmatcuk/doublestar",
+    "github.com/charlievieth/fs",
+    "github.com/cloudfoundry/go-socks5",
+    "github.com/cloudfoundry/socks5-proxy",
+    "github.com/davecgh/go-spew/spew",
+    "github.com/golang/protobuf/proto",
+    "github.com/jessevdk/go-flags",
+    "github.com/nu7hatch/gouuid",
+    "github.com/onsi/ginkgo",
+    "github.com/onsi/ginkgo/config",
+    "github.com/onsi/ginkgo/ginkgo",
+    "github.com/onsi/ginkgo/ginkgo/convert",
+    "github.com/onsi/ginkgo/ginkgo/interrupthandler",
+    "github.com/onsi/ginkgo/ginkgo/nodot",
+    "github.com/onsi/ginkgo/ginkgo/testrunner",
+    "github.com/onsi/ginkgo/ginkgo/testsuite",
+    "github.com/onsi/ginkgo/ginkgo/watch",
+    "github.com/onsi/ginkgo/reporters",
+    "github.com/onsi/ginkgo/reporters/stenographer",
+    "github.com/onsi/ginkgo/reporters/stenographer/support/go-colorable",
+    "github.com/onsi/ginkgo/reporters/stenographer/support/go-isatty",
+    "github.com/onsi/ginkgo/types",
+    "github.com/onsi/gomega",
+    "github.com/onsi/gomega/format",
+    "github.com/onsi/gomega/gbytes",
+    "github.com/onsi/gomega/gexec",
+    "github.com/onsi/gomega/ghttp",
+    "github.com/onsi/gomega/matchers",
+    "github.com/onsi/gomega/matchers/support/goraph/bipartitegraph",
+    "github.com/onsi/gomega/matchers/support/goraph/edge",
+    "github.com/onsi/gomega/matchers/support/goraph/node",
+    "github.com/onsi/gomega/matchers/support/goraph/util",
+    "github.com/onsi/gomega/types",
+    "github.com/pivotal-cf/paraphernalia/secure/tlsconfig",
+    "github.com/pmezard/go-difflib/difflib",
+    "github.com/stretchr/testify/assert",
+    "golang.org/x/crypto/curve25519",
+    "golang.org/x/crypto/ed25519",
+    "golang.org/x/crypto/ed25519/internal/edwards25519",
+    "golang.org/x/crypto/ssh",
+    "golang.org/x/net/context",
+    "golang.org/x/net/html",
+    "golang.org/x/net/html/atom",
+    "golang.org/x/net/html/charset",
+    "golang.org/x/net/proxy",
+    "golang.org/x/sys/unix",
+    "golang.org/x/text/encoding",
+    "golang.org/x/text/encoding/charmap",
+    "golang.org/x/text/encoding/htmlindex",
+    "golang.org/x/text/encoding/internal",
+    "golang.org/x/text/encoding/internal/identifier",
+    "golang.org/x/text/encoding/japanese",
+    "golang.org/x/text/encoding/korean",
+    "golang.org/x/text/encoding/simplifiedchinese",
+    "golang.org/x/text/encoding/traditionalchinese",
+    "golang.org/x/text/encoding/unicode",
+    "golang.org/x/text/language",
+    "golang.org/x/text/runes",
+    "golang.org/x/text/transform",
+    "golang.org/x/text/unicode/cldr",
+    "gopkg.in/yaml.v2",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
