@@ -42,5 +42,5 @@ required = ["github.com/onsi/ginkgo/ginkgo"]
   name = "golang.org/x/net"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/cloudfoundry/socks5-proxy"
+  version = "v0.1.0"
