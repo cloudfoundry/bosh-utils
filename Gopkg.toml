@@ -43,4 +43,4 @@ required = ["github.com/onsi/ginkgo/ginkgo"]
 
 [[constraint]]
   name = "github.com/cloudfoundry/socks5-proxy"
-  version = "v0.1.0"
+  version = "v0.2.0"
