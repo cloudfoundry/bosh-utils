@@ -25,7 +25,7 @@ jobs:
     plan:
       - get: weekly
         trigger: true
-      - get: bosh-cli
+      - get: bosh-utils
       - task: bump-deps
         file: bosh-utils/ci/tasks/bump-deps.yml
       - task: test-unit
