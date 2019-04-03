@@ -2,13 +2,14 @@
 groups:
 - name: test-and-release
   jobs:
-    - test-unit
-    - publish-multidigest-binary
+  - bump-deps
+  - test-unit
+  - publish-multidigest-binary
 
 - name: docker-images
   jobs:
-    - build-go-dep-bumper
-    - build-bosh-utils-image
+  - build-go-dep-bumper
+  - build-bosh-utils-image
 
 - name: all
   jobs:
@@ -16,8 +17,29 @@ groups:
   - publish-multidigest-binary
   - build-go-dep-bumper
   - build-bosh-utils-image
+  - bump-deps
 
 jobs:
+  - name: bump-deps
+    public: true
+    plan:
+      - get: weekly
+        trigger: true
+      - get: bosh-cli
+      - task: bump-deps
+        file: bosh-utils/ci/tasks/bump-deps.yml
+      - task: test-unit
+        input_mapping:
+          bosh-utils: bumped-bosh-utils
+        file: bosh-utils/ci/tasks/test-unit.yml
+      - task: test-unit-windows
+        input_mapping:
+          bosh-utils: bumped-bosh-utils
+        file: bosh-utils/ci/tasks/test-unit-windows.yml
+      - put: bosh-utils
+        params:
+          repository: bumped-bosh-utils
+
   - name: test-unit
     public: true
     plan:
@@ -95,11 +117,19 @@ jobs:
           skip_download: true
 
 resources:
+  - name: weekly
+    type: time
+    source:
+      start: 3:00 -0700
+      stop: 4:30 -0700
+      days: [Saturday]
+
   - name: bosh-utils
     type: git
     source:
-      uri: https://github.com/cloudfoundry/bosh-utils
+      uri: git@github.com:cloudfoundry/bosh-utils.git
       branch: develop
+      private_key: {{concourse_github_private_key}}
 
   - name: bosh-utils-promoted
     type: git
