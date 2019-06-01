@@ -174,7 +174,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c702843f592f44c2c558f08478b71331119d31907e7945f1cedc9ee3c932e493"
+  digest = "1:ef3ffa0905f706132b35e4995ff4031b02e24be795892620553d57b06883ff68"
   name = "golang.org/x/crypto"
   packages = [
     "curve25519",
@@ -186,7 +186,7 @@
     "ssh",
   ]
   pruneopts = "NUT"
-  revision = "22d7a77e9e5f409e934ed268692e56707cd169e5"
+  revision = "20be4c3c3ed52bfccdb2d59a412ee1a936d175a7"
 
 [[projects]]
   branch = "master"
@@ -205,14 +205,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:5565c79bf989e4e0d2f7c058670e58c0497663e9306beffae3482d8e0bacc9dc"
+  digest = "1:3748eb2ef6a7b44748846d0003d14da7a72c6f6da82a355360f6c99673fd24a1"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "dbbf3f1254d491605cf4a0034ce25d0dc71b0c58"
+  revision = "4c3a928424d249a1013e789cf5e458d480bcba16"
 
 [[projects]]
   digest = "1:8a0baffd5559acaa560f854d7d525c02f4fec2d4f8a214398556fb661a10f6e0"
