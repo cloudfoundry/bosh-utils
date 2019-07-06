@@ -13,12 +13,12 @@
   revision = "02e53af36e6c978af692887ed449b74026d76fec"
 
 [[projects]]
-  digest = "1:7294028ae4f4ebe9f92dccabdc69f63eba37b71fbfcdcb35ed1c32eb823fc6d4"
+  digest = "1:c2c6f380e0a78474e81fae9a8bdd2353f35c0ea2166126271f9944cc4e3b2343"
   name = "github.com/bmatcuk/doublestar"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "85a78806aa1b4707d1dbace9be592cf1ece91ab3"
-  version = "v1.1.1"
+  revision = "6d051236a614a33f1b10a94f70fd1af002283c5b"
+  version = "v1.1.2"
 
 [[projects]]
   branch = "master"
@@ -186,7 +186,7 @@
     "ssh",
   ]
   pruneopts = "NUT"
-  revision = "cc06ce4a13d484c0101a9e92913248488a75786d"
+  revision = "4def268fd1a49955bfb3dda92fe3db4f924f2285"
 
 [[projects]]
   branch = "master"
