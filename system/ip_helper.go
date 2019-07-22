@@ -6,15 +6,15 @@ import (
 	"net"
 )
 
-func CalculateNetworkAndBroadcast(ipAddress, netmask string) (string, string, error) {
+func CalculateNetworkAndBroadcast(ipAddress, netmask string) (string, string, int, error) {
 	ip := net.ParseIP(ipAddress)
 	if ip == nil {
-		return "", "", fmt.Errorf("Invalid IP '%s'", ipAddress)
+		return "", "", 0, fmt.Errorf("Invalid IP '%s'", ipAddress)
 	}
 
 	mask := net.ParseIP(netmask)
 	if mask == nil {
-		return "", "", fmt.Errorf("Invalid netmask '%s'", netmask)
+		return "", "", 0, fmt.Errorf("Invalid netmask '%s'", netmask)
 	}
 
 	ip = ip.To4()
@@ -24,10 +24,10 @@ func CalculateNetworkAndBroadcast(ipAddress, netmask string) (string, string, er
 		return calculateV4NetworkAndBroadcast(ip, mask)
 	}
 
-	return "", "", nil
+	return "", "", 0, nil
 }
 
-func calculateV4NetworkAndBroadcast(ipAddress, netmask net.IP) (string, string, error) {
+func calculateV4NetworkAndBroadcast(ipAddress, netmask net.IP) (string, string, int, error) {
 	mask := net.IPMask(netmask)
 	broadcast := make(net.IP, net.IPv4len)
 
@@ -36,8 +36,10 @@ func calculateV4NetworkAndBroadcast(ipAddress, netmask net.IP) (string, string, 
 
 	network := ipAddress.Mask(mask)
 	if network == nil {
-		return "", "", fmt.Errorf("could not apply mask %v to IP address %v", mask, ipAddress)
+		return "", "", 0, fmt.Errorf("could not apply mask %v to IP address %v", mask, ipAddress)
 	}
 
-	return network.To4().String(), broadcast.To4().String(), nil
+	maskSize, _ := mask.Size()
+
+	return network.To4().String(), broadcast.To4().String(), maskSize, nil
 }
