@@ -45,10 +45,11 @@ jobs:
     plan:
       - get: bosh-utils
         trigger: true
-      - task: test-unit
-        file: bosh-utils/ci/tasks/test-unit.yml
-      - task: test-unit-windows
-        file: bosh-utils/ci/tasks/test-unit-windows.yml
+      - in_parallel:
+        - task: test-unit
+          file: bosh-utils/ci/tasks/test-unit.yml
+        - task: test-unit-windows
+          file: bosh-utils/ci/tasks/test-unit-windows.yml
       - put: bosh-utils-commit-status
         params:
           state: success
@@ -67,7 +68,7 @@ jobs:
         params: {bump: patch}
       - put: version-semver
         params: {file: version-semver/number}
-      - aggregate:
+      - in_parallel:
         - task: build-multidigest-binary-darwin
           file: bosh-utils/ci/tasks/build-multidigest-binary.yml
           output_mapping: { out: compiled-darwin }
@@ -86,7 +87,7 @@ jobs:
           params:
             GOOS: linux
             GOARCH: ppc64le
-      - aggregate:
+      - in_parallel:
         - put: release-bucket-linux
           params: {file: compiled-linux/verify-multidigest-*-linux-amd64}
         - put: release-bucket-darwin
