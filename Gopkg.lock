@@ -13,12 +13,12 @@
   version = "1.0.0"
 
 [[projects]]
-  digest = "1:f3e10b6fd5c6580050a709f0f42242e9c3e1c703216aa05e2ddd503e04de6ae3"
+  digest = "1:6724cf35f4b6121ab7277c6a4b5f7790b99d095fc4b661092724abf8c24e7ab7"
   name = "github.com/bmatcuk/doublestar"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "eae5cbd0721cf1baf6a83474611de521d48034ea"
-  version = "v1.1.3"
+  revision = "8c5e0ade498b44ea8563405bf2cda0126d9ee006"
+  version = "v1.1.4"
 
 [[projects]]
   branch = "master"
@@ -201,18 +201,18 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "da137c7871d730100384dbcf36e6f8fa493aef5b"
+  revision = "ca1201d0de80cfde86cb01aea620983605dfe99b"
 
 [[projects]]
   branch = "master"
-  digest = "1:16b95a7a3dd5e5d1864f2e83d838dddae873668477b8ec20eb4a45b913da2573"
+  digest = "1:8c221325da9c9b82343a73d00dd4ede480e68f716092c2ed1c42c466ab307b75"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "fae7ac547cb717d141c433a2a173315e216b64c4"
+  revision = "fc99dfbffb4e5ed5758a37e31dd861afe285406b"
 
 [[projects]]
   digest = "1:8a0baffd5559acaa560f854d7d525c02f4fec2d4f8a214398556fb661a10f6e0"
