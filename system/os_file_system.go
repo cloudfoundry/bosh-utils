@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"errors"
@@ -232,6 +233,42 @@ func (fs *osFileSystem) ReadFile(path string) (content []byte, err error) {
 	return fs.ReadFileWithOpts(path, ReadOpts{})
 }
 
+// The map is before:after pair. "before" is a regular expression string that needs to be redacted.
+// "after" is the redacted result string. Multiple map pairs can be provided.
+// Example:
+// file content - {"user":"some_user","password":"some_password","api_key":"some_apikey"}
+// -------------------------------------------------
+// arg := make(map[string] string)
+// before1 := `"password":"[^"]*"`
+// after1 := `"password":"<redact>"`
+// before2 := `"api_key":"[^"]*"`
+// after2 := `"api_key":"<redact>"`
+// arg[before1] = after1
+// arg[before2] = after2
+// bytes, err := fs.ReadFileWithRedact(path, arg)
+// -------------------------------------------------
+// The debug log of the file content will be - {"user":"some_user","password":"<redact>","api_key":"<redact>"}
+func (fs *osFileSystem) ReadFileWithRedact(path string, arg map[string]string) (content []byte, err error) {
+	fs.logger.Debug(fs.logTag, "Reading file %s", path)
+
+	file, err := fs.OpenFile(path, os.O_RDONLY, 0)
+	if err != nil {
+		err = bosherr.WrapErrorf(err, "Opening file %s", path)
+		return
+	}
+
+	defer file.Close()
+
+	content, err = ioutil.ReadAll(file)
+	if err != nil {
+		err = bosherr.WrapErrorf(err, "Reading file content %s", path)
+		return
+	}
+
+	fs.logger.DebugWithDetails(fs.logTag, "Read content", redact(content, arg))
+	return
+}
+
 func (fs *osFileSystem) FileExists(path string) bool {
 	fs.logger.Debug(fs.logTag, "Checking if file exists %s", path)
 
@@ -425,4 +462,14 @@ func (fs *osFileSystem) runCommand(cmd string) (string, error) {
 	}
 
 	return strings.TrimSpace(stdout.String()), nil
+}
+
+func redact(content []byte, arg map[string]string) []byte {
+	temp := string(content)
+	for before, after := range arg {
+		temp = regexp.MustCompile(before).ReplaceAllString(temp, after)
+	}
+
+	result := []byte(temp)
+	return result
 }

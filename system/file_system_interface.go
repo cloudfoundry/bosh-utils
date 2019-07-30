@@ -38,6 +38,7 @@ type FileSystem interface {
 	ReadFileString(path string) (content string, err error)
 	ReadFile(path string) (content []byte, err error)
 	ReadFileWithOpts(path string, opts ReadOpts) (content []byte, err error)
+	ReadFileWithRedact(path string, arg map[string]string) (content []byte, err error)
 
 	FileExists(path string) bool
 	Stat(path string) (os.FileInfo, error)

@@ -406,6 +406,39 @@ var _ = Describe("OS FileSystem", func() {
 				Expect(logger.DebugWithDetailsCallCount() - beforeCountDetails).To(Equal(1))
 			})
 		})
+
+		Context("with redact", func() {
+			It("logs the file content with redact", func() {
+				logger := &loggerfakes.FakeLogger{}
+				osFs := NewOsFileSystem(logger)
+				testPath := filepath.Join(TempDir, "ReadFileTestFile")
+
+				orginal := `{"user":"some_user","password":"some_password","api_key":"some_apikey"}`
+				afterRedact := `{"user":"some_user","password":"<redact>","api_key":"<redact>"}`
+				osFs.WriteFileQuietly(testPath, []byte(orginal))
+				defer os.Remove(testPath)
+
+				beforeCount := logger.DebugCallCount()
+				beforeCountDetails := logger.DebugWithDetailsCallCount()
+
+				arg := make(map[string] string)
+				before1 := `"password":"[^"]*"`
+				after1 := "\"password\":\"<redact>\""
+				before2 := `"api_key":"[^"]*"`
+				after2 := "\"api_key\":\"<redact>\""
+				arg[before1] = after1
+				arg[before2] = after2
+
+				content, err := osFs.ReadFileWithRedact(testPath, arg)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(orginal).To(Equal(string(content)))
+
+				Expect(logger.DebugCallCount() - beforeCount).To(Equal(1))
+				Expect(logger.DebugWithDetailsCallCount() - beforeCountDetails).To(Equal(1))
+				_, _, logContent := logger.DebugWithDetailsArgsForCall(0)
+				Expect(afterRedact).To(Equal(fmt.Sprintf("%s", logContent[0])))
+			})
+		})
 	})
 
 	It("file exists", func() {
