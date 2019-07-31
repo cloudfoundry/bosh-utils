@@ -566,6 +566,19 @@ var _ = Describe("FakeFileSystem", func() {
 		})
 	})
 
+	Describe("Ls", func() {
+		It("Lists files in a directory", func() {
+			err := fs.WriteFile("foo/bar", []byte("hello"))
+			Expect(err).NotTo(HaveOccurred())
+			err = fs.WriteFile("foo/baz", []byte("hello"))
+			Expect(err).NotTo(HaveOccurred())
+
+			results, err := fs.Ls("foo")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(results).To(Equal([]string{"foo/bar", "foo/baz"}))
+		})
+	})
+
 	Describe("WriteFile", func() {
 		It("Writes the file", func() {
 			fs.WriteFile("foo", []byte("hello"))
