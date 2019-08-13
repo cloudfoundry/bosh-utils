@@ -579,6 +579,32 @@ var _ = Describe("FakeFileSystem", func() {
 		})
 	})
 
+	Describe("Walk", func() {
+		It("Recursively traverses a directory", func() {
+			err := fs.WriteFile("foo/bar", []byte("hello"))
+			Expect(err).NotTo(HaveOccurred())
+			err = fs.WriteFile("foobar", []byte("should not be included"))
+			Expect(err).NotTo(HaveOccurred())
+			err = fs.WriteFile("foo/bam/bang", []byte("hello"))
+			Expect(err).NotTo(HaveOccurred())
+			err = fs.WriteFile("foo/baz", []byte("hello"))
+			Expect(err).NotTo(HaveOccurred())
+
+			expectedFiles := []string{"foo", "foo/bam", "foo/bam/bang", "foo/bar", "foo/baz"}
+			actualFiles := []string{}
+			// foo/bar/.. makes it necessary to handle path expansion, which should be handled gracefully by the fake filesystem as well.
+			err = fs.Walk("foo/bar/..", func(path string, _ os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				actualFiles = append(actualFiles, path)
+				return nil
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(actualFiles).To(Equal(expectedFiles))
+		})
+	})
+
 	Describe("WriteFile", func() {
 		It("Writes the file", func() {
 			fs.WriteFile("foo", []byte("hello"))

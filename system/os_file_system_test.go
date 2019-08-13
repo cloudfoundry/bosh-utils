@@ -94,6 +94,37 @@ var _ = Describe("OS FileSystem", func() {
 		Expect(expandedPath).To(MatchPath(currentDir + "/fake-file.txt"))
 	})
 
+	Describe("Walk", func() {
+		It("Recursively traverses a directory", func() {
+			osFs := createOsFs()
+			tmpPath := TempDir
+			testPath := filepath.Join(tmpPath, "WalkPath")
+			defer os.RemoveAll(testPath)
+
+			err := osFs.MkdirAll(filepath.Join(testPath, "foo", "bam", "bang"), 0700)
+			Expect(err).NotTo(HaveOccurred())
+			err = osFs.MkdirAll(filepath.Join(testPath, "foo", "baz"), 0700)
+			Expect(err).NotTo(HaveOccurred())
+
+			expectedFiles := []string{
+				filepath.Join(testPath, "foo"),
+				filepath.Join(testPath, "foo/bam"),
+				filepath.Join(testPath, "foo/bam/bang"),
+				filepath.Join(testPath, "foo/baz"),
+			}
+			actualFiles := []string{}
+			err = osFs.Walk(filepath.Join(testPath, "foo"), func(path string, _ os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				actualFiles = append(actualFiles, path)
+				return nil
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(actualFiles).To(Equal(expectedFiles))
+		})
+	})
+
 	It("mkdir all", func() {
 		osFs := createOsFs()
 		tmpPath := TempDir
