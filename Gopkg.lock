@@ -91,7 +91,7 @@
   revision = "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 
 [[projects]]
-  digest = "1:e6f85c42b50299b3f3c1642851a6651ed593f904e9e14c000ab8a001c4050827"
+  digest = "1:21b26ffee38373f602c62dad7964b968d914815ffa9cdf88e79a75fab7cd9224"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -121,11 +121,11 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "eea6ad008b96acdaa524f5b409513bf062b500ad"
-  version = "v1.8.0"
+  revision = "7e8b50db0c6d0a15ac0eb015d4ca64e7e7e2c88c"
+  version = "v1.9.0"
 
 [[projects]]
-  digest = "1:96b79a553cec6f0b9d1282d7228422571c93608d34d731565cd2597da50e5b67"
+  digest = "1:709674d2cbee855168d2112a450ac7f089cc484587251d4a1c3d993d93da3c86"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -145,8 +145,8 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "90e289841c1ed79b7a598a7cd9959750cb5e89e2"
-  version = "v1.5.0"
+  revision = "27d50ea6455b212cf516609fa58b2b5dce1abc81"
+  version = "v1.6.0"
 
 [[projects]]
   branch = "master"
@@ -186,7 +186,7 @@
     "ssh",
   ]
   pruneopts = "NUT"
-  revision = "4def268fd1a49955bfb3dda92fe3db4f924f2285"
+  revision = "60c769a6c58655dab1b9adac0d58967dd517cfba"
 
 [[projects]]
   branch = "master"
