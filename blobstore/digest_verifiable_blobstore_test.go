@@ -117,7 +117,7 @@ var _ = Describe("checksumVerifiableBlobstore", func() {
 			Expect(blobID).To(Equal("fake-blob-id"))
 
 			Expect(innerBlobstore.CreateArgsForCall(0)).To(Equal(fixturePath))
-			Expect(multipleDigest.String()).To(Equal("b153af8b5f71cf357896988886a76e9fe59b1e2e;sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"))
+			Expect(multipleDigest.String()).To(Equal("b153af8b5f71cf357896988886a76e9fe59b1e2e;sha256:fd6e6e14505d076369d5a643d6a207514b51019e569047240b16c7f1f325e4ac"))
 		})
 
 		It("returns error if blob cannot be opened by filesystem", func() {
