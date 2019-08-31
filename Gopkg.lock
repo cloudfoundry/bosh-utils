@@ -91,7 +91,7 @@
   revision = "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 
 [[projects]]
-  digest = "1:21b26ffee38373f602c62dad7964b968d914815ffa9cdf88e79a75fab7cd9224"
+  digest = "1:9101fc203cb3366907f3b1a094301baebb7c5d74d0c7bb2917687f48cf24bbee"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -121,11 +121,11 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "7e8b50db0c6d0a15ac0eb015d4ca64e7e7e2c88c"
-  version = "v1.9.0"
+  revision = "974566c482abc93ffd3df6f4626e79076c7ed290"
+  version = "v1.10.1"
 
 [[projects]]
-  digest = "1:709674d2cbee855168d2112a450ac7f089cc484587251d4a1c3d993d93da3c86"
+  digest = "1:b5ec08263b3a1acfebdd8ffe97dbd938b9d03a23df7c61ba6924ad51c753d824"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -145,8 +145,8 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "27d50ea6455b212cf516609fa58b2b5dce1abc81"
-  version = "v1.6.0"
+  revision = "bdebf9e0ece900259084cfa4121b97ce1a540939"
+  version = "v1.7.0"
 
 [[projects]]
   branch = "master"
@@ -186,7 +186,7 @@
     "ssh",
   ]
   pruneopts = "NUT"
-  revision = "60c769a6c58655dab1b9adac0d58967dd517cfba"
+  revision = "9756ffdc24725223350eb3266ffb92590d28f278"
 
 [[projects]]
   branch = "master"
@@ -201,18 +201,18 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "74dc4d7220e7acc4e100824340f3e66577424772"
+  revision = "ba9fcec4b297b415637633c5a6e8fa592e4a16c3"
 
 [[projects]]
   branch = "master"
-  digest = "1:eda62c48ee7091fa98b7a4fb9a534d936268a43723d1511bcce1c639a2f022d8"
+  digest = "1:5d48e9058249e2688dc22bea8706da3c3535213185468357351deca2a75bdb9b"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "fde4db37ae7ad8191b03d30d27f258b5291ae4e3"
+  revision = "1e83adbbebd0f5dc971915fd7e5db032c3d2b731"
 
 [[projects]]
   digest = "1:8a0baffd5559acaa560f854d7d525c02f4fec2d4f8a214398556fb661a10f6e0"
