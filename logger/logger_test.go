@@ -65,6 +65,30 @@ func testConcurrentPrefix(newLogger func(lv LogLevel, out io.Writer) Logger) {
 	testOutput("out", out.String())
 }
 
+var _ = Describe("AsString", func() {
+	It("converts strings into LogLevel constants", func() {
+		level := AsString(LevelNone)
+		Expect(level).To(Equal("NONE"))
+
+		level = AsString(LevelDebug)
+		Expect(level).To(Equal("DEBUG"))
+
+		level = AsString(LevelInfo)
+		Expect(level).To(Equal("INFO"))
+
+		level = AsString(LevelWarn)
+		Expect(level).To(Equal("WARN"))
+
+		level = AsString(LevelError)
+		Expect(level).To(Equal("ERROR"))
+	})
+
+	It("returns debug as defult on unknown input", func() {
+		level := AsString(LogLevel(2983472))
+		Expect(level).To(Equal("DEBUG"))
+	})
+})
+
 var _ = Describe("Levelify", func() {
 	It("converts strings into LogLevel constants", func() {
 		level, err := Levelify("NONE")
