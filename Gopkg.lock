@@ -83,6 +83,14 @@
   version = "v1.4.0"
 
 [[projects]]
+  digest = "1:ebd0081aed1cd0af2f65a362c0ceea985eae9fe72efb28cefb84eca3b98dd3a3"
+  name = "github.com/jpillora/backoff"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "8eab2debe79d12b7bd3d10653910df25fa9552ba"
+  version = "1.0.0"
+
+[[projects]]
   branch = "master"
   digest = "1:16bbae9910129be5a18b951eabacd54414d3faea094dfab92bb3c84884d46b11"
   name = "github.com/nu7hatch/gouuid"
@@ -276,6 +284,7 @@
     "github.com/charlievieth/fs",
     "github.com/cloudfoundry/socks5-proxy",
     "github.com/jessevdk/go-flags",
+    "github.com/jpillora/backoff",
     "github.com/nu7hatch/gouuid",
     "github.com/onsi/ginkgo",
     "github.com/onsi/ginkgo/ginkgo",
