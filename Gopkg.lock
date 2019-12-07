@@ -13,12 +13,12 @@
   version = "1.0.0"
 
 [[projects]]
-  digest = "1:2352f40df77dec05ec853c63c0226a31343490412528e0345a86e46cece28b15"
+  digest = "1:b7a18d6bf5e663d2bfa578e7375c88763ef5705d0e999e780c7625b9b5cbd2a6"
   name = "github.com/bmatcuk/doublestar"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "2437321e1473408f122a95f65df3d8841fec4fba"
-  version = "v1.1.5"
+  revision = "8fcc08761109c1a6699c22f50a73448182507b32"
+  version = "v1.2.1"
 
 [[projects]]
   branch = "master"
@@ -182,7 +182,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c9e0b137902d857921fb87c28039a4af7e587970bd10c4fcec818d1559347d43"
+  digest = "1:1055f180c19b95e216950a40b6d123d1448e7e63df85a29502192fb028f4f057"
   name = "golang.org/x/crypto"
   packages = [
     "chacha20",
@@ -194,11 +194,11 @@
     "ssh",
   ]
   pruneopts = "NUT"
-  revision = "b544559bb6d1b5c62fba4af5e843ff542174f079"
+  revision = "e9b2fee46413994441b28dfca259d911d963dfed"
 
 [[projects]]
   branch = "master"
-  digest = "1:7da6080199e4f63b257e78d45d23778a9bcc5e9dde75e6cce476a294e30a8d6b"
+  digest = "1:bb4e534e14d6d2eb39abbcc9d5fbf0be626b30f8dc4cb2be71d5b9777468b15b"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -209,18 +209,18 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "ef20fe5d793301b553005db740f730d87993f778"
+  revision = "e7e4b65ae66375ec1e85afc8e6b9b4933ae4da81"
 
 [[projects]]
   branch = "master"
-  digest = "1:b61d4520a8d4b02e80c6a7eebca6a7cb27f178797de4036ec3bd9987287f9829"
+  digest = "1:edf8806001d1bf3c077c69abc2f1eb61955cacd9d1b680059f5441ea3dd5c682"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "6d18c012aee9febd81bbf9806760c8c4480e870d"
+  revision = "eeba5f6aabab6d6594a9191d6bfeaca5fa6a8248"
 
 [[projects]]
   digest = "1:8a0baffd5559acaa560f854d7d525c02f4fec2d4f8a214398556fb661a10f6e0"
