@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"time"
 
+	"code.cloudfoundry.org/tlsconfig"
+
 	proxy "github.com/cloudfoundry/socks5-proxy"
 )
 
@@ -37,16 +39,21 @@ func CreateDefaultClientInsecureSkipVerify() *http.Client {
 type factory struct{}
 
 func (f factory) New(insecureSkipVerify bool, certPool *x509.CertPool) *http.Client {
+	tlsConfig, err := tlsconfig.Build(
+		tlsconfig.WithInternalServiceDefaults(),
+		WithInsecureSkipVerify(insecureSkipVerify),
+	).Client(tlsconfig.WithAuthority(certPool))
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	client := &http.Client{
 		Transport: &http.Transport{
-			TLSNextProto: map[string]func(authority string, c *tls.Conn) http.RoundTripper{},
-			TLSClientConfig: &tls.Config{
-				RootCAs:            certPool,
-				InsecureSkipVerify: insecureSkipVerify,
-			},
-
-			Proxy: http.ProxyFromEnvironment,
-			Dial:  defaultDialer,
+			TLSClientConfig: tlsConfig,
+			Proxy:           http.ProxyFromEnvironment,
+			//TODO: JM/SS: Dial is deprecated in favor of DialContext
+			// We will need to update the socks5-proxy
+			Dial: defaultDialer,
 
 			TLSHandshakeTimeout: 30 * time.Second,
 			DisableKeepAlives:   true,
@@ -54,4 +61,11 @@ func (f factory) New(insecureSkipVerify bool, certPool *x509.CertPool) *http.Cli
 	}
 
 	return client
+}
+
+func WithInsecureSkipVerify(insecureSkipVerify bool) tlsconfig.TLSOption {
+	return func(config *tls.Config) error {
+		config.InsecureSkipVerify = insecureSkipVerify
+		return nil
+	}
 }

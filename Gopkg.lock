@@ -13,6 +13,14 @@
   version = "1.0.0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:b9ee00c71bed5232e90598550a94ef3d93c9b4ae493412a46aba7af7998681df"
+  name = "code.cloudfoundry.org/tlsconfig"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "6c65973656e309398a32f286ff6cad0f22460962"
+
+[[projects]]
   digest = "1:b7a18d6bf5e663d2bfa578e7375c88763ef5705d0e999e780c7625b9b5cbd2a6"
   name = "github.com/bmatcuk/doublestar"
   packages = ["."]
@@ -280,6 +288,7 @@
   analyzer-version = 1
   input-imports = [
     "code.cloudfoundry.org/clock/fakeclock",
+    "code.cloudfoundry.org/tlsconfig",
     "github.com/bmatcuk/doublestar",
     "github.com/charlievieth/fs",
     "github.com/cloudfoundry/socks5-proxy",
