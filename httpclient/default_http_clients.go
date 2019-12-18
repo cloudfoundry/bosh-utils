@@ -42,6 +42,7 @@ func (f factory) New(insecureSkipVerify bool, certPool *x509.CertPool) *http.Cli
 	tlsConfig, err := tlsconfig.Build(
 		tlsconfig.WithInternalServiceDefaults(),
 		WithInsecureSkipVerify(insecureSkipVerify),
+		WithClientSessionCache(0),
 	).Client(tlsconfig.WithAuthority(certPool))
 	if err != nil {
 		log.Fatal(err)
@@ -49,10 +50,9 @@ func (f factory) New(insecureSkipVerify bool, certPool *x509.CertPool) *http.Cli
 
 	client := &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig: tlsConfig,
-			Proxy:           http.ProxyFromEnvironment,
-			DialContext:     defaultDialerContextFunc,
-
+			TLSClientConfig:     tlsConfig,
+			Proxy:               http.ProxyFromEnvironment,
+			DialContext:         defaultDialerContextFunc,
 			TLSHandshakeTimeout: 30 * time.Second,
 		},
 	}
@@ -63,6 +63,13 @@ func (f factory) New(insecureSkipVerify bool, certPool *x509.CertPool) *http.Cli
 func WithInsecureSkipVerify(insecureSkipVerify bool) tlsconfig.TLSOption {
 	return func(config *tls.Config) error {
 		config.InsecureSkipVerify = insecureSkipVerify
+		return nil
+	}
+}
+
+func WithClientSessionCache(capacity int) tlsconfig.TLSOption {
+	return func(config *tls.Config) error {
+		config.ClientSessionCache = tls.NewLRUClientSessionCache(capacity)
 		return nil
 	}
 }
