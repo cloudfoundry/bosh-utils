@@ -15,11 +15,11 @@ import (
 )
 
 var (
-	DefaultClient = CreateDefaultClientInsecureSkipVerify()
-	defaultDialer = SOCKS5DialFuncFromEnvironment((&net.Dialer{
+	DefaultClient            = CreateDefaultClientInsecureSkipVerify()
+	defaultDialerContextFunc = SOCKS5DialContextFuncFromEnvironment((&net.Dialer{
 		Timeout:   30 * time.Second,
 		KeepAlive: 30 * time.Second,
-	}).Dial, proxy.NewSocks5Proxy(proxy.NewHostKey(), log.New(ioutil.Discard, "", log.LstdFlags), 1*time.Minute))
+	}), proxy.NewSocks5Proxy(proxy.NewHostKey(), log.New(ioutil.Discard, "", log.LstdFlags), 1*time.Minute))
 )
 
 type Client interface {
@@ -51,9 +51,7 @@ func (f factory) New(insecureSkipVerify bool, certPool *x509.CertPool) *http.Cli
 		Transport: &http.Transport{
 			TLSClientConfig: tlsConfig,
 			Proxy:           http.ProxyFromEnvironment,
-			//TODO: JM/SS: Dial is deprecated in favor of DialContext
-			// We will need to update the socks5-proxy
-			Dial: defaultDialer,
+			DialContext:     defaultDialerContextFunc,
 
 			TLSHandshakeTimeout: 30 * time.Second,
 			DisableKeepAlives:   true,

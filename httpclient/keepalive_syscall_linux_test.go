@@ -1,6 +1,7 @@
 package httpclient_test
 
 import (
+	"context"
 	"net/http"
 
 	. "github.com/onsi/ginkgo"
@@ -38,7 +39,7 @@ var _ = Describe("Linux-specific tests", func() {
 		<-readyToAccept
 
 		client := CreateDefaultClient(nil)
-		connection, err := client.Transport.(*http.Transport).Dial("tcp", laddr)
+		connection, err := client.Transport.(*http.Transport).DialContext(context.Background(), "tcp", laddr)
 		Expect(err).ToNot(HaveOccurred())
 
 		tcpConn, ok := connection.(*net.TCPConn)
