@@ -16,13 +16,6 @@ var _ = Describe("Default HTTP clients", func() {
 			Expect(client).ToNot(BeNil())
 			Expect(client).To(Equal(DefaultClient))
 		})
-
-		It("disables HTTP Transport keep-alive (disables HTTP/1.[01] connection reuse)", func() {
-			var client *http.Client
-			client = DefaultClient
-
-			Expect(client.Transport.(*http.Transport).DisableKeepAlives).To(Equal(true))
-		})
 	})
 
 	Describe("CreateDefaultClient", func() {
@@ -30,22 +23,12 @@ var _ = Describe("Default HTTP clients", func() {
 			client := CreateDefaultClient(nil)
 			Expect(client.Transport.(*http.Transport).TLSClientConfig.InsecureSkipVerify).To(Equal(false))
 		})
-
-		It("disables HTTP Transport keep-alive (disables HTTP/1.[01] connection reuse)", func() {
-			client := CreateDefaultClient(nil)
-			Expect(client.Transport.(*http.Transport).DisableKeepAlives).To(Equal(true))
-		})
 	})
 
 	Describe("CreateDefaultClientInsecureSkipVerify", func() {
 		It("skips ssl verification", func() {
 			client := CreateDefaultClientInsecureSkipVerify()
 			Expect(client.Transport.(*http.Transport).TLSClientConfig.InsecureSkipVerify).To(Equal(true))
-		})
-
-		It("disables HTTP Transport keep-alive (disables HTTP/1.[01] connection reuse)", func() {
-			client := CreateDefaultClientInsecureSkipVerify()
-			Expect(client.Transport.(*http.Transport).DisableKeepAlives).To(Equal(true))
 		})
 	})
 })

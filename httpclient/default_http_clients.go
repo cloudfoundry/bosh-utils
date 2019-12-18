@@ -54,7 +54,6 @@ func (f factory) New(insecureSkipVerify bool, certPool *x509.CertPool) *http.Cli
 			DialContext:     defaultDialerContextFunc,
 
 			TLSHandshakeTimeout: 30 * time.Second,
-			DisableKeepAlives:   true,
 		},
 	}
 
