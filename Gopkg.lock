@@ -202,7 +202,7 @@
     "ssh",
   ]
   pruneopts = "NUT"
-  revision = "becbf705a91575484002d598f87d74f0002801e7"
+  revision = "53104e6ec876ad4e22ad27cce588b01392043c1b"
 
 [[projects]]
   branch = "master"
@@ -221,14 +221,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:10cc1c4e57ca96905a05379f5ef8b66b3f4b6000261c068940130e2ca30b9b92"
+  digest = "1:add37b34e1338f2de86943ce586e150a6e25f1ef9769547510cb9f462bc7033d"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "0732a990476f7f2f5f7200b39ba4ab730c0f09f8"
+  revision = "c709ea063b76879dc9915358f55d4d77c16ab6d5"
 
 [[projects]]
   digest = "1:8a0baffd5559acaa560f854d7d525c02f4fec2d4f8a214398556fb661a10f6e0"
