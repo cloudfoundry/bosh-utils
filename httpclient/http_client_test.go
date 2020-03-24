@@ -118,7 +118,7 @@ var _ = Describe("HTTPClient", func() {
 
 			_, err := httpClient.PostCustomized(url, []byte("post-request"), func(r *http.Request) {})
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Post http://foo:<redacted>@10.10.0.0/path"))
+			Expect(err.Error()).To(ContainSubstring("http://foo:<redacted>@10.10.0.0/path"))
 		})
 
 		It("redacts passwords from error message for https calls", func() {
@@ -126,7 +126,7 @@ var _ = Describe("HTTPClient", func() {
 
 			_, err := httpClient.PostCustomized(url, []byte("post-request"), func(r *http.Request) {})
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Post https://foo:<redacted>@10.10.0.0/path"))
+			Expect(err.Error()).To(ContainSubstring("https://foo:<redacted>@10.10.0.0/path"))
 		})
 
 		Describe("httpclient opts", func() {
@@ -378,7 +378,7 @@ var _ = Describe("HTTPClient", func() {
 
 			_, err := httpClient.PutCustomized(url, []byte("put-request"), func(r *http.Request) {})
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Put http://foo:<redacted>@10.10.0.0/path"))
+			Expect(err.Error()).To(ContainSubstring("http://foo:<redacted>@10.10.0.0/path"))
 		})
 
 		It("redacts passwords from error message for https calls", func() {
@@ -386,7 +386,7 @@ var _ = Describe("HTTPClient", func() {
 
 			_, err := httpClient.PutCustomized(url, []byte("put-request"), func(r *http.Request) {})
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Put https://foo:<redacted>@10.10.0.0/path"))
+			Expect(err.Error()).To(ContainSubstring("https://foo:<redacted>@10.10.0.0/path"))
 		})
 
 		Describe("httpclient opts", func() {
@@ -529,7 +529,7 @@ var _ = Describe("HTTPClient", func() {
 
 			_, err := httpClient.GetCustomized(url, func(r *http.Request) {})
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Get http://foo:<redacted>@10.10.0.0/path"))
+			Expect(err.Error()).To(ContainSubstring("http://foo:<redacted>@10.10.0.0/path"))
 		})
 
 		It("redacts passwords from error message for https calls", func() {
@@ -537,7 +537,7 @@ var _ = Describe("HTTPClient", func() {
 
 			_, err := httpClient.GetCustomized(url, func(r *http.Request) {})
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Get https://foo:<redacted>@10.10.0.0:8080/path"))
+			Expect(err.Error()).To(ContainSubstring("https://foo:<redacted>@10.10.0.0:8080/path"))
 		})
 
 		Describe("httpclient opts", func() {
