@@ -204,7 +204,7 @@
     "ssh/internal/bcrypt_pbkdf",
   ]
   pruneopts = "NUT"
-  revision = "baeed622b8d86045ff442b324772b0ad306a2b3f"
+  revision = "056763e48d71961566155f089ac0f02f1dda9b5a"
 
 [[projects]]
   branch = "master"
@@ -223,14 +223,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:b30699335ad140923cefeb13d5392fd29735c38316b7bc581d4125218f9653b5"
+  digest = "1:b480c7ea913ea1f3fbadea3ef65638469e00b722e99e63395c54f2186c13505c"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "c3d80250170dec19bf61949c81233cede5ddaf61"
+  revision = "59c9f1ba88faf592b225274f69c5ef1e4ebacf82"
 
 [[projects]]
   digest = "1:8a0baffd5559acaa560f854d7d525c02f4fec2d4f8a214398556fb661a10f6e0"
