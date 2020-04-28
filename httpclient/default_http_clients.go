@@ -40,7 +40,7 @@ type factory struct{}
 
 func (f factory) New(insecureSkipVerify bool, certPool *x509.CertPool) *http.Client {
 	tlsConfig, err := tlsconfig.Build(
-		tlsconfig.WithInternalServiceDefaults(),
+		tlsconfig.WithExternalServiceDefaults(),
 		WithInsecureSkipVerify(insecureSkipVerify),
 		WithClientSessionCache(0),
 	).Client(tlsconfig.WithAuthority(certPool))
