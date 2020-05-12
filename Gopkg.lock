@@ -21,12 +21,12 @@
   revision = "bbe0f8da39b3c59d42217afcc79019c754dabdfb"
 
 [[projects]]
-  digest = "1:6232425d84afee0d5c60aca42835308040966e9a4f4f6bb59cc524f7acdfcd44"
+  digest = "1:753ce2f3e52554c40ed6c5baa10d9c8fc5c5b8a1684af4c4ad6674c37694bd66"
   name = "github.com/bmatcuk/doublestar"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "ac81ccc6969be9b61e4661f04d2200ee28d3b049"
-  version = "v1.2.4"
+  revision = "39df92f7399bdaa74c821d606e9322dd1332074a"
+  version = "v1.3.0"
 
 [[projects]]
   branch = "master"
@@ -61,12 +61,12 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:112b07cad4bd500e6e445cc0b9294ca310faa41199c19475c557daa2c7519549"
+  digest = "1:010e6ae8af115497e5112c31d02316bebc3b6853253ed18516a4f624082469a4"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   pruneopts = "NUT"
-  revision = "1b794fe86dd6a0c7c52ae69b5c9cb0aeedc52afa"
-  version = "v1.4.0"
+  revision = "6c66de79d66478d166c7ea05f5d2ccaf016fbd6b"
+  version = "v1.4.1"
 
 [[projects]]
   digest = "1:41933d387bfa3eaa6a82647914ed7044f7b8355764c24fb920892bc8c03ef0c3"
@@ -141,7 +141,7 @@
   version = "v1.12.0"
 
 [[projects]]
-  digest = "1:ebf3be88d533b1eafffb944d11cf3bfa90f55c0fd1cb7d47d6fe3a1b3fcd3bf0"
+  digest = "1:b2abc1dcb28e20f039afb157a5d8251ff98bf0560d0fc4516227fb8856322f97"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -161,8 +161,8 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "6be6c439588487cd908a3a700795660c2a16dfec"
-  version = "v1.9.0"
+  revision = "1a3d249459a44387a05ca2d2c2b3d5f3db596dcb"
+  version = "v1.10.0"
 
 [[projects]]
   branch = "master"
@@ -190,7 +190,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:54746d9cae639582b80aa290346021e59c6fb76669ad8bf83fcc6971a9425671"
+  digest = "1:6481b321e52388f6d8a66f6f0fb8cd64c51a704acc9b94b793579f19dc87aa49"
   name = "golang.org/x/crypto"
   packages = [
     "blowfish",
@@ -204,7 +204,7 @@
     "ssh/internal/bcrypt_pbkdf",
   ]
   pruneopts = "NUT"
-  revision = "4bdfaf469ed5a1194e0ec57ec7b1af73991a7ee3"
+  revision = "06a226fb4e3765ef3f48aa2852b401bc7b98e981"
 
 [[projects]]
   branch = "master"
@@ -219,18 +219,19 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "e086a090c8fdb9982880f0fb6e3db47af1856533"
+  revision = "7e3656a0809f6f95abd88ac65313578f80b00df2"
 
 [[projects]]
   branch = "master"
-  digest = "1:6a29662ec805fb1c3d9c9ff0b61d6cb08cb915d5fa12aae254b8f61f77ffe93d"
+  digest = "1:bb8d0cfcb888c02acc6cde5ea08ba4895982cc8dfff251323e43ee6b7f37e555"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
+    "internal/unsafeheader",
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "1957bb5e6d1f523308b49060df02171d06ddfc77"
+  revision = "7e40ca221e254089b05fb9efcd69844a57f6a367"
 
 [[projects]]
   digest = "1:8a0baffd5559acaa560f854d7d525c02f4fec2d4f8a214398556fb661a10f6e0"
@@ -272,7 +273,7 @@
   revision = "9bdfabe68543c54f90421aeb9a60ef8061b5b544"
 
 [[projects]]
-  digest = "1:f1865c7b6c5f85632ff40fd729aa3393e66a2db3de74d43ab7c594be7e9bfe25"
+  digest = "1:b76a323f549018e4ca29937a8e189d2167a2eb6cea652bf5d9f4a1d15c636cb6"
   name = "google.golang.org/protobuf"
   packages = [
     "encoding/prototext",
@@ -304,8 +305,8 @@
     "runtime/protoimpl",
   ]
   pruneopts = "NUT"
-  revision = "3b9eee12916ce611400f93d6c2fed2fc2911b0ad"
-  version = "v1.21.0"
+  revision = "8b0d71ac935315b10385aaaf30175de0c74bbba6"
+  version = "v1.22.0"
 
 [[projects]]
   digest = "1:0914bf7efc3e3052163e92b859a89f3b407ad353d7c3b7f59a1bbb4fd05bb25d"
