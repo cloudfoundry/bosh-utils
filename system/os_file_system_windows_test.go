@@ -48,7 +48,7 @@ var _ = Describe("Windows Specific tests", func() {
 			fi, err := osFs.Stat(filepath.Join(dstPath, "readonly.txt"))
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(fi.Mode()).To(Equal(os.FileMode(0666)))
+			Expect(fi.Mode()).To(Equal(os.FileMode(0444)))
 		})
 	})
 
