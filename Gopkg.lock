@@ -61,12 +61,12 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:010e6ae8af115497e5112c31d02316bebc3b6853253ed18516a4f624082469a4"
+  digest = "1:9e1f58e0d3991f12e7b532161f56dc12c633fb01802ec60520d877599c2af2c5"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   pruneopts = "NUT"
-  revision = "6c66de79d66478d166c7ea05f5d2ccaf016fbd6b"
-  version = "v1.4.1"
+  revision = "d04d7b157bb510b1e0c10132224b616ac0e26b17"
+  version = "v1.4.2"
 
 [[projects]]
   digest = "1:41933d387bfa3eaa6a82647914ed7044f7b8355764c24fb920892bc8c03ef0c3"
@@ -219,11 +219,11 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "7e3656a0809f6f95abd88ac65313578f80b00df2"
+  revision = "a91f0712d120a21e49061d61eb6ba9b88cb0d376"
 
 [[projects]]
   branch = "master"
-  digest = "1:bb8d0cfcb888c02acc6cde5ea08ba4895982cc8dfff251323e43ee6b7f37e555"
+  digest = "1:b1523e3b73f715bd924674c6b7d19b54e0423e77d57e571b3144c03ca7e7c621"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -231,7 +231,7 @@
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "7e40ca221e254089b05fb9efcd69844a57f6a367"
+  revision = "1151b9dac4a98d49ef7f80f07ddd826ff51e0b36"
 
 [[projects]]
   digest = "1:8a0baffd5559acaa560f854d7d525c02f4fec2d4f8a214398556fb661a10f6e0"
@@ -273,7 +273,7 @@
   revision = "9bdfabe68543c54f90421aeb9a60ef8061b5b544"
 
 [[projects]]
-  digest = "1:b76a323f549018e4ca29937a8e189d2167a2eb6cea652bf5d9f4a1d15c636cb6"
+  digest = "1:2d07e31460124a78b7493196e5f6c7425404865f7de73161ea7f2c6ee427ef72"
   name = "google.golang.org/protobuf"
   packages = [
     "encoding/prototext",
@@ -305,8 +305,8 @@
     "runtime/protoimpl",
   ]
   pruneopts = "NUT"
-  revision = "8b0d71ac935315b10385aaaf30175de0c74bbba6"
-  version = "v1.22.0"
+  revision = "d165be301fb1e13390ad453281ded24385fd8ebc"
+  version = "v1.23.0"
 
 [[projects]]
   digest = "1:0914bf7efc3e3052163e92b859a89f3b407ad353d7c3b7f59a1bbb4fd05bb25d"
@@ -326,12 +326,12 @@
   revision = "dd632973f1e7218eb1089048e0798ec9ae7dceb8"
 
 [[projects]]
-  digest = "1:d9b9ac6943a512737f76bf3d61b08d97121c66686bc02ffc231313563230b468"
+  digest = "1:62a89978829993fb84e755bff5ae0e3d84837228898fd55b1a88a885036e1e51"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "53403b58ad1b561927d19068c655246f2db79d48"
-  version = "v2.2.8"
+  revision = "0b1645d91e851e735d3e23330303ce81f70adbe3"
+  version = "v2.3.0"
 
 [solve-meta]
   analyzer-name = "dep"
