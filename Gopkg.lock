@@ -189,12 +189,12 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:619c0d90a027b62dfc220e66d94522d283e911aac02b1cef4242e3ca7be7b859"
+  digest = "1:100bc26640871bd80f0ff54b3a0e5615dfd7f1fbb234e5d41f821ccb30d07eff"
   name = "github.com/stretchr/testify"
   packages = ["assert"]
   pruneopts = "NUT"
-  revision = "3ebf1ddaeb260c4b1ae502a01c7844fa8c1fa0e9"
-  version = "v1.5.1"
+  revision = "004e3cb72213e5e727e4e08f668ee6c8f27e5d32"
+  version = "v1.6.0"
 
 [[projects]]
   branch = "master"
@@ -227,11 +227,11 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "0ba52f642ac2f9371a88bfdde41f4b4e195a37c0"
+  revision = "3c3fba18258b2a1398a025a6aeb7374d2a470009"
 
 [[projects]]
   branch = "master"
-  digest = "1:b1523e3b73f715bd924674c6b7d19b54e0423e77d57e571b3144c03ca7e7c621"
+  digest = "1:f3e8041a913f9c6790c2abe05ccebdacb473b2a677c7742c348496c732ad2386"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -239,7 +239,7 @@
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "fe76b779f299728f3bd63f77ea2c815504229c3b"
+  revision = "05986578812163b26672dabd9b425240ae2bb0ad"
 
 [[projects]]
   digest = "1:8a0baffd5559acaa560f854d7d525c02f4fec2d4f8a214398556fb661a10f6e0"
@@ -281,7 +281,7 @@
   revision = "9bdfabe68543c54f90421aeb9a60ef8061b5b544"
 
 [[projects]]
-  digest = "1:2d07e31460124a78b7493196e5f6c7425404865f7de73161ea7f2c6ee427ef72"
+  digest = "1:2a628685d02a3eb98bd3b2b25778967113a5bdfae5be743e2612960b07780809"
   name = "google.golang.org/protobuf"
   packages = [
     "encoding/prototext",
@@ -313,8 +313,8 @@
     "runtime/protoimpl",
   ]
   pruneopts = "NUT"
-  revision = "d165be301fb1e13390ad453281ded24385fd8ebc"
-  version = "v1.23.0"
+  revision = "5c3dd7024aed895adfe053f26b5a479e991cbca9"
+  version = "v1.24.0"
 
 [[projects]]
   branch = "v1"
@@ -331,6 +331,14 @@
   pruneopts = "NUT"
   revision = "0b1645d91e851e735d3e23330303ce81f70adbe3"
   version = "v2.3.0"
+
+[[projects]]
+  branch = "v3"
+  digest = "1:7e47d320134449a94187cd129c17c76a98c90bff242774042449ceb6576905d7"
+  name = "gopkg.in/yaml.v3"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "2ff61e1afc866138abf1a8adf3cc89721090ac31"
 
 [solve-meta]
   analyzer-name = "dep"
