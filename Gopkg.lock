@@ -21,12 +21,12 @@
   revision = "bbe0f8da39b3c59d42217afcc79019c754dabdfb"
 
 [[projects]]
-  digest = "1:753ce2f3e52554c40ed6c5baa10d9c8fc5c5b8a1684af4c4ad6674c37694bd66"
+  digest = "1:30482ccb11e2c861f5437c740dfd70013152f6bae68f7789db4812d2bc9d7c52"
   name = "github.com/bmatcuk/doublestar"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "39df92f7399bdaa74c821d606e9322dd1332074a"
-  version = "v1.3.0"
+  revision = "bcc22aaac635258b7645a8cd117dd5c870b0458b"
+  version = "v1.3.1"
 
 [[projects]]
   branch = "master"
@@ -115,7 +115,7 @@
   version = "v1.4.4"
 
 [[projects]]
-  digest = "1:37013f573f57ddeb4c2f85ac28a8e4d21d2f7a3d538311f8faa987ca2a1df42d"
+  digest = "1:54bb7e66a266e0c9138426817f2c6b6bbfc4abd6a0984c8eb9ee7be95b876e3b"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -130,6 +130,7 @@
     "internal/codelocation",
     "internal/containernode",
     "internal/failer",
+    "internal/global",
     "internal/leafnodes",
     "internal/remote",
     "internal/spec",
@@ -145,8 +146,8 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "149d5d94b7be4ef2a9c67c5b2de17584aa6073fe"
-  version = "v1.12.2"
+  revision = "9bef594084d663dc2c58c2874b5d2edf06071744"
+  version = "v1.12.3"
 
 [[projects]]
   digest = "1:8d0fe95432805159fd26380192db6173ca74cde6ac507cc0cf8a49978606d3a6"
@@ -189,16 +190,16 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:100bc26640871bd80f0ff54b3a0e5615dfd7f1fbb234e5d41f821ccb30d07eff"
+  digest = "1:c59bbf7751c26b0fd98789cc8a8bdedc8377a61506537f62874902e597b20fa3"
   name = "github.com/stretchr/testify"
   packages = ["assert"]
   pruneopts = "NUT"
-  revision = "004e3cb72213e5e727e4e08f668ee6c8f27e5d32"
-  version = "v1.6.0"
+  revision = "f654a9112bbeac49ca2cd45bfbe11533c4666cf8"
+  version = "v1.6.1"
 
 [[projects]]
   branch = "master"
-  digest = "1:6481b321e52388f6d8a66f6f0fb8cd64c51a704acc9b94b793579f19dc87aa49"
+  digest = "1:11c46b479e9b871a24b2559ddc02227c15b0a33362964cc8de720e0e92c684fb"
   name = "golang.org/x/crypto"
   packages = [
     "blowfish",
@@ -212,7 +213,7 @@
     "ssh/internal/bcrypt_pbkdf",
   ]
   pruneopts = "NUT"
-  revision = "06a226fb4e3765ef3f48aa2852b401bc7b98e981"
+  revision = "70a84ac30bf957c7df57edd1935d2081871515e1"
 
 [[projects]]
   branch = "master"
@@ -227,11 +228,11 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "3c3fba18258b2a1398a025a6aeb7374d2a470009"
+  revision = "627f9648deb96c27737b83199d44bb5c1010cbcf"
 
 [[projects]]
   branch = "master"
-  digest = "1:f3e8041a913f9c6790c2abe05ccebdacb473b2a677c7742c348496c732ad2386"
+  digest = "1:e032360fa4bad73e00bf62d6cdd2f51c88213b7e85f2e74d8476c2e17650f023"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -239,7 +240,7 @@
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "05986578812163b26672dabd9b425240ae2bb0ad"
+  revision = "6fdc65e7d9800cc59998e8ac0d9406a20ff5f399"
 
 [[projects]]
   digest = "1:8a0baffd5559acaa560f854d7d525c02f4fec2d4f8a214398556fb661a10f6e0"
@@ -334,11 +335,11 @@
 
 [[projects]]
   branch = "v3"
-  digest = "1:7e47d320134449a94187cd129c17c76a98c90bff242774042449ceb6576905d7"
+  digest = "1:c69e5fef940c975533f41c808cfcd99cec3d11efb36a659186d766f3c2c6cf53"
   name = "gopkg.in/yaml.v3"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "2ff61e1afc866138abf1a8adf3cc89721090ac31"
+  revision = "a5ece683394c3b88d90572e44d36c93aea492c2c"
 
 [solve-meta]
   analyzer-name = "dep"
