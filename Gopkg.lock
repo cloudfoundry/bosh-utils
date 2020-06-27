@@ -199,7 +199,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:11c46b479e9b871a24b2559ddc02227c15b0a33362964cc8de720e0e92c684fb"
+  digest = "1:5746db75ceacb93838e4c7aa871d29401f00bc1f61a77f22dfa59e80ccbffc97"
   name = "golang.org/x/crypto"
   packages = [
     "blowfish",
@@ -213,7 +213,7 @@
     "ssh/internal/bcrypt_pbkdf",
   ]
   pruneopts = "NUT"
-  revision = "70a84ac30bf957c7df57edd1935d2081871515e1"
+  revision = "75b288015ac94e66e3d6715fb68a9b41bf046ec2"
 
 [[projects]]
   branch = "master"
@@ -228,11 +228,11 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "627f9648deb96c27737b83199d44bb5c1010cbcf"
+  revision = "4c5254603344ea4a8ae4bed7e296a9588303e14f"
 
 [[projects]]
   branch = "master"
-  digest = "1:ae4702c56e3eb9998ed2957c2816e808c0d577b2b7838fe534918490dc0df214"
+  digest = "1:ec8a5ae4754cb114543bba4c85529d70681127c7b83a985ace1acdd095e18416"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -240,7 +240,7 @@
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "981b61492c3565ea113dc1621ca30ef897df5586"
+  revision = "ddb9806d33aed8dbaac1cd6f1cba58952e87f933"
 
 [[projects]]
   digest = "1:27f1a11ecfee360418360997a013764fd4da959413ad1a8ac2ea5b38508048fc"
@@ -282,7 +282,7 @@
   revision = "9bdfabe68543c54f90421aeb9a60ef8061b5b544"
 
 [[projects]]
-  digest = "1:2a628685d02a3eb98bd3b2b25778967113a5bdfae5be743e2612960b07780809"
+  digest = "1:cccb3a18e62abaccd19c309fc01a69da2509719f5a453cb2e66969f670503245"
   name = "google.golang.org/protobuf"
   packages = [
     "encoding/prototext",
@@ -295,12 +295,11 @@
     "internal/encoding/tag",
     "internal/encoding/text",
     "internal/errors",
-    "internal/fieldnum",
     "internal/fieldsort",
     "internal/filedesc",
     "internal/filetype",
     "internal/flags",
-    "internal/genname",
+    "internal/genid",
     "internal/impl",
     "internal/mapsort",
     "internal/pragma",
@@ -314,8 +313,8 @@
     "runtime/protoimpl",
   ]
   pruneopts = "NUT"
-  revision = "5c3dd7024aed895adfe053f26b5a479e991cbca9"
-  version = "v1.24.0"
+  revision = "3f7a61f89bb6813f89d981d1870ed68da0b3c3f1"
+  version = "v1.25.0"
 
 [[projects]]
   branch = "v1"
