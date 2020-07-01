@@ -3,9 +3,10 @@ package logger
 import (
 	"errors"
 	"io"
-	"log"
 	"os"
 	"time"
+
+	log "github.com/cloudfoundry/bosh-utils/logger/rfc3339log"
 )
 
 type asyncWriter struct {
@@ -84,8 +85,18 @@ func (l *asyncLogger) FlushTimeout(d time.Duration) error {
 	}
 }
 
-func NewAsyncWriterLogger(level LogLevel, ioWriter io.Writer) Logger {
+func NewAsyncWriterLogger(level LogLevel, ioWriter io.Writer, timeFormat_optional ...string) Logger {
 	wout := newAsyncWriter(ioWriter)
+	if len(timeFormat_optional) > 0 && timeFormat_optional[0] == "rfc3339" {
+		return &asyncLogger{
+			writer: wout,
+			log: &logger{
+				level:  level,
+				logger: log.New(wout, "", log.Lrfc3339),
+			},
+		}
+
+	}
 	return &asyncLogger{
 		writer: wout,
 		log: &logger{

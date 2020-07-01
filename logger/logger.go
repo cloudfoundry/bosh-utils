@@ -3,12 +3,13 @@ package logger
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"runtime/debug"
 	"strings"
 	"sync"
 	"time"
+
+	log "github.com/cloudfoundry/bosh-utils/logger/rfc3339log"
 )
 
 type LogLevel int
@@ -81,7 +82,14 @@ func NewLogger(level LogLevel) Logger {
 	return NewWriterLogger(level, os.Stderr)
 }
 
-func NewWriterLogger(level LogLevel, writer io.Writer) Logger {
+func NewWriterLogger(level LogLevel, writer io.Writer, timeFormat_optional ...string) Logger {
+	if len(timeFormat_optional) > 0 && timeFormat_optional[0] == "rfc3339" {
+		return New(
+			level,
+			log.New(writer, "", log.Lrfc3339),
+		)
+	}
+
 	return New(
 		level,
 		log.New(writer, "", log.LstdFlags),
