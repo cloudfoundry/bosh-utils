@@ -213,7 +213,7 @@
     "ssh/internal/bcrypt_pbkdf",
   ]
   pruneopts = "NUT"
-  revision = "75b288015ac94e66e3d6715fb68a9b41bf046ec2"
+  revision = "948cd5f35899cbf089c620b3caeac9b60fa08704"
 
 [[projects]]
   branch = "master"
@@ -228,7 +228,7 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "4c5254603344ea4a8ae4bed7e296a9588303e14f"
+  revision = "ab34263943818b32f575efc978a3d24e80b04bd7"
 
 [[projects]]
   branch = "master"
