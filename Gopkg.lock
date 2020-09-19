@@ -34,7 +34,7 @@
   name = "github.com/charlievieth/fs"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "7dc373669fa10ddf827c37c595dee30a2f001be9"
+  revision = "454dded8b957bf46afc5122eaf5bf31847485a54"
 
 [[projects]]
   branch = "master"
@@ -232,7 +232,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e93843412c28b0416c1a17cce0cc2627a599d13682e969ef9c96e79701ebfddb"
+  digest = "1:485fbd9195142be044a69148d0501301f4ae3a584f8ae474d1c1bd414a077553"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -240,7 +240,7 @@
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "eff7692f900947b7d782d16af70ca32cc40774f0"
+  revision = "af09f7315aff1cbc48fb21d21aa55d67b4f914c5"
 
 [[projects]]
   digest = "1:27f1a11ecfee360418360997a013764fd4da959413ad1a8ac2ea5b38508048fc"
