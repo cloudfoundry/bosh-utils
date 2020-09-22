@@ -93,6 +93,18 @@
   version = "1.0.0"
 
 [[projects]]
+  digest = "1:0d33e8f4230cafee906332f45cc456ce2b66ac18a1edc40a9c87e3e68682d08b"
+  name = "github.com/maxbrunsfeld/counterfeiter"
+  packages = [
+    ".",
+    "arguments",
+    "generator",
+  ]
+  pruneopts = "NUT"
+  revision = "2d74a219416bffff638e30a3775c76715f1968a7"
+  version = "v6.0.1"
+
+[[projects]]
   branch = "master"
   digest = "1:16bbae9910129be5a18b951eabacd54414d3faea094dfab92bb3c84884d46b11"
   name = "github.com/nu7hatch/gouuid"
@@ -216,6 +228,17 @@
   revision = "5c72a883971a4325f8c62bf07b6d38c20ea47a6a"
 
 [[projects]]
+  digest = "1:467bb8fb8fa786448b8d486cd0bb7c1a5577dcd7310441aa02a20110cd9f727d"
+  name = "golang.org/x/mod"
+  packages = [
+    "module",
+    "semver",
+  ]
+  pruneopts = "NUT"
+  revision = "859b3ef565e237f9f1a0fb6b55385c497545680d"
+  version = "v0.3.0"
+
+[[projects]]
   branch = "master"
   digest = "1:532252ac3b338b8a61bfc43b798ff16d78d63afecf72e7f86966d386cfa83905"
   name = "golang.org/x/net"
@@ -269,6 +292,32 @@
   pruneopts = "NUT"
   revision = "23ae387dee1f90d29a23c0e87ee0b46038fbed0e"
   version = "v0.3.3"
+
+[[projects]]
+  branch = "master"
+  digest = "1:b63623309bf64a26ccb6aeea7e2681a6225261a938f742225661f47db49f472d"
+  name = "golang.org/x/tools"
+  packages = [
+    "go/ast/astutil",
+    "go/gcexportdata",
+    "go/internal/gcimporter",
+    "go/internal/packagesdriver",
+    "go/packages",
+    "go/types/typeutil",
+    "imports",
+    "internal/event",
+    "internal/event/core",
+    "internal/event/keys",
+    "internal/event/label",
+    "internal/fastwalk",
+    "internal/gocommand",
+    "internal/gopathwalk",
+    "internal/imports",
+    "internal/packagesinternal",
+    "internal/typesinternal",
+  ]
+  pruneopts = "NUT"
+  revision = "fa0125251cc482cce8c015000e15beef48ecafa9"
 
 [[projects]]
   branch = "master"
@@ -351,6 +400,7 @@
     "github.com/cloudfoundry/socks5-proxy",
     "github.com/jessevdk/go-flags",
     "github.com/jpillora/backoff",
+    "github.com/maxbrunsfeld/counterfeiter",
     "github.com/nu7hatch/gouuid",
     "github.com/onsi/ginkgo",
     "github.com/onsi/ginkgo/ginkgo",
