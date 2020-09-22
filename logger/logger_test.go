@@ -311,6 +311,23 @@ var _ = Describe("Logger", func() {
 		})
 	})
 
+	Describe("Enabling RFC3339 time stamps", func() {
+		It("formats time stamps according to RFC3339", func() {
+			logger := NewWriterLogger(LevelError, outBuf)
+
+			logger.UseRFC3339Timestamps()
+			logger.Error("TAG", "some error log")
+
+			expectedLogFormat := func(tag, msg string) string {
+				return fmt.Sprintf("\\[%s\\] [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{9}Z %s\n", tag, msg)
+			}
+
+			expectedContent := expectedLogFormat("TAG", "ERROR - some error log")
+			Expect(outBuf).To(MatchRegexp(expectedContent))
+
+		})
+	})
+
 	It("does not block while printing a string", func() {
 		var slow slowGoStringer
 		logger := NewWriterLogger(LevelError, outBuf)
