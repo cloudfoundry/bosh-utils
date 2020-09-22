@@ -1,4 +1,7 @@
-required = ["github.com/onsi/ginkgo/ginkgo"]
+required = [
+  "github.com/onsi/ginkgo/ginkgo",
+  "github.com/maxbrunsfeld/counterfeiter",
+]
 
 [prune]
   unused-packages = true
@@ -49,3 +52,7 @@ required = ["github.com/onsi/ginkgo/ginkgo"]
 [[override]]
   name = "gopkg.in/fsnotify.v1"
   source = "https://github.com/fsnotify/fsnotify.git"
+
+[[constraint]]
+  name = "github.com/maxbrunsfeld/counterfeiter"
+  version = "6.0.1"
