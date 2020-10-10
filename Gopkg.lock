@@ -251,11 +251,11 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "0a1ea396d57c75b04aff7cb73d169717064c2b8a"
+  revision = "dbdefad45b8998787d2fd6a2edea7fc79838207b"
 
 [[projects]]
   branch = "master"
-  digest = "1:e661af6a37d33a45c94edbe50050ef8e821ee2b302ee2d71ff35caf08cfd8c12"
+  digest = "1:e0fc33c28fb064af2f968d97a5d89e415635823ac82c85d55757d00357b90ab8"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -263,7 +263,7 @@
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "fdedc70b468f679c263a3ccaefc1faeed3239939"
+  revision = "dfb3f7c4e6342ab64fe0e22bde473c74a5699721"
 
 [[projects]]
   digest = "1:27f1a11ecfee360418360997a013764fd4da959413ad1a8ac2ea5b38508048fc"
@@ -317,7 +317,7 @@
     "internal/typesinternal",
   ]
   pruneopts = "NUT"
-  revision = "ecd9fd270d5d8717504e3c25d668fe010450ea5e"
+  revision = "fcf82128ed91fc9924ee9daba0d9816af1936ff9"
 
 [[projects]]
   branch = "master"
