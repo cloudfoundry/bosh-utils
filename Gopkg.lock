@@ -240,7 +240,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4218927c16bb90810d73a689a8fce7050a49cf64bb9ba33089dda15ae2e48476"
+  digest = "1:886cd6bbbde7b82e52a1222177f33f564654f7f04c18120122673f81a0d6f5f7"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -251,11 +251,11 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "7b1cca2348c07eb09fef635269c8e01611260f9f"
+  revision = "be3efd7ff1275f85d6b01ced0bee28cdb728f4b9"
 
 [[projects]]
   branch = "master"
-  digest = "1:fd59bed14d027d775b18cc008e65a33465d5b358bb6c17317b94529cc557acfa"
+  digest = "1:02741cc373194261e4588fc685bb8bc05e7f385e54c061a47c8de6b2996e9840"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -263,7 +263,7 @@
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "b09fb700fbb73bb06b1863b5741a67ef6dbfa433"
+  revision = "fb209a7c41cd8505b3b047ae14763a4d3d06fa19"
 
 [[projects]]
   digest = "1:27f1a11ecfee360418360997a013764fd4da959413ad1a8ac2ea5b38508048fc"
@@ -295,7 +295,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:8e9f4867e1ec6d775f534197254de1d93d9131f64413befda6bcc88beed9b13b"
+  digest = "1:a57e734528cbaede2fca90b59473e2967cac683031ddf27789b71300268360aa"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
@@ -317,7 +317,7 @@
     "internal/typesinternal",
   ]
   pruneopts = "NUT"
-  revision = "6003fad69a889b43c22ce72e5796412a20301c5e"
+  revision = "c8cfbd0f21e6146422c1927945569c9c855a56bc"
 
 [[projects]]
   branch = "master"
