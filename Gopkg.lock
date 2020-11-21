@@ -21,12 +21,12 @@
   revision = "bbe0f8da39b3c59d42217afcc79019c754dabdfb"
 
 [[projects]]
-  digest = "1:628d0f7f5f0f6295ce5210a265a1f9bf58cf903f6798ff9af3b423c9d416f5b7"
+  digest = "1:42800cc5868028ee21ff8252e541b2461244686ba0248cc1e3fcaee5082ded41"
   name = "github.com/bmatcuk/doublestar"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "eb4d9ac565e08f034b7f2631c445f08dd3975b97"
-  version = "v1.3.3"
+  revision = "ec92414acf6b37022a5de45c2cfb10569c523730"
+  version = "v1.3.4"
 
 [[projects]]
   branch = "master"
@@ -225,7 +225,7 @@
     "ssh/internal/bcrypt_pbkdf",
   ]
   pruneopts = "NUT"
-  revision = "9e8e0b390897c84cad53ebe9ed2d1d331a5394d9"
+  revision = "c1f2f97bffc9c53fc40a1a28a5b460094c0050d9"
 
 [[projects]]
   digest = "1:467bb8fb8fa786448b8d486cd0bb7c1a5577dcd7310441aa02a20110cd9f727d"
@@ -251,11 +251,11 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "ff519b6c91021e6316e1df005bc19f266994ddda"
+  revision = "69a78807bb2bb6d1599c68698c6b009505012083"
 
 [[projects]]
   branch = "master"
-  digest = "1:f6e781667db7143a6f8f68fca22b2b71aa40db7cc5e4ca219076615188d01500"
+  digest = "1:fafaee974d64eecf4745c8e66c3eedd944d6831408072afbe6cb26c5c9e24d2b"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -263,7 +263,7 @@
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "4d91cf3a1aaf3c60795ad95ff47583eed427d778"
+  revision = "f84b799fce68db3cb46a8f6f819c1e56377181df"
 
 [[projects]]
   digest = "1:d0ce967403a66635e6b31005cd17ae75c32408a632df63bc4d4e1c20992503f3"
@@ -295,7 +295,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:a166aec27520f42b3920f7407e1a7488e8577a4ba1aee0f05b26933d23d405a7"
+  digest = "1:2fa7f2e65654266eb8da513b7e5b97b26aff6f55cadde23e3bde8e2709987856"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
@@ -317,7 +317,7 @@
     "internal/typesinternal",
   ]
   pruneopts = "NUT"
-  revision = "78b158585360beccadc3faac6e35759f491831f3"
+  revision = "780cb80bd7fbb444813fc4b6be83a7ede5cd0d7d"
 
 [[projects]]
   branch = "master"
