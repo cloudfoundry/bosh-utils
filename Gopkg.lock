@@ -211,7 +211,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e53ab76a50aca3eba9826aa14b8eef4e6fc7f99e093da6a45941eff99be6745d"
+  digest = "1:7f86085412e967bd1156c7b32dc93c0d73733d4dd9c1aa67cd242413fc4067a3"
   name = "golang.org/x/crypto"
   packages = [
     "blowfish",
@@ -225,18 +225,18 @@
     "ssh/internal/bcrypt_pbkdf",
   ]
   pruneopts = "NUT"
-  revision = "c8d3bf9c5392d5f66747f112cd55055d7a530b19"
+  revision = "be400aefbc4c83e9aab51e82b8d4b12760653b47"
 
 [[projects]]
-  digest = "1:467bb8fb8fa786448b8d486cd0bb7c1a5577dcd7310441aa02a20110cd9f727d"
+  digest = "1:4c6e4e4e7d0f334dd6201c3172d9795c5c87e19b2612a83ec309c899c4aa0903"
   name = "golang.org/x/mod"
   packages = [
     "module",
     "semver",
   ]
   pruneopts = "NUT"
-  revision = "859b3ef565e237f9f1a0fb6b55385c497545680d"
-  version = "v0.3.0"
+  revision = "3bfbaada29be620417d472f349d55056286b2119"
+  version = "v0.4.0"
 
 [[projects]]
   branch = "master"
@@ -251,11 +251,11 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "69a78807bb2bb6d1599c68698c6b009505012083"
+  revision = "c7110b5ffcbb9f2ac4de9fbd2600e37d42473a9a"
 
 [[projects]]
   branch = "master"
-  digest = "1:83df1fd18d4b295f7e4b166dd30aa4771fafaddcf9af9ec50d664c9210cb8674"
+  digest = "1:1a6044e69711d3c367f08f7b3517b097ae7a8376b5741789dfed5e3e0b211106"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -263,7 +263,7 @@
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "77190671981848ff71219ecfff38636c9add3b79"
+  revision = "ed752295db8857b3a7f36c3f57e38509cadff471"
 
 [[projects]]
   digest = "1:d0ce967403a66635e6b31005cd17ae75c32408a632df63bc4d4e1c20992503f3"
@@ -317,7 +317,7 @@
     "internal/typesinternal",
   ]
   pruneopts = "NUT"
-  revision = "b5590deeca9b708498816ae0bf4482b97f46295f"
+  revision = "654352759326a83ade56ef0d49787dedaa16078e"
 
 [[projects]]
   branch = "master"
