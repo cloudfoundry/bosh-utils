@@ -162,7 +162,7 @@
   version = "v1.14.2"
 
 [[projects]]
-  digest = "1:34be348337536eaa0dac9b418d503faaf0d735a853ef4ce938564ad036ba4a80"
+  digest = "1:d1a4158009d329bdd236ab98789a598c4e0b2595d60f132fdebacaa73c0b1d13"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -182,8 +182,8 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "46e0cd22c9d45e5745e994abc67b128504ad7727"
-  version = "v1.10.3"
+  revision = "f9a2b5d71f6c392d3169b2f53d4c3531062044c4"
+  version = "v1.10.4"
 
 [[projects]]
   branch = "master"
@@ -225,7 +225,7 @@
     "ssh/internal/bcrypt_pbkdf",
   ]
   pruneopts = "NUT"
-  revision = "be400aefbc4c83e9aab51e82b8d4b12760653b47"
+  revision = "5f87f3452ae96c4850ab9af7783f2517b643061b"
 
 [[projects]]
   digest = "1:4c6e4e4e7d0f334dd6201c3172d9795c5c87e19b2612a83ec309c899c4aa0903"
@@ -251,7 +251,7 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "c7110b5ffcbb9f2ac4de9fbd2600e37d42473a9a"
+  revision = "ac852fbbde11df194bfd5004603c7c8e117901f2"
 
 [[projects]]
   branch = "master"
@@ -263,7 +263,7 @@
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "ed752295db8857b3a7f36c3f57e38509cadff471"
+  revision = "8ad439b19e0fb2ded35375e495090c1334011eb9"
 
 [[projects]]
   digest = "1:d0ce967403a66635e6b31005cd17ae75c32408a632df63bc4d4e1c20992503f3"
@@ -295,7 +295,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e49c2e118694702bc9489bf54e0a1f683dd0419b9acb8c4853a288f9d61fcc5c"
+  digest = "1:3c921e62a8f176063a99d9f77eebdbe6b2ac554c947e38a95d4d16e6dc2e1c88"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
@@ -317,7 +317,7 @@
     "internal/typesinternal",
   ]
   pruneopts = "NUT"
-  revision = "654352759326a83ade56ef0d49787dedaa16078e"
+  revision = "d93e913c1a5829629e8005c31b45b96a7b143a16"
 
 [[projects]]
   branch = "master"
