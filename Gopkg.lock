@@ -211,7 +211,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7f86085412e967bd1156c7b32dc93c0d73733d4dd9c1aa67cd242413fc4067a3"
+  digest = "1:dfce02e9800527f7a7278e6c75de3fe5e8493a500fa2b70d29486266a8e6c70d"
   name = "golang.org/x/crypto"
   packages = [
     "blowfish",
@@ -225,7 +225,7 @@
     "ssh/internal/bcrypt_pbkdf",
   ]
   pruneopts = "NUT"
-  revision = "5f87f3452ae96c4850ab9af7783f2517b643061b"
+  revision = "9d1352758620574fd6fc23c31c59c4333b4b3fff"
 
 [[projects]]
   digest = "1:4c6e4e4e7d0f334dd6201c3172d9795c5c87e19b2612a83ec309c899c4aa0903"
@@ -251,11 +251,11 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "ac852fbbde11df194bfd5004603c7c8e117901f2"
+  revision = "986b41b23924a168277bf3df55a4fd462154f916"
 
 [[projects]]
   branch = "master"
-  digest = "1:1a6044e69711d3c367f08f7b3517b097ae7a8376b5741789dfed5e3e0b211106"
+  digest = "1:2411143743ab99d384a84805e6fd388d81531a732a3bbb6649bee01ef926f42a"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -263,7 +263,7 @@
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "8ad439b19e0fb2ded35375e495090c1334011eb9"
+  revision = "7d0127a7474212d658b2b43a776ebb0ac9f10b80"
 
 [[projects]]
   digest = "1:d0ce967403a66635e6b31005cd17ae75c32408a632df63bc4d4e1c20992503f3"
@@ -317,7 +317,7 @@
     "internal/typesinternal",
   ]
   pruneopts = "NUT"
-  revision = "d93e913c1a5829629e8005c31b45b96a7b143a16"
+  revision = "ae774e9781d20c38931ca8334d1c4eeb4ccb4ae0"
 
 [[projects]]
   branch = "master"
