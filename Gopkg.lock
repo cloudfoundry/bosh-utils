@@ -113,7 +113,7 @@
   revision = "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 
 [[projects]]
-  digest = "1:17995b544cdab2ad44419d8c9f551416c63c0fdee5a8b916373188623ed77ea5"
+  digest = "1:1f3230329bc193cc4ce7c622998afc3d311fa11f78b9efd54fbdecf6e8bef637"
   name = "github.com/nxadm/tail"
   packages = [
     ".",
@@ -123,8 +123,8 @@
     "winfile",
   ]
   pruneopts = "NUT"
-  revision = "2683a83f3fb0c35b4908abeecadf6704cede46d1"
-  version = "v1.4.5"
+  revision = "ed4934787418681691173f6f7aa0499582e7611a"
+  version = "v1.4.6"
 
 [[projects]]
   digest = "1:63c7ef43595a6277340cfb29aa5b5b6ef9254a8d59360c06145ebe4314e62cac"
@@ -225,7 +225,7 @@
     "ssh/internal/bcrypt_pbkdf",
   ]
   pruneopts = "NUT"
-  revision = "9d1352758620574fd6fc23c31c59c4333b4b3fff"
+  revision = "eec23a3978adcfd26c29f4153eaa3e3d9b2cc53a"
 
 [[projects]]
   digest = "1:4c6e4e4e7d0f334dd6201c3172d9795c5c87e19b2612a83ec309c899c4aa0903"
@@ -251,11 +251,11 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "986b41b23924a168277bf3df55a4fd462154f916"
+  revision = "6772e930b67bb09bf22262c7378e7d2f67cf59d1"
 
 [[projects]]
   branch = "master"
-  digest = "1:2411143743ab99d384a84805e6fd388d81531a732a3bbb6649bee01ef926f42a"
+  digest = "1:d70f1ae7c11688a7fb9e21633c730cbd82efeda4024d2e6fbf801dfdbf1c13ef"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -263,7 +263,7 @@
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "7d0127a7474212d658b2b43a776ebb0ac9f10b80"
+  revision = "0d417f6369309be088e227ead8736fb722d759d3"
 
 [[projects]]
   digest = "1:d0ce967403a66635e6b31005cd17ae75c32408a632df63bc4d4e1c20992503f3"
@@ -317,7 +317,7 @@
     "internal/typesinternal",
   ]
   pruneopts = "NUT"
-  revision = "ae774e9781d20c38931ca8334d1c4eeb4ccb4ae0"
+  revision = "2b0845dc783e36ae26d683f4915a5840ef01ab0f"
 
 [[projects]]
   branch = "master"
