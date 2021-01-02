@@ -263,7 +263,7 @@
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "0d417f6369309be088e227ead8736fb722d759d3"
+  revision = "2d18734c6014bdfc4d7fd7cfc8e0608c9684967b"
 
 [[projects]]
   digest = "1:d0ce967403a66635e6b31005cd17ae75c32408a632df63bc4d4e1c20992503f3"
@@ -317,7 +317,7 @@
     "internal/typesinternal",
   ]
   pruneopts = "NUT"
-  revision = "2b0845dc783e36ae26d683f4915a5840ef01ab0f"
+  revision = "2dba1e4ea05c87619b17c862f8ae1cb05ac5694a"
 
 [[projects]]
   branch = "master"
