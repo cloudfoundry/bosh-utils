@@ -202,12 +202,12 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:c59bbf7751c26b0fd98789cc8a8bdedc8377a61506537f62874902e597b20fa3"
+  digest = "1:257678dc4f0189515d88387a39364c4f56ea37a632e9cc94e540ab911f0bbb0d"
   name = "github.com/stretchr/testify"
   packages = ["assert"]
   pruneopts = "NUT"
-  revision = "f654a9112bbeac49ca2cd45bfbe11533c4666cf8"
-  version = "v1.6.1"
+  revision = "acba37e5db06f0093b465a7d47822bf13644b66c"
+  version = "v1.7.0"
 
 [[projects]]
   branch = "master"
@@ -235,8 +235,8 @@
     "semver",
   ]
   pruneopts = "NUT"
-  revision = "3bfbaada29be620417d472f349d55056286b2119"
-  version = "v0.4.0"
+  revision = "6ce8bb3f08e0e47592fe93e007071d86dcf214bb"
+  version = "v0.4.1"
 
 [[projects]]
   branch = "master"
@@ -255,7 +255,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d70f1ae7c11688a7fb9e21633c730cbd82efeda4024d2e6fbf801dfdbf1c13ef"
+  digest = "1:3d2d7daf1d1e4781c88e0186bda1f2749e190d73564c2981d16ce82f32313db5"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -263,10 +263,10 @@
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "2d18734c6014bdfc4d7fd7cfc8e0608c9684967b"
+  revision = "4bcb84eeeb78d47aae60461dac79349e427b5349"
 
 [[projects]]
-  digest = "1:d0ce967403a66635e6b31005cd17ae75c32408a632df63bc4d4e1c20992503f3"
+  digest = "1:71f4b937710573df214b940f7cc1dc0fc816974db00dba006f7a8a5dbe20c07e"
   name = "golang.org/x/text"
   packages = [
     "encoding",
@@ -290,12 +290,12 @@
     "unicode/cldr",
   ]
   pruneopts = "NUT"
-  revision = "22f1617af38ed4cd65b3b96e02bab267e560155c"
-  version = "v0.3.4"
+  revision = "75a595aef632b07c6eeaaa805adb6f0f66e4130e"
+  version = "v0.3.5"
 
 [[projects]]
   branch = "master"
-  digest = "1:3c921e62a8f176063a99d9f77eebdbe6b2ac554c947e38a95d4d16e6dc2e1c88"
+  digest = "1:1d2d200c77bc064518e41d24cdadaf8f1bd591ddcfb3af97ac6b46bb9f0c9a79"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
@@ -317,7 +317,7 @@
     "internal/typesinternal",
   ]
   pruneopts = "NUT"
-  revision = "2dba1e4ea05c87619b17c862f8ae1cb05ac5694a"
+  revision = "e0d201561e39aeaab8136532f2bbe17ae1ef24ff"
 
 [[projects]]
   branch = "master"
@@ -383,11 +383,11 @@
 
 [[projects]]
   branch = "v3"
-  digest = "1:c9a53b5be2654e3d1d466419bb389371ff3755220ec3cafd43dd8742fb7aebdd"
+  digest = "1:7f943028086d549b7f99ecad153e416e4726538768d663277f3c272f93ffb1c2"
   name = "gopkg.in/yaml.v3"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "eeeca48fe7764f320e4870d231902bf9c1be2c08"
+  revision = "496545a6307b2a7d7a710fd516e5e16e8ab62dbc"
 
 [solve-meta]
   analyzer-name = "dep"
