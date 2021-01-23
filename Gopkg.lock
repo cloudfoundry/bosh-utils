@@ -251,19 +251,20 @@
     "proxy",
   ]
   pruneopts = "NUT"
-  revision = "6772e930b67bb09bf22262c7378e7d2f67cf59d1"
+  revision = "5f4716e94777e714bc2fb3e3a44599cb40817aac"
 
 [[projects]]
   branch = "master"
-  digest = "1:3d2d7daf1d1e4781c88e0186bda1f2749e190d73564c2981d16ce82f32313db5"
+  digest = "1:d1fa97a6fa0a9e7b9708fddccbdd5e1dbbbcdfbfaa930ba5f312381d92d3a8da"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
+    "execabs",
     "internal/unsafeheader",
     "unix",
   ]
   pruneopts = "NUT"
-  revision = "4bcb84eeeb78d47aae60461dac79349e427b5349"
+  revision = "a8b976e07c7b0ff014c8da1d5352077edaf678d4"
 
 [[projects]]
   digest = "1:71f4b937710573df214b940f7cc1dc0fc816974db00dba006f7a8a5dbe20c07e"
@@ -294,8 +295,7 @@
   version = "v0.3.5"
 
 [[projects]]
-  branch = "master"
-  digest = "1:1d2d200c77bc064518e41d24cdadaf8f1bd591ddcfb3af97ac6b46bb9f0c9a79"
+  digest = "1:e0b738f0390478cbb64d048e563382d65a95ddc84c7cba34f2e70933c595c786"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
@@ -317,7 +317,8 @@
     "internal/typesinternal",
   ]
   pruneopts = "NUT"
-  revision = "e0d201561e39aeaab8136532f2bbe17ae1ef24ff"
+  revision = "fe37c9e135b934191089b245ac29325091462508"
+  version = "v0.1.0"
 
 [[projects]]
   branch = "master"
