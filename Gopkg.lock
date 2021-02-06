@@ -127,7 +127,7 @@
   version = "v1.4.6"
 
 [[projects]]
-  digest = "1:63c7ef43595a6277340cfb29aa5b5b6ef9254a8d59360c06145ebe4314e62cac"
+  digest = "1:7f895d8b3ee3baada8b26d25d6498fa1ab1d7f45c12b4ab6dde3a733da9b369e"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -136,6 +136,7 @@
     "ginkgo/convert",
     "ginkgo/interrupthandler",
     "ginkgo/nodot",
+    "ginkgo/outline",
     "ginkgo/testrunner",
     "ginkgo/testsuite",
     "ginkgo/watch",
@@ -158,11 +159,11 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "55c858784e51c26077949c81b6defb6b97b76944"
-  version = "v1.14.2"
+  revision = "c75f46eb0a6e1e3de5a78dd0eb4e2492d4ec5829"
+  version = "v1.15.0"
 
 [[projects]]
-  digest = "1:d1a4158009d329bdd236ab98789a598c4e0b2595d60f132fdebacaa73c0b1d13"
+  digest = "1:ad328785556c11b848d6245e5e4ea7ec392924d69a83f39a76e19594a94bc322"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -182,8 +183,8 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "f9a2b5d71f6c392d3169b2f53d4c3531062044c4"
-  version = "v1.10.4"
+  revision = "3e036b855ae3e332843aff25edf11a0a37033156"
+  version = "v1.10.5"
 
 [[projects]]
   branch = "master"
@@ -295,10 +296,11 @@
   version = "v0.3.5"
 
 [[projects]]
-  digest = "1:e0b738f0390478cbb64d048e563382d65a95ddc84c7cba34f2e70933c595c786"
+  digest = "1:dc1659fa8c883e4a42d3554cc03aabdd714d3139c7cecb38c34da2cb59e34663"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
+    "go/ast/inspector",
     "go/gcexportdata",
     "go/internal/gcimporter",
     "go/internal/packagesdriver",
