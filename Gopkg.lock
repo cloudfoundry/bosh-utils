@@ -113,7 +113,7 @@
   revision = "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 
 [[projects]]
-  digest = "1:1f3230329bc193cc4ce7c622998afc3d311fa11f78b9efd54fbdecf6e8bef637"
+  digest = "1:85d886fe78a7da9d756d4648297c3b2ea770c9e5c728eb28d0191a63c2275bda"
   name = "github.com/nxadm/tail"
   packages = [
     ".",
@@ -123,8 +123,8 @@
     "winfile",
   ]
   pruneopts = "NUT"
-  revision = "ed4934787418681691173f6f7aa0499582e7611a"
-  version = "v1.4.6"
+  revision = "abad231d8d07ef91e09cd4c4c457cac35ed3bbb9"
+  version = "v1.4.8"
 
 [[projects]]
   digest = "1:7f895d8b3ee3baada8b26d25d6498fa1ab1d7f45c12b4ab6dde3a733da9b369e"
