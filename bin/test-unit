@@ -4,4 +4,4 @@ set -e
 bin=$(dirname $0)
 
 echo -e "\n Testing packages..."
-$bin/env ginkgo -r -race -trace -skipPackage="vendor" $@
+go run github.com/onsi/ginkgo/ginkgo -r -race -trace -skipPackage="vendor" $@

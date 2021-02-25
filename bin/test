@@ -5,7 +5,6 @@ set -e
 bin=$(dirname $0)
 
 echo "Formatting packages..."
-$bin/env go fmt $($bin/env go list github.com/cloudfoundry/bosh-utils/... | grep -v vendor)
+go fmt $(go list github.com/cloudfoundry/bosh-utils/... | grep -v vendor)
 
-$bin/install-ginkgo
 $bin/test-unit
