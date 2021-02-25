@@ -21,8 +21,7 @@ if ((Get-Command "tar.exe" -ErrorAction SilentlyContinue) -eq $null)
 
 go.exe version
 
-go.exe install github.com/cloudfoundry/bosh-utils/vendor/github.com/onsi/ginkgo/ginkgo
-ginkgo.exe -r -keepGoing -skipPackage="vendor"
+go.exe run github.com/onsi/ginkgo/ginkgo -r -keepGoing -skipPackage="vendor"
 if ($LastExitCode -ne 0)
 {
     Write-Error $_
