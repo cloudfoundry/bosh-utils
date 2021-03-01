@@ -28,13 +28,13 @@ var WindowsExePath string
 
 var _ = BeforeSuite(func() {
 	var err error
-	CatExePath, err = gexec.Build("exec_cmd_runner_fixtures/cat.go")
+	CatExePath, err = gexec.Build("exec_cmd_runner_fixtures/cat/cat.go")
 	Expect(err).ToNot(HaveOccurred())
 
-	FalseExePath, err = gexec.Build("exec_cmd_runner_fixtures/false.go")
+	FalseExePath, err = gexec.Build("exec_cmd_runner_fixtures/false/false.go")
 	Expect(err).ToNot(HaveOccurred())
 
-	WindowsExePath, err = gexec.Build("exec_cmd_runner_fixtures/windows_exe.go")
+	WindowsExePath, err = gexec.Build("exec_cmd_runner_fixtures/windows_exe/windows_exe.go")
 	Expect(err).ToNot(HaveOccurred())
 })
 

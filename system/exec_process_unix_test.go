@@ -68,7 +68,7 @@ var _ = Describe("execProcess", func() {
 
 			for _, exe := range exesToCompile {
 				dst := filepath.Join(buildDir, exe)
-				src := filepath.Join("exec_cmd_runner_fixtures", exe+".go")
+				src := filepath.Join("exec_cmd_runner_fixtures", exe, exe+".go")
 				err := exec.Command("go", "build", "-o", dst, src).Run()
 				Expect(err).ToNot(HaveOccurred())
 			}
