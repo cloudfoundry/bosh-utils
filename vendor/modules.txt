@@ -116,7 +116,7 @@ golang.org/x/net/html/atom
 golang.org/x/net/html/charset
 golang.org/x/net/internal/socks
 golang.org/x/net/proxy
-# golang.org/x/sys v0.0.0-20210305230114-8fe3ee5dd75b
+# golang.org/x/sys v0.0.0-20210309074719-68d13333faf2
 ## explicit
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
