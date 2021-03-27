@@ -11,7 +11,7 @@ require (
 	github.com/cloudfoundry/socks5-proxy v0.2.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
-	github.com/jessevdk/go-flags v1.4.0
+	github.com/jessevdk/go-flags v1.5.0
 	github.com/jpillora/backoff v1.0.0
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/nxadm/tail v1.4.8 // indirect
@@ -20,9 +20,9 @@ require (
 	github.com/pivotal-cf/paraphernalia v0.0.0-20180203224945-a64ae2051c20
 	github.com/stretchr/testify v1.7.0
 	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
-	golang.org/x/crypto v0.0.0-20210317152858-513c2a44f670 // indirect
-	golang.org/x/net v0.0.0-20210316092652-d523dce5a7f4
-	golang.org/x/sys v0.0.0-20210319071255-635bc2c9138d // indirect
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2 // indirect
+	golang.org/x/net v0.0.0-20210326220855-61e056675ecf
+	golang.org/x/sys v0.0.0-20210326220804-49726bf1d181 // indirect
 	golang.org/x/text v0.3.5 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0
