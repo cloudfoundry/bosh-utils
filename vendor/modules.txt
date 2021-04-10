@@ -108,7 +108,7 @@ golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/poly1305
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/net v0.0.0-20210331212208-0fccb6fa2b5c
+# golang.org/x/net v0.0.0-20210410081132-afb366fc7cd1
 ## explicit
 golang.org/x/net/context
 golang.org/x/net/html
@@ -121,8 +121,7 @@ golang.org/x/net/proxy
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
-# golang.org/x/text v0.3.5
-## explicit
+# golang.org/x/text v0.3.6
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
 golang.org/x/text/encoding/htmlindex
