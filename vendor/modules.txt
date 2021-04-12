@@ -17,7 +17,6 @@ github.com/cloudfoundry/go-socks5
 ## explicit
 github.com/cloudfoundry/socks5-proxy
 # github.com/davecgh/go-spew v1.1.1
-## explicit
 github.com/davecgh/go-spew/spew
 # github.com/fsnotify/fsnotify v1.4.9
 github.com/fsnotify/fsnotify
@@ -35,7 +34,6 @@ github.com/jpillora/backoff
 ## explicit
 github.com/nu7hatch/gouuid
 # github.com/nxadm/tail v1.4.8
-## explicit
 github.com/nxadm/tail
 github.com/nxadm/tail/ratelimiter
 github.com/nxadm/tail/util
