@@ -7,7 +7,7 @@ export GOPATH=$(pwd)/gopath
 export PATH=/usr/local/ruby/bin:/usr/local/go/bin:$PATH
 
 
-semver=`cat version-semver/number`
+semver=`cat version-semver/version`
 timestamp=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
 filename="verify-multidigest-${semver}-${GOOS}-${GOARCH}"
 

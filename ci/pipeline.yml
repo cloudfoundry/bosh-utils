@@ -45,6 +45,8 @@ jobs:
     plan:
       - get: bosh-utils
         trigger: true
+      - get: version-semver
+        params: {bump: patch}
       - in_parallel:
         - task: test-unit
           file: bosh-utils/ci/tasks/test-unit.yml
@@ -57,6 +59,10 @@ jobs:
       - put: bosh-utils-promoted
         params:
           repository: bosh-utils
+          tag_prefix: "v"
+          tag: version-semver/version
+      - put: version-semver
+        params: { file: version-semver/version }
 
   - name: publish-multidigest-binary
     public: true
@@ -65,9 +71,7 @@ jobs:
         trigger: true
         passed: [test-unit]
       - get: version-semver
-        params: {bump: patch}
-      - put: version-semver
-        params: {file: version-semver/number}
+        passed: [test-unit]
       - in_parallel:
         - task: build-multidigest-binary-darwin
           file: bosh-utils/ci/tasks/build-multidigest-binary.yml
