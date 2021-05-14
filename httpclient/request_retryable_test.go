@@ -37,7 +37,12 @@ var _ = Describe("RequestRetryable", func() {
 			request, err = http.NewRequest("GET", server.URL(), ioutil.NopCloser(strings.NewReader("fake-request-body")))
 			Expect(err).NotTo(HaveOccurred())
 
-			requestRetryable = httpclient.NewRequestRetryable(request, httpclient.DefaultClient, logger, nil)
+			client := &http.Client{Transport: &http.Transport{}}
+			requestRetryable = httpclient.NewRequestRetryable(request, client, logger, nil)
+		})
+
+		AfterEach(func() {
+			server.Close()
 		})
 
 		It("sends a request to the server", func() {
@@ -105,7 +110,9 @@ var _ = Describe("RequestRetryable", func() {
 				seekableReaderCloser = NewSeekableReadClose([]byte("hello from seekable"))
 				request.Body = seekableReaderCloser
 				request.GetBody = nil
-				requestRetryable = httpclient.NewRequestRetryable(request, httpclient.DefaultClient, logger, nil)
+
+				client := &http.Client{Transport: &http.Transport{}}
+				requestRetryable = httpclient.NewRequestRetryable(request, client, logger, nil)
 			})
 
 			Context("when the response status code is success", func() {
@@ -144,7 +151,9 @@ var _ = Describe("RequestRetryable", func() {
 					errOnResponseAttemptable := func(*http.Response, error) (bool, error) {
 						return false, errors.New("fake-error")
 					}
-					requestRetryable = httpclient.NewRequestRetryable(request, httpclient.DefaultClient, logger, errOnResponseAttemptable)
+
+					client := &http.Client{Transport: &http.Transport{}}
+					requestRetryable = httpclient.NewRequestRetryable(request, client, logger, errOnResponseAttemptable)
 				})
 
 				It("still closes the request body", func() {

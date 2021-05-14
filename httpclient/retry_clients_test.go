@@ -27,8 +27,13 @@ var _ = Describe("RetryClients", func() {
 				server = ghttp.NewServer()
 				logger := boshlog.NewLogger(boshlog.LevelNone)
 				maxAttempts = 7
+				client := &http.Client{Transport: &http.Transport{}}
 
-				retryClient = httpclient.NewRetryClient(httpclient.DefaultClient, uint(maxAttempts), 0, logger)
+				retryClient = httpclient.NewRetryClient(client, uint(maxAttempts), 0, logger)
+			})
+
+			AfterEach(func() {
+				server.Close()
 			})
 
 			It("returns response from retryable request", func() {
@@ -91,7 +96,12 @@ var _ = Describe("RetryClients", func() {
 				logger := boshlog.NewLogger(boshlog.LevelNone)
 				maxAttempts = 7
 
-				retryClient = httpclient.NewNetworkSafeRetryClient(http.DefaultClient, uint(maxAttempts), 0, logger)
+				client := &http.Client{Transport: &http.Transport{}}
+				retryClient = httpclient.NewNetworkSafeRetryClient(client, uint(maxAttempts), 0, logger)
+			})
+
+			AfterEach(func() {
+				server.Close()
 			})
 
 			It("returns response from retryable request", func() {
