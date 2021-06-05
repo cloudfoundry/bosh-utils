@@ -7,7 +7,7 @@ require (
 	code.cloudfoundry.org/tlsconfig v0.0.0-20200131000646-bbe0f8da39b3
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/charlievieth/fs v0.0.1
-	github.com/cloudfoundry/socks5-proxy v0.2.8
+	github.com/cloudfoundry/socks5-proxy v0.2.9
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jpillora/backoff v1.0.0
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
