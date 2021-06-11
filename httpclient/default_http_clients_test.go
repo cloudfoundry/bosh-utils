@@ -69,5 +69,11 @@ var _ = Describe("Default HTTP clients", func() {
 			client := CreateDefaultClientInsecureSkipVerify()
 			Expect(client.Transport.(*http.Transport).DisableKeepAlives).To(Equal(true))
 		})
+
+		It("allows external CipherSuites for example: tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305", func() {
+			client := CreateDefaultClientInsecureSkipVerify()
+			Expect(client.Transport.(*http.Transport).TLSClientConfig.CipherSuites).
+				To(ContainElement(tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305))
+		})
 	})
 })
