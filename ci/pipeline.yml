@@ -36,6 +36,8 @@ jobs:
         input_mapping:
           bosh-utils: bumped-bosh-utils
         file: bosh-utils/ci/tasks/test-unit-windows.yml
+        tags:
+          - windows-nimbus
       - put: bosh-utils
         params:
           repository: bumped-bosh-utils
@@ -52,6 +54,8 @@ jobs:
           file: bosh-utils/ci/tasks/test-unit.yml
         - task: test-unit-windows
           file: bosh-utils/ci/tasks/test-unit-windows.yml
+          tags:
+            - windows-nimbus
       - put: bosh-utils-commit-status
         params:
           state: success
