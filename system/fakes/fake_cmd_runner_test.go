@@ -14,7 +14,7 @@ var _ = Describe("FakeCmdRunner", func() {
 	)
 
 	BeforeEach(func() {
-		runner = &FakeCmdRunner{}
+		runner = NewFakeCmdRunner()
 	})
 
 	Describe("RunCommandQuietly", func() {
@@ -27,6 +27,30 @@ var _ = Describe("FakeCmdRunner", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(runner.RunCommandsQuietly).To(Equal([][]string{{"foo", "bar"}}))
+		})
+	})
+
+	Describe("RunCommand", func() {
+		BeforeEach(func() {
+			runner.AddCmdResult(
+				"foo bar",
+				FakeCmdResult{Stdout: "nice"},
+			)
+		})
+
+		It("pops first result", func() {
+			_, _, _, err := runner.RunCommand("foo", "bar")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(runner.RunCommands).To(Equal([][]string{{"foo", "bar"}}))
+		})
+
+		It("pops first result then succeeds properly", func() {
+			_, _, _, err := runner.RunCommand("foo", "bar")
+			_, _, _, err = runner.RunCommand("foo", "bar")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(runner.RunCommands).To(Equal([][]string{{"foo", "bar"}, {"foo", "bar"}}))
 		})
 	})
 })
