@@ -13,7 +13,7 @@ github.com/bmatcuk/doublestar
 github.com/charlievieth/fs
 # github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.22
+# github.com/cloudfoundry/socks5-proxy v0.2.23
 ## explicit
 github.com/cloudfoundry/socks5-proxy
 # github.com/davecgh/go-spew v1.1.1
@@ -107,7 +107,7 @@ golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/net v0.0.0-20210924151903-3ad01bbaa167
+# golang.org/x/net v0.0.0-20210929193557-e81a3d93ecf6
 ## explicit
 golang.org/x/net/context
 golang.org/x/net/html
@@ -115,8 +115,7 @@ golang.org/x/net/html/atom
 golang.org/x/net/html/charset
 golang.org/x/net/internal/socks
 golang.org/x/net/proxy
-# golang.org/x/sys v0.0.0-20210925032602-92d5a993a665
-## explicit
+# golang.org/x/sys v0.0.0-20211001092434-39dca1131b70
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
