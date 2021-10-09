@@ -8,12 +8,12 @@ code.cloudfoundry.org/tlsconfig
 # github.com/bmatcuk/doublestar v1.3.4
 ## explicit
 github.com/bmatcuk/doublestar
-# github.com/charlievieth/fs v0.0.1
+# github.com/charlievieth/fs v0.0.2
 ## explicit
 github.com/charlievieth/fs
 # github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.23
+# github.com/cloudfoundry/socks5-proxy v0.2.24
 ## explicit
 github.com/cloudfoundry/socks5-proxy
 # github.com/davecgh/go-spew v1.1.1
@@ -107,7 +107,7 @@ golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/net v0.0.0-20210929193557-e81a3d93ecf6
+# golang.org/x/net v0.0.0-20211008194852-3b03d305991f
 ## explicit
 golang.org/x/net/context
 golang.org/x/net/html
@@ -115,7 +115,7 @@ golang.org/x/net/html/atom
 golang.org/x/net/html/charset
 golang.org/x/net/internal/socks
 golang.org/x/net/proxy
-# golang.org/x/sys v0.0.0-20211001092434-39dca1131b70
+# golang.org/x/sys v0.0.0-20211007075335-d3039528d8ac
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
