@@ -86,7 +86,7 @@ MIIDXzCCAkegAwIBAgIJAPerMgLAne5vMA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
 
 			_, err := crypto.CertPoolFromPEM([]byte(caCert))
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Parsing certificate 2: x509: malformed certificate"))
+			Expect(err.Error()).To(ContainSubstring("Parsing certificate 2:"))
 		})
 
 		It("can parse multiple certificate PEM blocks in a row", func() {
