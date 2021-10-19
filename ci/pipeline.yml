@@ -106,22 +106,22 @@ jobs:
   - name: build-bosh-utils-image
     public: true
     plan:
-      - get: bosh-utils
+      - get: bosh-utils-dockerfiles
         trigger: true
       - put: bosh-utils-image
         params:
-          build: "bosh-utils/ci/docker/bosh-utils"
+          build: "bosh-utils-dockerfiles/ci/docker/bosh-utils"
         get_params:
           skip_download: true
 
   - name: build-go-dep-bumper
     public: true
     plan:
-      - get: bosh-utils
+      - get: bosh-utils-dockerfiles
         trigger: true
       - put: go-dep-bumper
         params:
-          build: "bosh-utils/ci/docker/go-dep-bumper"
+          build: "bosh-utils-dockerfiles/ci/docker/go-dep-bumper"
         get_params:
           skip_download: true
 
@@ -154,6 +154,15 @@ resources:
       access_token: {{repo_github_token}}
       branch: develop
       context: ci/unit-tests
+
+  - name: bosh-utils-dockerfiles
+    type: git
+    source:
+      uri: git@github.com:cloudfoundry/bosh-utils.git
+      branch: develop
+      private_key: {{concourse_github_private_key}}
+      paths:
+      - "ci/docker"
 
   - name: release-bucket-darwin
     type: s3
