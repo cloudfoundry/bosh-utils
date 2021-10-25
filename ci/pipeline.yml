@@ -108,6 +108,8 @@ jobs:
     plan:
       - get: bosh-utils-dockerfiles
         trigger: true
+      - get: image-weekly
+        trigger: true
       - put: bosh-utils-image
         params:
           build: "bosh-utils-dockerfiles/ci/docker/bosh-utils"
@@ -132,6 +134,13 @@ resources:
       start: 3:00 -0700
       stop: 4:30 -0700
       days: [Saturday]
+
+  - name: image-weekly
+    type: time
+    source:
+      start: 3:00 -0700
+      stop: 4:30 -0700
+      days: [ Friday ]
 
   - name: bosh-utils
     type: git
