@@ -23,11 +23,17 @@ jobs:
   - name: bump-deps
     public: true
     plan:
-      - get: weekly
-        trigger: true
-      - get: bosh-utils
+      - in_parallel:
+        - get: weekly
+          trigger: true
+        - get: bosh-utils
+        - get: golang-release
       - task: bump-deps
-        file: bosh-utils/ci/tasks/bump-deps.yml
+        file: golang-release/ci/tasks/shared/bump-deps.yml
+        input_mapping:
+          input_repo: bosh-utils
+        output_mapping:
+          output_repo: bumped-bosh-utils
       - task: test-unit
         input_mapping:
           bosh-utils: bumped-bosh-utils
@@ -172,6 +178,11 @@ resources:
       private_key: {{concourse_github_private_key}}
       paths:
       - "ci/docker"
+
+  - name: golang-release
+    type: git
+    source:
+      uri: https://github.com/bosh-packages/golang-release.git
 
   - name: release-bucket-darwin
     type: s3
