@@ -14,11 +14,36 @@ import (
 	boshsys "github.com/cloudfoundry/bosh-utils/system"
 )
 
+func fixtureMultipleSrcDir() string {
+	pwd, err := os.Getwd()
+	Expect(err).NotTo(HaveOccurred())
+	return filepath.Join(pwd, "test_assets", "test_filtered_copy_multiple_to_temp")
+}
+
 var _ = Describe("genericCpCopier", func() {
 	var (
 		fs       boshsys.FileSystem
 		cpCopier Copier
 	)
+
+	filesInDir := func(dir string) []string {
+		copiedFiles := []string{}
+		err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if !info.IsDir() {
+				copiedFiles = append(copiedFiles, path)
+			}
+			return nil
+		})
+
+		Expect(err).ToNot(HaveOccurred())
+
+		sort.Strings(copiedFiles)
+
+		return copiedFiles
+	}
 
 	BeforeEach(func() {
 		logger := boshlog.NewLogger(boshlog.LevelNone)
@@ -27,25 +52,6 @@ var _ = Describe("genericCpCopier", func() {
 	})
 
 	Describe("FilteredCopyToTemp", func() {
-		filesInDir := func(dir string) []string {
-			copiedFiles := []string{}
-			err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-				if err != nil {
-					return err
-				}
-				if !info.IsDir() {
-					copiedFiles = append(copiedFiles, path)
-				}
-				return nil
-			})
-
-			Expect(err).ToNot(HaveOccurred())
-
-			sort.Strings(copiedFiles)
-
-			return copiedFiles
-		}
-
 		It("copies all regular files from filtered copy to temp", func() {
 			srcDir := fixtureSrcDir()
 			filters := []string{
@@ -174,6 +180,65 @@ var _ = Describe("genericCpCopier", func() {
 			Expect(copiedFiles).To(Equal([]string{
 				filepath.Join(dstDir, "some_directory", "sub_dir", "other_sub_dir", ".keep"),
 			}))
+		})
+	})
+
+	Describe("FilteredCopyMultipleToTemp", func() {
+		It("copies all regular files from each directory to temp", func() {
+			srcDir := fixtureSrcDir()
+			otherSrcDir := fixtureMultipleSrcDir()
+
+			filters := []string{
+				"**/*",
+			}
+
+			dstDir, err := cpCopier.FilteredCopyMultipleToTemp([]string{srcDir, otherSrcDir}, filters)
+			Expect(err).ToNot(HaveOccurred())
+
+			defer os.RemoveAll(dstDir)
+
+			copiedFiles := filesInDir(dstDir)
+
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(copiedFiles).To(Equal([]string{
+				filepath.Join(dstDir, "app.stderr.log"),
+				filepath.Join(dstDir, "app.stdout.log"),
+				filepath.Join(dstDir, "other_logs", "more_logs", "more.stdout.log"),
+				filepath.Join(dstDir, "other_logs", "other_app.stdout.log"),
+				filepath.Join(dstDir, "some_directory", "sub_dir", "other_sub_dir", ".keep"),
+				filepath.Join(dstDir, "multiple_directory", "sub_dir", "other_sub_dir", ".keep"),
+			}))
+
+			content, err := fs.ReadFileString(filepath.Join(dstDir, "app.stdout.log"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(content).To(ContainSubstring("this is app stdout"))
+
+			content, err = fs.ReadFileString(filepath.Join(dstDir, "app.stderr.log"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(content).To(ContainSubstring("this is app stderr"))
+
+			content, err = fs.ReadFileString(filepath.Join(dstDir, "other_logs", "other_app.stdout.log"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(content).To(ContainSubstring("this is other app stdout"))
+
+			content, err = fs.ReadFileString(filepath.Join(dstDir, "other_logs", "more_logs", "more.stdout.log"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(content).To(ContainSubstring("this is more stdout"))
+
+			Expect(fs.FileExists(filepath.Join(dstDir, "some_directory"))).To(BeTrue())
+			Expect(fs.FileExists(filepath.Join(dstDir, "some_directory", "sub_dir"))).To(BeTrue())
+			Expect(fs.FileExists(filepath.Join(dstDir, "some_directory", "sub_dir", "other_sub_dir"))).To(BeTrue())
+
+			_, err = fs.ReadFile(filepath.Join(dstDir, "other_logs", "other_app.stderr.log"))
+			Expect(err).To(HaveOccurred())
+
+			_, err = fs.ReadFile(filepath.Join(dstDir, "..", "some.config"))
+			Expect(err).To(HaveOccurred())
+
+			Expect(fs.FileExists(filepath.Join(dstDir, "multiple_directory"))).To(BeTrue())
+			Expect(fs.FileExists(filepath.Join(dstDir, "multiple_directory", "sub_dir"))).To(BeTrue())
+			Expect(fs.FileExists(filepath.Join(dstDir, "multiple_directory", "sub_dir", "other_sub_dir"))).To(BeTrue())
 		})
 	})
 

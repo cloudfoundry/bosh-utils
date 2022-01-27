@@ -28,46 +28,52 @@ func NewGenericCpCopier(
 }
 
 func (c genericCpCopier) FilteredCopyToTemp(dir string, filters []string) (string, error) {
+	return c.FilteredCopyMultipleToTemp([]string{dir}, filters)
+}
+
+func (c genericCpCopier) FilteredCopyMultipleToTemp(dirs []string, filters []string) (string, error) {
 	var filtersFilesToCopy []string
 	var err error
 
-	filters = c.convertDirectoriesToGlobs(dir, filters)
-
-	filesToCopy := []string{}
-
-	for _, filterPath := range filters {
-		filtersFilesToCopy, err = doublestar.Glob(filterPath)
-		if err != nil {
-			return "", bosherr.WrapError(err, "Finding files matching filters")
-		}
-
-		for _, fileToCopy := range filtersFilesToCopy {
-			filesToCopy = append(filesToCopy, strings.TrimPrefix(strings.TrimPrefix(fileToCopy, dir), "/"))
-		}
-	}
-
 	return c.tryInTempDir(func(tempDir string) error {
-		for _, relativePath := range filesToCopy {
-			src := filepath.Join(dir, relativePath)
-			dst := filepath.Join(tempDir, relativePath)
+		for _, dir := range dirs {
+			filters = c.convertDirectoriesToGlobs(dir, filters)
 
-			fileInfo, err := os.Stat(src)
-			if err != nil {
-				return bosherr.WrapErrorf(err, "Getting file info for '%s'", src)
-			}
+			filesToCopy := []string{}
 
-			if !fileInfo.IsDir() {
-				err = c.cp(src, dst, tempDir)
+			for _, filterPath := range filters {
+				filtersFilesToCopy, err = doublestar.Glob(filterPath)
 				if err != nil {
-					c.CleanUp(tempDir)
-					return err
+					return bosherr.WrapError(err, "Finding files matching filters")
+				}
+
+				for _, fileToCopy := range filtersFilesToCopy {
+					filesToCopy = append(filesToCopy, strings.TrimPrefix(strings.TrimPrefix(fileToCopy, dir), "/"))
 				}
 			}
-		}
 
-		err = os.Chmod(tempDir, os.FileMode(0755))
-		if err != nil {
-			bosherr.WrapError(err, "Fixing permissions on temp dir")
+			for _, relativePath := range filesToCopy {
+				src := filepath.Join(dir, relativePath)
+				dst := filepath.Join(tempDir, relativePath)
+
+				fileInfo, err := os.Stat(src)
+				if err != nil {
+					return bosherr.WrapErrorf(err, "Getting file info for '%s'", src)
+				}
+
+				if !fileInfo.IsDir() {
+					err = c.cp(src, dst, tempDir)
+					if err != nil {
+						c.CleanUp(tempDir)
+						return err
+					}
+				}
+			}
+
+			err = os.Chmod(tempDir, os.FileMode(0755))
+			if err != nil {
+				bosherr.WrapError(err, "Fixing permissions on temp dir")
+			}
 		}
 
 		return nil
