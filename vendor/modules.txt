@@ -14,7 +14,7 @@ github.com/charlievieth/fs
 # github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e
 ## explicit
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.39
+# github.com/cloudfoundry/socks5-proxy v0.2.40
 ## explicit; go 1.17
 github.com/cloudfoundry/socks5-proxy
 # github.com/davecgh/go-spew v1.1.1
@@ -105,7 +105,7 @@ github.com/pmezard/go-difflib/difflib
 github.com/stretchr/testify/assert
 # github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00
 ## explicit
-# golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
+# golang.org/x/crypto v0.0.0-20220128200615-198e4374d7ed
 ## explicit; go 1.17
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
@@ -117,7 +117,7 @@ golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/net v0.0.0-20220121210141-e204ce36a2ba
+# golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd
 ## explicit; go 1.17
 golang.org/x/net/context
 golang.org/x/net/html
@@ -125,7 +125,7 @@ golang.org/x/net/html/atom
 golang.org/x/net/html/charset
 golang.org/x/net/internal/socks
 golang.org/x/net/proxy
-# golang.org/x/sys v0.0.0-20220114195835-da31bd327af9
+# golang.org/x/sys v0.0.0-20220128215802-99c3d69c2c27
 ## explicit; go 1.17
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
