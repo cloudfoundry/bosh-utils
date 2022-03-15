@@ -224,17 +224,15 @@ resources:
     type: docker-image
     source:
       repository: bosh/utils
-      email: ((dockerhub_email))
-      username: ((dockerhub_username))
-      password: ((dockerhub_password))
+      username: ((docker.username))
+      password: ((docker.password))
 
   - name: go-dep-bumper
     type: docker-image
     source:
       repository: bosh/go-dep-bumper
-      email: ((dockerhub_email))
-      username: ((dockerhub_username))
-      password: ((dockerhub_password))
+      username: ((docker.username))
+      password: ((docker.password))
 
 resource_types:
   - name: github-status
