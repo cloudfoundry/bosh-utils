@@ -166,7 +166,7 @@ resources:
     type: github-status
     source:
       repository: cloudfoundry/bosh-utils
-      access_token: {{repo_github_token}}
+      access_token: ((github_read_write_token))
       branch: develop
       context: ci/unit-tests
 
