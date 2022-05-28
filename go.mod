@@ -7,7 +7,7 @@ require (
 	code.cloudfoundry.org/tlsconfig v0.0.0-20211123175040-23cc9f05b6b3
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/charlievieth/fs v0.0.2
-	github.com/cloudfoundry/socks5-proxy v0.2.56
+	github.com/cloudfoundry/socks5-proxy v0.2.57
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jpillora/backoff v1.0.0
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
@@ -15,7 +15,7 @@ require (
 	github.com/onsi/gomega v1.11.0
 	github.com/pivotal-cf/paraphernalia v0.0.0-20180203224945-a64ae2051c20
 	github.com/stretchr/testify v1.7.1
-	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2
+	golang.org/x/net v0.0.0-20220526153639-5463443f8c37
 	gopkg.in/yaml.v2 v2.4.0
 )
 
@@ -29,11 +29,11 @@ require (
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
-	golang.org/x/crypto v0.0.0-20220518034528-6f7dac969898 // indirect
+	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.0.0-20201224043029-2b0845dc783e // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20220512140231-539c8e751b99 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

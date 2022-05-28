@@ -14,7 +14,7 @@ github.com/charlievieth/fs
 # github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e
 ## explicit
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.56
+# github.com/cloudfoundry/socks5-proxy v0.2.57
 ## explicit; go 1.18
 github.com/cloudfoundry/socks5-proxy
 # github.com/davecgh/go-spew v1.1.1
@@ -105,7 +105,7 @@ github.com/pmezard/go-difflib/difflib
 github.com/stretchr/testify/assert
 # github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00
 ## explicit
-# golang.org/x/crypto v0.0.0-20220518034528-6f7dac969898
+# golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
 ## explicit; go 1.17
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
@@ -116,7 +116,7 @@ golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2
+# golang.org/x/net v0.0.0-20220526153639-5463443f8c37
 ## explicit; go 1.17
 golang.org/x/net/context
 golang.org/x/net/html
@@ -186,6 +186,6 @@ gopkg.in/tomb.v1
 # gopkg.in/yaml.v2 v2.4.0
 ## explicit; go 1.15
 gopkg.in/yaml.v2
-# gopkg.in/yaml.v3 v3.0.0-20220512140231-539c8e751b99
+# gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
