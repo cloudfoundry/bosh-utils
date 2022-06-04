@@ -7,7 +7,7 @@ require (
 	code.cloudfoundry.org/tlsconfig v0.0.0-20211123175040-23cc9f05b6b3
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/charlievieth/fs v0.0.2
-	github.com/cloudfoundry/socks5-proxy v0.2.57
+	github.com/cloudfoundry/socks5-proxy v0.2.58
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jpillora/backoff v1.0.0
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
@@ -15,7 +15,7 @@ require (
 	github.com/onsi/gomega v1.11.0
 	github.com/pivotal-cf/paraphernalia v0.0.0-20180203224945-a64ae2051c20
 	github.com/stretchr/testify v1.7.1
-	golang.org/x/net v0.0.0-20220526153639-5463443f8c37
+	golang.org/x/net v0.0.0-20220531201128-c960675eff93
 	gopkg.in/yaml.v2 v2.4.0
 )
 
