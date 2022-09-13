@@ -3,6 +3,7 @@ package httpclient_test
 import (
 	"context"
 	"net/http"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -29,6 +30,7 @@ var _ = Describe("Linux-specific tests", func() {
 
 			ln, err := net.Listen("tcp", laddr)
 			Expect(err).ToNot(HaveOccurred())
+			time.Sleep(3 * time.Second)
 
 			readyToAccept <- true
 
