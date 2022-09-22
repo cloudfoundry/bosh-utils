@@ -87,6 +87,9 @@ var _ = Describe("Default HTTP clients", func() {
 			clientDialContextPointer := reflect.ValueOf(clientTransport.DialContext).Pointer()
 			clientAfterResetDialContextPointer := reflect.ValueOf(clientAfterResetTransport.DialContext).Pointer()
 			Expect(clientAfterResetDialContextPointer).ToNot(Equal(clientDialContextPointer))
+			// don't pollute other tests with a PROXY'd dialer
+			os.Unsetenv("BOSH_ALL_PROXY")
+			ResetDialerContext()
 		})
 	})
 })
