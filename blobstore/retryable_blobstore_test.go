@@ -3,7 +3,7 @@ package blobstore_test
 import (
 	"errors"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	boshblob "github.com/cloudfoundry/bosh-utils/blobstore"

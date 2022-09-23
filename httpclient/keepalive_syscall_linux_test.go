@@ -9,7 +9,7 @@ import (
 
 	. "github.com/cloudfoundry/bosh-utils/httpclient"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

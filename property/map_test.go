@@ -2,7 +2,7 @@ package property_test
 
 import (
 	. "github.com/cloudfoundry/bosh-utils/property"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"gopkg.in/yaml.v2"
 )
