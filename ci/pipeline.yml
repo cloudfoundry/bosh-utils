@@ -153,14 +153,14 @@ resources:
     source:
       uri: git@github.com:cloudfoundry/bosh-utils.git
       branch: develop
-      private_key: {{concourse_github_private_key}}
+      private_key: ((github_deploy_key_bosh-utils.private_key))
 
   - name: bosh-utils-promoted
     type: git
     source:
       uri: git@github.com:cloudfoundry/bosh-utils.git
       branch: master
-      private_key: {{concourse_github_private_key}}
+      private_key: ((github_deploy_key_bosh-utils.private_key))
 
   - name: bosh-utils-commit-status
     type: github-status
@@ -175,7 +175,7 @@ resources:
     source:
       uri: git@github.com:cloudfoundry/bosh-utils.git
       branch: develop
-      private_key: {{concourse_github_private_key}}
+      private_key: ((github_deploy_key_bosh-utils.private_key))
       paths:
       - "ci/docker"
 
@@ -188,37 +188,37 @@ resources:
     type: s3
     source:
       regexp: verify-multidigest-(.*)-darwin-amd64
-      bucket: {{aws_s3_release_bucket}}
-      region_name: {{aws_s3_release_bucket_region}}
-      access_key_id: {{aws_s3_release_bucket_access_key}}
-      secret_access_key: {{aws_s3_release_bucket_secret_key}}
+      bucket: verify-multidigest
+      region_name: us-east-1
+      access_key_id: ((bosh-verify-multidigest-upload_aws_access_key.username))
+      secret_access_key: ((bosh-verify-multidigest-upload_aws_access_key.password))
 
   - name: release-bucket-linux
     type: s3
     source:
       regexp: verify-multidigest-(.*)-linux-amd64
-      bucket: {{aws_s3_release_bucket}}
-      region_name: {{aws_s3_release_bucket_region}}
-      access_key_id: {{aws_s3_release_bucket_access_key}}
-      secret_access_key: {{aws_s3_release_bucket_secret_key}}
+      bucket: verify-multidigest
+      region_name: us-east-1
+      access_key_id: ((bosh-verify-multidigest-upload_aws_access_key.username))
+      secret_access_key: ((bosh-verify-multidigest-upload_aws_access_key.password))
 
   - name: release-bucket-linux-ppc64le
     type: s3
     source:
       regexp: verify-multidigest-(.*)-linux-ppc64le
-      bucket: {{aws_s3_release_bucket}}
-      region_name: {{aws_s3_release_bucket_region}}
-      access_key_id: {{aws_s3_release_bucket_access_key}}
-      secret_access_key: {{aws_s3_release_bucket_secret_key}}
+      bucket: verify-multidigest
+      region_name: us-east-1
+      access_key_id: ((bosh-verify-multidigest-upload_aws_access_key.username))
+      secret_access_key: ((bosh-verify-multidigest-upload_aws_access_key.password))
 
   - name: version-semver
     type: semver
     source:
       initial_version: 0.0.1
       key: verify-multidigest-current-version
-      bucket: {{aws_s3_release_bucket}}
-      access_key_id: {{aws_s3_release_bucket_access_key}}
-      secret_access_key: {{aws_s3_release_bucket_secret_key}}
+      bucket: verify-multidigest
+      access_key_id: ((bosh-verify-multidigest-upload_aws_access_key.username))
+      secret_access_key: ((bosh-verify-multidigest-upload_aws_access_key.password))
 
   - name: bosh-utils-image
     type: docker-image
