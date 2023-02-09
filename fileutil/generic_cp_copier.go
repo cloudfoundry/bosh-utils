@@ -1,7 +1,6 @@
 package fileutil
 
 import (
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -57,7 +56,13 @@ func (c genericCpCopier) FilteredCopyToTemp(dir string, filters []string) (strin
 			}
 
 			if !fileInfo.IsDir() {
-				err = c.cp(src, dst, tempDir)
+				dstContainingDir := filepath.Dir(dst)
+				err := c.fs.MkdirAll(dstContainingDir, os.ModePerm)
+				if err != nil {
+					return bosherr.WrapErrorf(err, "Making destination directory '%s' for '%s'", dstContainingDir, src)
+				}
+
+				err = c.fs.CopyFile(src, dst)
 				if err != nil {
 					c.CleanUp(tempDir)
 					return err
@@ -111,41 +116,3 @@ func (c genericCpCopier) convertDirectoriesToGlobs(dir string, filters []string)
 	return convertedFilters
 }
 
-func (c genericCpCopier) cp(src, dst, tempDir string) error {
-	containingDir := filepath.Dir(dst)
-	err := c.fs.MkdirAll(containingDir, os.ModePerm)
-	if err != nil {
-		return bosherr.WrapErrorf(err, "Making destination directory '%s' for '%s'", containingDir, src)
-	}
-
-	out, err := os.OpenFile(dst, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
-	if err != nil {
-		return bosherr.WrapErrorf(err, "Opening destination file for copy '%s'", dst)
-	}
-	defer out.Close()
-
-	// Open the input file
-	in, err := os.OpenFile(src, os.O_RDONLY, 0)
-	if err != nil {
-		return bosherr.WrapErrorf(err, "Opening source file for copy '%s'", src)
-	}
-	defer in.Close()
-
-	// Copy inFilename input outFilename output
-	_, err = io.Copy(out, in)
-	if err != nil {
-		return bosherr.WrapErrorf(err, "Copying source '%s' to destination '%s'", src, dst)
-	}
-
-	sfi, err := os.Stat(src)
-	if err != nil {
-		return bosherr.WrapErrorf(err, "Getting source file stats for '%s'", src)
-	}
-
-	err = os.Chmod(dst, sfi.Mode())
-	if err != nil {
-		return bosherr.WrapErrorf(err, "Changing file permissions for destination '%s'", dst)
-	}
-
-	return nil
-}
