@@ -19,6 +19,24 @@ var _ = Describe("genericCpCopier", func() {
 		fs       boshsys.FileSystem
 		cpCopier Copier
 	)
+	filesInDir := func(dir string) []string {
+		copiedFiles := []string{}
+		err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if !info.IsDir() {
+				copiedFiles = append(copiedFiles, path)
+			}
+			return nil
+		})
+
+		Expect(err).ToNot(HaveOccurred())
+
+		sort.Strings(copiedFiles)
+
+		return copiedFiles
+	}
 
 	BeforeEach(func() {
 		logger := boshlog.NewLogger(boshlog.LevelNone)
@@ -27,24 +45,6 @@ var _ = Describe("genericCpCopier", func() {
 	})
 
 	Describe("FilteredCopyToTemp", func() {
-		filesInDir := func(dir string) []string {
-			copiedFiles := []string{}
-			err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-				if err != nil {
-					return err
-				}
-				if !info.IsDir() {
-					copiedFiles = append(copiedFiles, path)
-				}
-				return nil
-			})
-
-			Expect(err).ToNot(HaveOccurred())
-
-			sort.Strings(copiedFiles)
-
-			return copiedFiles
-		}
 
 		It("copies all regular files from filtered copy to temp", func() {
 			srcDir := fixtureSrcDir()
@@ -174,6 +174,30 @@ var _ = Describe("genericCpCopier", func() {
 			Expect(copiedFiles).To(Equal([]string{
 				filepath.Join(dstDir, "some_directory", "sub_dir", "other_sub_dir", ".keep"),
 			}))
+		})
+	})
+
+	Describe("FilteredMultiCopyToTemp", func() {
+		It("copies all regular files from each provided directory to temp", func() {
+			srcDir := fixtureSrcDir()
+			filters := []string{
+				"**/*",
+			}
+			srcDirs := []DirToCopy{
+				{Dir: filepath.Join(srcDir), Prefix: "first_prefix"},
+				{Dir: filepath.Join(srcDir, "some_directory"), Prefix: "second_prefix"},
+				{Dir: filepath.Join(srcDir, "some_directory")},
+			}
+			dstDir, err := cpCopier.FilteredMultiCopyToTemp(srcDirs, filters)
+			Expect(err).ToNot(HaveOccurred())
+
+			defer os.RemoveAll(dstDir)
+
+			copiedFiles := filesInDir(dstDir)
+
+			Expect(copiedFiles).To(ContainElement(filepath.Join(dstDir, "first_prefix", "other_logs", "other_app.stdout.log")))
+			Expect(copiedFiles).To(ContainElement(filepath.Join(dstDir, "second_prefix", "sub_dir", "other_sub_dir", ".keep")))
+			Expect(copiedFiles).To(ContainElement(filepath.Join(dstDir, "sub_dir", "other_sub_dir", ".keep")))
 		})
 	})
 
