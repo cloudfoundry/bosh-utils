@@ -15,7 +15,7 @@ require (
 	github.com/onsi/gomega v1.25.0
 	github.com/pivotal-cf/paraphernalia v0.0.0-20180203224945-a64ae2051c20
 	github.com/stretchr/testify v1.8.1
-	golang.org/x/net v0.6.0
+	golang.org/x/net v0.7.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
