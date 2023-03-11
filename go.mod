@@ -7,7 +7,7 @@ require (
 	code.cloudfoundry.org/tlsconfig v0.0.0-20230225100352-b3e9427a4d77
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/charlievieth/fs v0.0.3
-	github.com/cloudfoundry/socks5-proxy v0.2.85
+	github.com/cloudfoundry/socks5-proxy v0.2.86
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jpillora/backoff v1.0.0
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
@@ -15,7 +15,7 @@ require (
 	github.com/onsi/gomega v1.27.1
 	github.com/pivotal-cf/paraphernalia v0.0.0-20180203224945-a64ae2051c20
 	github.com/stretchr/testify v1.8.2
-	golang.org/x/net v0.7.0
+	golang.org/x/net v0.8.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
@@ -26,14 +26,14 @@ require (
 	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
-	github.com/google/pprof v0.0.0-20230228050547-1710fef4ab10 // indirect
+	github.com/google/pprof v0.0.0-20230309165930-d61513b1440d // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
-	golang.org/x/crypto v0.6.0 // indirect
-	golang.org/x/sys v0.5.0 // indirect
-	golang.org/x/text v0.7.0 // indirect
-	golang.org/x/tools v0.6.0 // indirect
+	golang.org/x/crypto v0.7.0 // indirect
+	golang.org/x/sys v0.6.0 // indirect
+	golang.org/x/text v0.8.0 // indirect
+	golang.org/x/tools v0.7.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
