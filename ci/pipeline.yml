@@ -190,8 +190,9 @@ resources:
       regexp: verify-multidigest-(.*)-darwin-amd64
       bucket: verify-multidigest
       region_name: us-east-1
-      access_key_id: ((bosh-verify-multidigest-upload_aws_access_key.username))
-      secret_access_key: ((bosh-verify-multidigest-upload_aws_access_key.password))
+      access_key_id: ((bosh-verify-multidigest-upload_assume_aws_access_key.username))
+      secret_access_key: ((bosh-verify-multidigest-upload_assume_aws_access_key.password))
+      aws_role_arn: ((bosh-verify-multidigest-upload_assume_aws_access_key.role_arn))
 
   - name: release-bucket-linux
     type: s3
@@ -199,8 +200,9 @@ resources:
       regexp: verify-multidigest-(.*)-linux-amd64
       bucket: verify-multidigest
       region_name: us-east-1
-      access_key_id: ((bosh-verify-multidigest-upload_aws_access_key.username))
-      secret_access_key: ((bosh-verify-multidigest-upload_aws_access_key.password))
+      access_key_id: ((bosh-verify-multidigest-upload_assume_aws_access_key.username))
+      secret_access_key: ((bosh-verify-multidigest-upload_assume_aws_access_key.password))
+      aws_role_arn: ((bosh-verify-multidigest-upload_assume_aws_access_key.role_arn))
 
   - name: release-bucket-linux-ppc64le
     type: s3
@@ -208,8 +210,9 @@ resources:
       regexp: verify-multidigest-(.*)-linux-ppc64le
       bucket: verify-multidigest
       region_name: us-east-1
-      access_key_id: ((bosh-verify-multidigest-upload_aws_access_key.username))
-      secret_access_key: ((bosh-verify-multidigest-upload_aws_access_key.password))
+      access_key_id: ((bosh-verify-multidigest-upload_assume_aws_access_key.username))
+      secret_access_key: ((bosh-verify-multidigest-upload_assume_aws_access_key.password))
+      aws_role_arn: ((bosh-verify-multidigest-upload_assume_aws_access_key.role_arn))
 
   - name: version-semver
     type: semver
