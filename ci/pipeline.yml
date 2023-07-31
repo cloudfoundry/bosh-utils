@@ -19,7 +19,6 @@ groups:
 
 jobs:
   - name: bump-deps
-    public: true
     plan:
       - in_parallel:
         - get: weekly
@@ -47,7 +46,6 @@ jobs:
           repository: bumped-bosh-utils
 
   - name: test-unit
-    public: true
     plan:
       - get: bosh-utils
         trigger: true
@@ -75,7 +73,6 @@ jobs:
         params: { file: version-semver/version }
 
   - name: publish-multidigest-binary
-    public: true
     plan:
       - get: bosh-utils
         trigger: true
@@ -113,7 +110,7 @@ jobs:
           params: {file: compiled-linux-ppc64le/verify-multidigest-*-linux-ppc64le}
 
   - name: build-bosh-utils-image
-    public: true
+    serial: true
     plan:
       - get: bosh-utils-dockerfiles
         trigger: true
