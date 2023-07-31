@@ -51,6 +51,8 @@ jobs:
     plan:
       - get: bosh-utils
         trigger: true
+      - get: bosh-utils-registry-image
+        trigger: true
       - get: version-semver
         params: {bump: patch}
       - in_parallel:
@@ -76,6 +78,9 @@ jobs:
     public: true
     plan:
       - get: bosh-utils
+        trigger: true
+        passed: [test-unit]
+      - get: bosh-utils-registry-image
         trigger: true
         passed: [test-unit]
       - get: version-semver
@@ -112,7 +117,7 @@ jobs:
     plan:
       - get: bosh-utils-dockerfiles
         trigger: true
-      - get: image-weekly
+      - get: bosh-golang-release-image
         trigger: true
       - put: bosh-utils-image
         params:
@@ -127,13 +132,6 @@ resources:
       start: 3:00 -0700
       stop: 4:30 -0700
       days: [Saturday]
-
-  - name: image-weekly
-    type: time
-    source:
-      start: 3:00 -0700
-      stop: 4:30 -0700
-      days: [ Friday ]
 
   - name: bosh-utils
     type: git
@@ -215,6 +213,20 @@ resources:
     type: docker-image
     source:
       repository: bosh/utils
+      username: ((docker.username))
+      password: ((docker.password))
+
+  - name: bosh-utils-registry-image
+    type: registry-image
+    source:
+      repository: bosh/utils
+      username: ((docker.username))
+      password: ((docker.password))
+
+  - name: bosh-golang-release-image
+    type: registry-image
+    source:
+      repository: bosh/golang-release
       username: ((docker.username))
       password: ((docker.password))
 
