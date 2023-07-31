@@ -21,7 +21,7 @@ if ((Get-Command "tar.exe" -ErrorAction SilentlyContinue) -eq $null)
 
 go.exe version
 
-go.exe run github.com/onsi/ginkgo/v2/ginkgo -r -keepGoing --skip-package="vendor"
+go.exe run github.com/onsi/ginkgo/v2/ginkgo -r -keep-going --skip-package="vendor"
 if ($LastExitCode -ne 0)
 {
     Write-Error $_
