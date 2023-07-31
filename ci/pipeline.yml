@@ -8,14 +8,12 @@ groups:
 
 - name: docker-images
   jobs:
-  - build-go-dep-bumper
   - build-bosh-utils-image
 
 - name: all
   jobs:
   - test-unit
   - publish-multidigest-binary
-  - build-go-dep-bumper
   - build-bosh-utils-image
   - bump-deps
 
@@ -118,18 +116,7 @@ jobs:
         trigger: true
       - put: bosh-utils-image
         params:
-          build: "bosh-utils-dockerfiles/ci/docker/bosh-utils"
-        get_params:
-          skip_download: true
-
-  - name: build-go-dep-bumper
-    public: true
-    plan:
-      - get: bosh-utils-dockerfiles
-        trigger: true
-      - put: go-dep-bumper
-        params:
-          build: "bosh-utils-dockerfiles/ci/docker/go-dep-bumper"
+          build: "bosh-utils-dockerfiles/ci/docker"
         get_params:
           skip_download: true
 
@@ -228,13 +215,6 @@ resources:
     type: docker-image
     source:
       repository: bosh/utils
-      username: ((docker.username))
-      password: ((docker.password))
-
-  - name: go-dep-bumper
-    type: docker-image
-    source:
-      repository: bosh/go-dep-bumper
       username: ((docker.username))
       password: ((docker.password))
 
