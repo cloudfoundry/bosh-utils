@@ -19,6 +19,7 @@ groups:
 
 jobs:
   - name: bump-deps
+    serial: true
     plan:
       - in_parallel:
         - get: weekly
@@ -46,6 +47,7 @@ jobs:
           repository: bumped-bosh-utils
 
   - name: test-unit
+    serial: true
     plan:
       - get: bosh-utils
         trigger: true
@@ -73,6 +75,7 @@ jobs:
         params: { file: version-semver/version }
 
   - name: publish-multidigest-binary
+    serial: true
     plan:
       - get: bosh-utils
         trigger: true
