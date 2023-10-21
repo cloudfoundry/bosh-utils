@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	code.cloudfoundry.org/clock v1.0.0
-	code.cloudfoundry.org/tlsconfig v0.0.0-20230929201433-6cd2b78aba25
+	code.cloudfoundry.org/tlsconfig v0.0.0-20231017135636-f0e44068c22f
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/charlievieth/fs v0.0.3
 	github.com/cloudfoundry/socks5-proxy v0.2.101
