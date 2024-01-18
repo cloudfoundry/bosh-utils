@@ -328,6 +328,28 @@ var _ = Describe("Logger", func() {
 		})
 	})
 
+	Describe("Enabling using tags with different log levels", func() {
+		Describe("when the log level is error", func() {
+			It("overwrites log level with that of used tag", func() {
+				logger := NewWriterLogger(LevelError, outBuf)
+
+				logger.UseTags([]LogTag{{"ForwardHandler", 0}})
+
+				logger.Debug("STANDARD_DEBUG", "some debug log")
+				logger.Info("STANDARD_INFO", "some info log")
+				logger.Warn("STANDARD_WARN", "some warn log")
+				logger.Error("STANDARD_ERROR", "some error log")
+				logger.Debug("ForwardHandler", "debug logs to show")
+
+				Expect(outBuf).ToNot(ContainSubstring("STANDARD_DEBUG"))
+				Expect(outBuf).ToNot(ContainSubstring("STANDARD_INFO"))
+				Expect(outBuf).ToNot(ContainSubstring("STANDARD_WARN"))
+				Expect(outBuf).To(ContainSubstring("STANDARD_ERROR"))
+				Expect(outBuf).To(ContainSubstring("ForwardHandler"))
+			})
+		})
+	})
+
 	It("does not block while printing a string", func() {
 		var slow slowGoStringer
 		logger := NewWriterLogger(LevelError, outBuf)
