@@ -2,7 +2,7 @@
 ## explicit
 code.cloudfoundry.org/clock
 code.cloudfoundry.org/clock/fakeclock
-# code.cloudfoundry.org/tlsconfig v0.0.0-20240116140718-a2c58c2ff70c
+# code.cloudfoundry.org/tlsconfig v0.0.0-20240209182105-bbe53504285f
 ## explicit; go 1.19
 code.cloudfoundry.org/tlsconfig
 # github.com/bmatcuk/doublestar v1.3.4
@@ -14,8 +14,8 @@ github.com/charlievieth/fs
 # github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e
 ## explicit
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.109
-## explicit; go 1.22
+# github.com/cloudfoundry/socks5-proxy v0.2.110
+## explicit; go 1.21
 github.com/cloudfoundry/socks5-proxy
 # github.com/davecgh/go-spew v1.1.1
 ## explicit
