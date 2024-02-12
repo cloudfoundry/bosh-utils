@@ -2,14 +2,14 @@ module github.com/cloudfoundry/bosh-utils
 
 go 1.21
 
-toolchain go1.22.0
+toolchain go1.21.0
 
 require (
 	code.cloudfoundry.org/clock v1.0.0
-	code.cloudfoundry.org/tlsconfig v0.0.0-20240209182105-bbe53504285f
+	code.cloudfoundry.org/tlsconfig v0.0.0-20240212155513-9c53d48c26df
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/charlievieth/fs v0.0.3
-	github.com/cloudfoundry/socks5-proxy v0.2.110
+	github.com/cloudfoundry/socks5-proxy v0.2.111
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jpillora/backoff v1.0.0
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
@@ -35,7 +35,7 @@ require (
 	golang.org/x/crypto v0.19.0 // indirect
 	golang.org/x/sys v0.17.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-	golang.org/x/tools v0.17.0 // indirect
+	golang.org/x/tools v0.18.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
