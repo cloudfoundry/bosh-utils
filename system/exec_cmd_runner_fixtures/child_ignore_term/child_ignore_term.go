@@ -11,7 +11,7 @@ func main() {
 	fmt.Printf("child_pid=%d\n", os.Getpid())
 
 	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGKILL)
+	signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGKILL) //nolint:staticcheck
 
 	go func() {
 		for {

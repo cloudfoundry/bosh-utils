@@ -31,7 +31,7 @@ func TimedReader(buf *bytes.Buffer) error {
 	case <-time.After(time.Second):
 		return errors.New("timeout")
 	}
-	return errors.New("THIS SHOULD NEVER HAPPEN!")
+	return errors.New("THIS SHOULD NEVER HAPPEN!") //nolint:govet
 }
 
 func main() {

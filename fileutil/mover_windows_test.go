@@ -28,7 +28,7 @@ var _ = Describe("Mover", func() {
 		oldLocation = "/path/to/old_file"
 		newLocation = "/path/to/new_file"
 
-		fs.WriteFileString(oldLocation, "some content")
+		fs.WriteFileString(oldLocation, "some content") //nolint:errcheck
 	})
 
 	Context("when Rename fails due to Win32 Error Code ERROR_NOT_SAME_DEVICE", func() {

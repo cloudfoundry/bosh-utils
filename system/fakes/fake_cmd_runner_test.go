@@ -46,7 +46,7 @@ var _ = Describe("FakeCmdRunner", func() {
 		})
 
 		It("pops first result then succeeds properly", func() {
-			_, _, _, err := runner.RunCommand("foo", "bar")
+			_, _, _, err := runner.RunCommand("foo", "bar") //nolint:ineffassign,staticcheck
 			_, _, _, err = runner.RunCommand("foo", "bar")
 			Expect(err).ToNot(HaveOccurred())
 

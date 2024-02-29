@@ -2,14 +2,12 @@ package httpclient_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 	"path/filepath"
 	"sync"
-
-	"errors"
 
 	. "github.com/cloudfoundry/bosh-utils/httpclient"
 	proxy "github.com/cloudfoundry/socks5-proxy"
@@ -38,12 +36,12 @@ var _ = Describe("Socksify", func() {
 				proxyDialer.DialerCall.Returns.DialFunc = proxy.DialFunc(func(x, y string) (net.Conn, error) {
 					return nil, errors.New("proxy dialer")
 				})
-				tempDir, err := ioutil.TempDir("", "")
+				tempDir, err := os.MkdirTemp("", "")
 				Expect(err).NotTo(HaveOccurred())
 				privateKeyPath := filepath.Join(tempDir, "test.key")
-				err = ioutil.WriteFile(privateKeyPath, []byte("some-key"), 0600)
+				err = os.WriteFile(privateKeyPath, []byte("some-key"), 0600)
 				Expect(err).NotTo(HaveOccurred())
-				os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf("ssh+socks5://localhost:12345?private-key=%s", privateKeyPath))
+				os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf("ssh+socks5://localhost:12345?private-key=%s", privateKeyPath)) //nolint:errcheck
 
 				dialFunc = SOCKS5DialContextFuncFromEnvironment(&origDial, proxyDialer)
 			})
@@ -61,12 +59,12 @@ var _ = Describe("Socksify", func() {
 
 			Context("When a 'custom-username' is given in the URL", func() {
 				JustBeforeEach(func() {
-					tempDir, err := ioutil.TempDir("", "")
+					tempDir, err := os.MkdirTemp("", "")
 					Expect(err).NotTo(HaveOccurred())
 					privateKeyPath := filepath.Join(tempDir, "test.key")
-					err = ioutil.WriteFile(privateKeyPath, []byte("some-key"), 0600)
+					err = os.WriteFile(privateKeyPath, []byte("some-key"), 0600)
 					Expect(err).NotTo(HaveOccurred())
-					os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf("ssh+socks5://custom-username@localhost:12345?private-key=%s", privateKeyPath))
+					os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf("ssh+socks5://custom-username@localhost:12345?private-key=%s", privateKeyPath)) //nolint:errcheck
 					dialFunc = SOCKS5DialContextFuncFromEnvironment(&origDial, proxyDialer)
 				})
 				It("Returns a function that creates a socks5 proxy dialer for user 'custom-username'", func() {
@@ -110,7 +108,7 @@ var _ = Describe("Socksify", func() {
 
 			Context("when the URL after the ssh+ prefix cannot be parsed", func() {
 				BeforeEach(func() {
-					os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf("ssh+:cannot-start-with-colon"))
+					os.Setenv("BOSH_ALL_PROXY", "ssh+:cannot-start-with-colon") //nolint:errcheck
 					dialFunc = SOCKS5DialContextFuncFromEnvironment(&origDial, proxyDialer)
 				})
 				It("returns a dialer that returns the url parsing error", func() {
@@ -138,7 +136,7 @@ var _ = Describe("Socksify", func() {
 
 			Context("when the query params do not contain the private key path", func() {
 				BeforeEach(func() {
-					os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf("ssh+socks5://localhost:12345?foo=bar"))
+					os.Setenv("BOSH_ALL_PROXY", "ssh+socks5://localhost:12345?foo=bar") //nolint:errcheck
 					dialFunc = SOCKS5DialContextFuncFromEnvironment(&origDial, proxyDialer)
 				})
 				It("returns a dialer that returns the param not found error", func() {
@@ -152,7 +150,7 @@ var _ = Describe("Socksify", func() {
 
 			Context("when no key exists at the private key path", func() {
 				BeforeEach(func() {
-					os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf("ssh+socks5://localhost:12345?private-key=/no/file/here"))
+					os.Setenv("BOSH_ALL_PROXY", "ssh+socks5://localhost:12345?private-key=/no/file/here") //nolint:errcheck
 					dialFunc = SOCKS5DialContextFuncFromEnvironment(&origDial, proxyDialer)
 				})
 				It("returns a dialer that returns the private key file not found error", func() {
@@ -169,7 +167,7 @@ var _ = Describe("Socksify", func() {
 			// Happy paths not tested
 			Context("when the URL cannot be parsed", func() {
 				BeforeEach(func() {
-					os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf(":cannot-start-with-colon"))
+					os.Setenv("BOSH_ALL_PROXY", ":cannot-start-with-colon") //nolint:errcheck
 					dialFunc = SOCKS5DialContextFuncFromEnvironment(&origDial, proxyDialer)
 				})
 				It("returns a dialer that returns the parsing error", func() {
@@ -183,7 +181,7 @@ var _ = Describe("Socksify", func() {
 
 			Context("when the URL is not a valid proxy scheme", func() {
 				BeforeEach(func() {
-					os.Setenv("BOSH_ALL_PROXY", fmt.Sprintf("foo://cannot-start-with-colon"))
+					os.Setenv("BOSH_ALL_PROXY", "foo://cannot-start-with-colon") //nolint:errcheck
 					dialFunc = SOCKS5DialContextFuncFromEnvironment(&origDial, proxyDialer)
 				})
 				It("returns a dialer returns the invalid proxy scheme error", func() {

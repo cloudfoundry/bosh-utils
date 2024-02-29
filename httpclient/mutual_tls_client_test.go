@@ -3,8 +3,8 @@ package httpclient_test
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/cloudfoundry/bosh-utils/httpclient"
@@ -30,7 +30,7 @@ var _ = Describe("NewMutualTLSClient", func() {
 		identity, err = tls.LoadX509KeyPair("./assets/test_client.pem", "./assets/test_client.key")
 		Expect(err).ToNot(HaveOccurred())
 		// Load CA cert
-		caCert, err := ioutil.ReadFile("./assets/test_ca.pem")
+		caCert, err := os.ReadFile("./assets/test_ca.pem")
 		Expect(err).ToNot(HaveOccurred())
 		caCertPool = x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
@@ -53,11 +53,11 @@ var _ = Describe("NewMutualTLSClient", func() {
 	})
 
 	It("has secure tls defaults", func() {
-		tlsConfigBefore := *tlsConfig
+		tlsConfigBefore := *tlsConfig //nolint:govet
 
 		tlsconfig.WithInternalServiceDefaults()(tlsConfig)
 
-		Expect(*tlsConfig).To(Equal(tlsConfigBefore))
+		Expect(*tlsConfig).To(Equal(tlsConfigBefore)) //nolint:govet
 	})
 
 	It("sets up a timeout", func() {

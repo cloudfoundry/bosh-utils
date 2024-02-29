@@ -2,17 +2,16 @@ package system_test
 
 import (
 	"bytes"
-	"io/ioutil"
 	"math/rand"
+	"os"
 	"path/filepath"
 	"runtime"
+	"testing"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
-
-	"testing"
 )
 
 const Windows = runtime.GOOS == "windows"
@@ -44,7 +43,7 @@ var _ = AfterSuite(func() {
 
 func randSeq(n int) string {
 	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) //nolint:staticcheck
 	b := make([]byte, n)
 	for i := range b {
 		b[i] = letters[rand.Intn(len(letters))]
@@ -55,7 +54,7 @@ func randSeq(n int) string {
 // returns a long directory path rooted at a temp directory root.
 // To cleanup delete the root directory.
 func randLongPath() (root, path string) {
-	tmpdir, err := ioutil.TempDir("", "")
+	tmpdir, err := os.MkdirTemp("", "")
 	Expect(err).To(Succeed())
 	volume := tmpdir + string(filepath.Separator)
 	buf := bytes.NewBufferString(volume)

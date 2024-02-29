@@ -1,7 +1,6 @@
 package main_test
 
 import (
-	"io/ioutil"
 	"os"
 	"os/exec"
 
@@ -18,7 +17,7 @@ var _ = Describe("Verify_multidigest", func() {
 
 	BeforeEach(func() {
 		var err error
-		tempFile, err = ioutil.TempFile("", "multi-digest-test")
+		tempFile, err = os.CreateTemp("", "multi-digest-test")
 		Expect(err).ToNot(HaveOccurred())
 		_, err = tempFile.WriteString("sample content")
 		Expect(err).ToNot(HaveOccurred())
@@ -32,7 +31,7 @@ var _ = Describe("Verify_multidigest", func() {
 	})
 
 	AfterEach(func() {
-		os.Remove(tempFile.Name())
+		os.Remove(tempFile.Name()) //nolint:errcheck
 	})
 
 	Describe("version option", func() {

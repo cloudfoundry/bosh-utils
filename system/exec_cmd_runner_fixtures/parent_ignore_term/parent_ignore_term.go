@@ -13,7 +13,7 @@ func main() {
 	fmt.Printf("parent_pid=%d\n", os.Getpid())
 
 	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGKILL)
+	signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGKILL) //nolint:staticcheck
 
 	go func() {
 		for {
@@ -30,7 +30,7 @@ func main() {
 	cmd := exec.Command(filepath.Join(filepath.Dir(os.Args[0]), "child_ignore_term"))
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Run()
+	cmd.Run() //nolint:errcheck
 
 	// Keep on running even if child dies
 	select {}

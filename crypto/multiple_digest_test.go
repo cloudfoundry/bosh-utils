@@ -2,8 +2,9 @@ package crypto_test
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -13,9 +14,6 @@ import (
 	fakesys "github.com/cloudfoundry/bosh-utils/system/fakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	"errors"
-	"fmt"
 )
 
 var _ = Describe("MultipleDigest", func() {
@@ -77,10 +75,10 @@ var _ = Describe("MultipleDigest", func() {
 
 		BeforeEach(func() {
 			var err error
-			file, err = ioutil.TempFile("", "multiple-digest")
+			file, err = os.CreateTemp("", "multiple-digest")
 			Expect(err).ToNot(HaveOccurred())
 			defer file.Close()
-			file.Write([]byte("fake-contents"))
+			file.Write([]byte("fake-contents")) //nolint:errcheck
 		})
 
 		It("can read a file and verify its content aginst the digest", func() {
@@ -261,10 +259,10 @@ var _ = Describe("MultipleDigest", func() {
 
 	Describe("NewMultipleDigestFromPath", func() {
 		It("returns a multi digest with provided algorithms", func() {
-			file, err := ioutil.TempFile("", "multiple-digest")
+			file, err := os.CreateTemp("", "multiple-digest")
 			Expect(err).ToNot(HaveOccurred())
 			defer file.Close()
-			file.Write([]byte("fake-readSeeker-2-contents"))
+			file.Write([]byte("fake-readSeeker-2-contents")) //nolint:errcheck
 			algos := []Algorithm{
 				DigestAlgorithmSHA1,
 				DigestAlgorithmSHA256,
@@ -278,10 +276,10 @@ var _ = Describe("MultipleDigest", func() {
 		})
 
 		It("return an error when calculation the digest fails", func() {
-			file, err := ioutil.TempFile("", "multiple-digest")
+			file, err := os.CreateTemp("", "multiple-digest")
 			Expect(err).ToNot(HaveOccurred())
 			defer file.Close()
-			file.Write([]byte("fake-readSeeker-2-contents"))
+			file.Write([]byte("fake-readSeeker-2-contents")) //nolint:errcheck
 			algos := []Algorithm{
 				DigestAlgorithmSHA1,
 				DigestAlgorithmSHA256,
@@ -321,14 +319,14 @@ var _ = Describe("MultipleDigest", func() {
 		)
 
 		BeforeEach(func() {
-			file, err := ioutil.TempFile("", "multiple-digest")
+			file, err := os.CreateTemp("", "multiple-digest")
 			Expect(err).ToNot(HaveOccurred())
-			file.Write([]byte("fake-readSeeker-2-contents"))
+			file.Write([]byte("fake-readSeeker-2-contents")) //nolint:errcheck
 			readSeeker = file
 		})
 
 		AfterEach(func() {
-			file.Close()
+			file.Close() //nolint:errcheck
 		})
 
 		It("returns a multi digest with provided algorithms", func() {

@@ -54,13 +54,13 @@ var _ = Describe("localBlobstore", func() {
 
 	Describe("Get", func() {
 		It("fetches the local blob contents", func() {
-			fs.WriteFileString(fakeBlobstorePath+"/fake-blob-id", "fake contents")
+			fs.WriteFileString(fakeBlobstorePath+"/fake-blob-id", "fake contents") //nolint:errcheck
 
 			tempFile, err := fs.TempFile("bosh-blobstore-local-TestLocalGet")
 			Expect(err).ToNot(HaveOccurred())
 
 			fs.ReturnTempFile = tempFile
-			defer fs.RemoveAll(tempFile.Name())
+			defer fs.RemoveAll(tempFile.Name()) //nolint:errcheck
 
 			_, err = blobstore.Get("fake-blob-id")
 			Expect(err).ToNot(HaveOccurred())
@@ -85,7 +85,7 @@ var _ = Describe("localBlobstore", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			fs.ReturnTempFile = tempFile
-			defer fs.RemoveAll(tempFile.Name())
+			defer fs.RemoveAll(tempFile.Name()) //nolint:errcheck
 
 			fs.CopyFileError = errors.New("fake-copy-file-error")
 
@@ -104,7 +104,7 @@ var _ = Describe("localBlobstore", func() {
 			Expect(err).ToNot(HaveOccurred())
 			fileName := file.Name()
 
-			defer fs.RemoveAll(fileName)
+			defer fs.RemoveAll(fileName) //nolint:errcheck
 
 			err = blobstore.CleanUp(fileName)
 			Expect(err).ToNot(HaveOccurred())
@@ -114,7 +114,7 @@ var _ = Describe("localBlobstore", func() {
 
 	Describe("Create", func() {
 		It("creates the local blob", func() {
-			fs.WriteFileString("/fake-file.txt", "fake-file-contents")
+			fs.WriteFileString("/fake-file.txt", "fake-file-contents") //nolint:errcheck
 
 			uuidGen.GeneratedUUID = "some-uuid"
 
@@ -148,7 +148,7 @@ var _ = Describe("localBlobstore", func() {
 		})
 
 		It("errs when copy file errs", func() {
-			fs.WriteFileString("/fake-file.txt", "fake-file-contents")
+			fs.WriteFileString("/fake-file.txt", "fake-file-contents") //nolint:errcheck
 
 			uuidGen.GeneratedUUID = "some-uuid"
 			fs.CopyFileError = errors.New("fake-copy-file-error")
@@ -161,7 +161,7 @@ var _ = Describe("localBlobstore", func() {
 
 	Describe("Delete", func() {
 		It("removes the blob from the blobstore", func() {
-			fs.WriteFileString("/fake-file.txt", "fake-file-contents")
+			fs.WriteFileString("/fake-file.txt", "fake-file-contents") //nolint:errcheck
 			blobID, err := blobstore.Create("/fake-file.txt")
 			Expect(err).ToNot(HaveOccurred())
 
@@ -180,7 +180,7 @@ var _ = Describe("localBlobstore", func() {
 			fs.RemoveAllStub = func(_ string) error {
 				return errors.New("failed to remove")
 			}
-			fs.WriteFileString("/fake-file.txt", "fake-file-contents")
+			fs.WriteFileString("/fake-file.txt", "fake-file-contents") //nolint:errcheck
 			blobID, err := blobstore.Create("/fake-file.txt")
 			Expect(err).ToNot(HaveOccurred())
 

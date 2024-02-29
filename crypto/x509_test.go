@@ -35,7 +35,7 @@ QAOSxgrLBblGLWcDF9fjMeYaUnI34pHviCKeVxfgsxDR+Jg11F78sPdYLOF6ipBe
 
 			certPool, err := crypto.CertPoolFromPEM([]byte(caCert))
 			Expect(err).ToNot(HaveOccurred())
-			Expect(certPool.Subjects()[0]).To(ContainSubstring("Internet Widgits Pty Ltd"))
+			Expect(certPool.Subjects()[0]).To(ContainSubstring("Internet Widgits Pty Ltd")) //nolint:staticcheck
 		})
 
 		It("returns error if PEM formatted block is invalid", func() {
@@ -133,9 +133,9 @@ nH9ttalAwSLBsobVaK8mmiAdtAdx+CmHWrB4UNxCPYasrt5A6a9A9SiQ2dLd
 
 			certPool, err := crypto.CertPoolFromPEM([]byte(caCert))
 			Expect(err).ToNot(HaveOccurred())
-			Expect(len(certPool.Subjects())).To(Equal(2))
-			Expect(certPool.Subjects()[0]).To(ContainSubstring("Internet Widgits Pty Ltd"))
-			Expect(certPool.Subjects()[1]).To(ContainSubstring("Cloud Foundry"))
+			Expect(len(certPool.Subjects())).To(Equal(2))                                   //nolint:staticcheck
+			Expect(certPool.Subjects()[0]).To(ContainSubstring("Internet Widgits Pty Ltd")) //nolint:staticcheck
+			Expect(certPool.Subjects()[1]).To(ContainSubstring("Cloud Foundry"))            //nolint:staticcheck
 		})
 	})
 })

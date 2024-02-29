@@ -9,8 +9,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"io/ioutil"
-
 	fsWrapper "github.com/charlievieth/fs"
 )
 
@@ -40,7 +38,7 @@ var _ = Describe("Windows Specific tests", func() {
 
 			dstPath, err := osFs.TempDir("CopyDirTestDest")
 			Expect(err).ToNot(HaveOccurred())
-			defer osFs.RemoveAll(dstPath)
+			defer osFs.RemoveAll(dstPath) //nolint:errcheck
 
 			err = osFs.CopyDir(srcPath, dstPath)
 			Expect(err).ToNot(HaveOccurred())
@@ -57,10 +55,10 @@ var _ = Describe("Windows Specific tests", func() {
 
 		rootPath, longPath := randLongPath()
 		err := fsWrapper.MkdirAll(longPath, 0755)
-		defer fsWrapper.RemoveAll(rootPath)
+		defer fsWrapper.RemoveAll(rootPath) //nolint:errcheck
 		Expect(err).ToNot(HaveOccurred())
 
-		dstFile, err := ioutil.TempFile(`\\?\`+longPath, "")
+		dstFile, err := os.CreateTemp(`\\?\`+longPath, "")
 		Expect(err).ToNot(HaveOccurred())
 
 		dstPath := path.Join(longPath, filepath.Base(dstFile.Name()))
@@ -81,8 +79,8 @@ var _ = Describe("Windows Specific tests", func() {
 	// Alert future developers that a previously unimplemented
 	// function in the os package is now implemented on Windows.
 	It("fails if os features are implemented in Windows", func() {
-		Expect(os.Chown("", 0, 0)).To(Equal(&os.PathError{"chown", "", syscall.EWINDOWS}), "os.Chown")
-		Expect(os.Lchown("", 0, 0)).To(Equal(&os.PathError{"lchown", "", syscall.EWINDOWS}), "os.Lchown")
+		Expect(os.Chown("", 0, 0)).To(Equal(&os.PathError{"chown", "", syscall.EWINDOWS}), "os.Chown")    //nolint:govet
+		Expect(os.Lchown("", 0, 0)).To(Equal(&os.PathError{"lchown", "", syscall.EWINDOWS}), "os.Lchown") //nolint:govet
 
 		Expect(os.Getuid()).To(Equal(-1), "os.Getuid")
 		Expect(os.Geteuid()).To(Equal(-1), "os.Geteuid")

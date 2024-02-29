@@ -2,7 +2,6 @@ package system_test
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -45,15 +44,15 @@ var _ = Describe("Long Paths", func() {
 
 	AfterEach(func() {
 		// don't check for error!
-		fs.RemoveAll(rootPath)
-		fs.Remove(LongPath)
+		fs.RemoveAll(rootPath) //nolint:errcheck
+		fs.Remove(LongPath)    //nolint:errcheck
 	})
 
 	// TODO: make sure we can cleanup before running tests
 	It("the fs package can cleanup long paths and dirs", func() {
 		f, err := fs.Create(LongPath)
 		Expect(err).To(Succeed())
-		f.Close()
+		f.Close() //nolint:errcheck
 		Expect(fs.Remove(LongPath)).To(Succeed())
 
 		Expect(fs.MkdirAll(LongDir, 0755)).To(Succeed())
@@ -74,7 +73,7 @@ var _ = Describe("Long Paths", func() {
 	It("can create and delete a file with a long path", func() {
 		f, err := osFs.OpenFile(LongPath, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
 		Expect(err).To(Succeed())
-		f.Close()
+		f.Close() //nolint:errcheck
 		Expect(osFs.RemoveAll(LongPath)).To(Succeed())
 	})
 
@@ -126,7 +125,7 @@ var _ = Describe("Long Paths", func() {
 		for newPath == LongPath {
 			newPath = filepath.Join(os.TempDir(), randSeq(LONG_PATH_LENGTH))
 		}
-		defer fs.Remove(newPath)
+		defer fs.Remove(newPath) //nolint:errcheck
 
 		Expect(osFs.WriteFileString(LongPath, "abc")).To(Succeed())
 		Expect(osFs.Rename(LongPath, newPath)).To(Succeed())
@@ -138,7 +137,7 @@ var _ = Describe("Long Paths", func() {
 		for newPath == LongPath {
 			newPath = filepath.Join(os.TempDir(), randSeq(LONG_PATH_LENGTH))
 		}
-		defer fs.Remove(newPath)
+		defer fs.Remove(newPath) //nolint:errcheck
 
 		Expect(osFs.WriteFileString(LongPath, "abc")).To(Succeed())
 		Expect(osFs.Symlink(LongPath, newPath)).To(Succeed())
@@ -157,7 +156,7 @@ var _ = Describe("Long Paths", func() {
 		for newPath == LongPath {
 			newPath = filepath.Join(os.TempDir(), randSeq(LONG_PATH_LENGTH))
 		}
-		defer fs.Remove(newPath)
+		defer fs.Remove(newPath) //nolint:errcheck
 
 		Expect(osFs.WriteFileString(LongPath, content)).To(Succeed())
 		Expect(osFs.CopyFile(LongPath, newPath)).To(Succeed())
@@ -174,7 +173,7 @@ var _ = Describe("Long Paths", func() {
 		lastFilePath := filepath.Join(LongDir, "a.txt")
 		Expect(osFs.WriteFileString(lastFilePath, content)).To(Succeed())
 
-		newRoot, err := ioutil.TempDir("", "")
+		newRoot, err := os.MkdirTemp("", "")
 		Expect(err).To(Succeed())
 
 		// expFilePath should contain the contents of lastFilePath.

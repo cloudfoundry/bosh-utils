@@ -105,7 +105,7 @@ var _ = Describe("checksumVerifiableBlobstore", func() {
 	Describe("Create", func() {
 		BeforeEach(func() {
 			fakeFile := fakesys.NewFakeFile(fixturePath, fs)
-			fakeFile.Write([]byte("blargityblargblarg"))
+			fakeFile.Write([]byte("blargityblargblarg")) //nolint:errcheck
 			fs.RegisterOpenFile(fixturePath, fakeFile)
 		})
 

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	osuser "os/user"
@@ -36,7 +35,7 @@ func readFile(file *os.File) string {
 		return ""
 	}
 
-	return string(buf.Bytes())
+	return buf.String()
 }
 
 var _ = Describe("OS FileSystem", func() {
@@ -44,12 +43,12 @@ var _ = Describe("OS FileSystem", func() {
 
 	BeforeEach(func() {
 		var err error
-		TempDir, err = ioutil.TempDir("", "bosh-utils-")
+		TempDir, err = os.MkdirTemp("", "bosh-utils-")
 		Expect(err).ToNot(HaveOccurred())
 	})
 
 	AfterEach(func() {
-		os.RemoveAll(TempDir)
+		os.RemoveAll(TempDir) //nolint:errcheck
 	})
 
 	It("home dir", func() {
@@ -167,7 +166,7 @@ var _ = Describe("OS FileSystem", func() {
 		err = os.Chmod(compPath, os.FileMode(0666))
 		Expect(err).ToNot(HaveOccurred())
 
-		fileStat, err := os.Stat(testPath)
+		fileStat, err := os.Stat(testPath) //nolint:ineffassign,staticcheck
 		compStat, err := os.Stat(compPath)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(fileStat.Mode()).To(Equal(compStat.Mode()))
@@ -178,7 +177,7 @@ var _ = Describe("OS FileSystem", func() {
 		err = os.Chmod(compPath, os.FileMode(0644))
 		Expect(err).ToNot(HaveOccurred())
 
-		fileStat, err = os.Stat(testPath)
+		fileStat, err = os.Stat(testPath) //nolint:ineffassign,staticcheck
 		compStat, err = os.Stat(compPath)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(fileStat.Mode()).To(Equal(compStat.Mode()))
@@ -193,8 +192,8 @@ var _ = Describe("OS FileSystem", func() {
 
 		Expect(err).ToNot(HaveOccurred())
 
-		file.Write([]byte("testing new file"))
-		file.Close()
+		file.Write([]byte("testing new file")) //nolint:errcheck
+		file.Close()                           //nolint:errcheck
 
 		createdFile, err := os.Open(testPath)
 		Expect(err).ToNot(HaveOccurred())
@@ -245,21 +244,21 @@ var _ = Describe("OS FileSystem", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(written).To(BeTrue())
 
-			file.Close()
+			file.Close() //nolint:errcheck
 			file, err = os.Open(testPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(readFile(file)).To(Equal("second write"))
 
-			file.Close()
-			file, err = os.Open(testPath)
-			defer file.Close()
+			file.Close()                  //nolint:errcheck
+			file, err = os.Open(testPath) //nolint:ineffassign,staticcheck
+			defer file.Close()            //nolint:staticcheck
 
 			written, err = osFs.ConvergeFileContents(testPath, []byte("second write"))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(written).To(BeFalse())
 			Expect(readFile(file)).To(Equal("second write"))
-			file.Close()
+			file.Close() //nolint:errcheck
 		})
 
 		It("does create file if dry run option is set", func() {
@@ -300,7 +299,7 @@ var _ = Describe("OS FileSystem", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(written).To(BeTrue())
 
-			file.Close()
+			file.Close() //nolint:errcheck
 			file, err = os.Open(testPath)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(readFile(file)).To(Equal("initial write"))
@@ -310,11 +309,11 @@ var _ = Describe("OS FileSystem", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(written).To(BeTrue())
 
-			file.Close()
+			file.Close() //nolint:errcheck
 			file, err = os.Open(testPath)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(readFile(file)).To(Equal("initial write"))
-			file.Close()
+			file.Close() //nolint:errcheck
 		})
 	})
 
@@ -325,7 +324,7 @@ var _ = Describe("OS FileSystem", func() {
 
 			f, err := os.OpenFile(testPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(0200))
 			Expect(err).ToNot(HaveOccurred())
-			f.Close()
+			f.Close() //nolint:errcheck
 			defer os.Remove(testPath)
 
 			err = osFs.WriteFile(testPath, []byte("test"))
@@ -403,7 +402,7 @@ var _ = Describe("OS FileSystem", func() {
 				osFs := NewOsFileSystem(logger)
 				testPath := filepath.Join(TempDir, "ReadFileTestFile")
 
-				osFs.WriteFileQuietly(testPath, []byte("some contents"))
+				osFs.WriteFileQuietly(testPath, []byte("some contents")) //nolint:errcheck
 				defer os.Remove(testPath)
 
 				beforeCount := logger.DebugCallCount()
@@ -423,7 +422,7 @@ var _ = Describe("OS FileSystem", func() {
 				osFs := NewOsFileSystem(logger)
 				testPath := filepath.Join(TempDir, "ReadFileTestFile")
 
-				osFs.WriteFileQuietly(testPath, []byte("some contents"))
+				osFs.WriteFileQuietly(testPath, []byte("some contents")) //nolint:errcheck
 				defer os.Remove(testPath)
 
 				beforeCount := logger.DebugCallCount()
@@ -445,7 +444,7 @@ var _ = Describe("OS FileSystem", func() {
 
 		Expect(osFs.FileExists(testPath)).To(BeFalse())
 
-		osFs.WriteFileString(testPath, "initial write")
+		osFs.WriteFileString(testPath, "initial write") //nolint:errcheck
 		defer os.Remove(testPath)
 
 		Expect(osFs.FileExists(testPath)).To(BeTrue())
@@ -458,10 +457,10 @@ var _ = Describe("OS FileSystem", func() {
 		oldFilePath := filepath.Join(oldPath, "test.txt")
 		newPath := filepath.Join(tempDir, "new")
 
-		os.Mkdir(oldPath, os.ModePerm)
+		os.Mkdir(oldPath, os.ModePerm) //nolint:errcheck
 		f, err := os.Create(oldFilePath)
 		Expect(err).ToNot(HaveOccurred())
-		f.Close()
+		f.Close() //nolint:errcheck
 
 		err = osFs.Rename(oldPath, newPath)
 		Expect(err).ToNot(HaveOccurred())
@@ -478,11 +477,11 @@ var _ = Describe("OS FileSystem", func() {
 			osFs := createOsFs()
 			filePath := filepath.Join(TempDir, "SymlinkTestFile")
 			containingDir := filepath.Join(TempDir, "SubDir")
-			os.Remove(containingDir)
+			os.Remove(containingDir) //nolint:errcheck
 			symlinkPath := filepath.Join(containingDir, "SymlinkTestSymlink")
 
-			osFs.WriteFileString(filePath, "some content")
-			osFs.Symlink(filePath, symlinkPath)
+			osFs.WriteFileString(filePath, "some content") //nolint:errcheck
+			osFs.Symlink(filePath, symlinkPath)            //nolint:errcheck
 
 			symlinkStats, err := os.Lstat(symlinkPath)
 			Expect(err).ToNot(HaveOccurred())
@@ -498,9 +497,9 @@ var _ = Describe("OS FileSystem", func() {
 			symlinkPath := filepath.Join(TempDir, "SymlinkTestIdempotent1Symlink")
 
 			osFs := createOsFs()
-			osFs.WriteFileString(filePath, "some content")
+			osFs.WriteFileString(filePath, "some content") //nolint:errcheck
 
-			osFs.Symlink(filePath, symlinkPath)
+			osFs.Symlink(filePath, symlinkPath) //nolint:errcheck
 
 			firstSymlinkStats, err := os.Lstat(symlinkPath)
 			Expect(err).ToNot(HaveOccurred())
@@ -519,8 +518,8 @@ var _ = Describe("OS FileSystem", func() {
 			otherFilePath := filepath.Join(TempDir, "SymlinkTestIdempotent1OtherFile")
 			symlinkPath := filepath.Join(TempDir, "SymlinkTestIdempotent1Symlink")
 
-			osFs.WriteFileString(filePath, "some content")
-			osFs.WriteFileString(otherFilePath, "other content")
+			osFs.WriteFileString(filePath, "some content")       //nolint:errcheck
+			osFs.WriteFileString(otherFilePath, "other content") //nolint:errcheck
 
 			err := osFs.Symlink(otherFilePath, symlinkPath)
 			Expect(err).ToNot(HaveOccurred())
@@ -542,8 +541,8 @@ var _ = Describe("OS FileSystem", func() {
 			filePath := filepath.Join(TempDir, "SymlinkTestIdempotent1File")
 			symlinkPath := filepath.Join(TempDir, "SymlinkTestIdempotent1Symlink")
 
-			osFs.WriteFileString(filePath, "some content")
-			osFs.WriteFileString(symlinkPath, "some other content")
+			osFs.WriteFileString(filePath, "some content")          //nolint:errcheck
+			osFs.WriteFileString(symlinkPath, "some other content") //nolint:errcheck
 
 			err := osFs.Symlink(filePath, symlinkPath)
 			Expect(err).ToNot(HaveOccurred())
@@ -563,13 +562,14 @@ var _ = Describe("OS FileSystem", func() {
 			fileB := filepath.Join(TempDir, "file_b")
 			symlinkPath := filepath.Join(TempDir, "symlink")
 
-			osFs.WriteFileString(fileA, "file a")
-			osFs.WriteFileString(fileB, "file b")
+			osFs.WriteFileString(fileA, "file a") //nolint:errcheck
+			osFs.WriteFileString(fileB, "file b") //nolint:errcheck
 
 			err := osFs.Symlink(fileA, symlinkPath)
 			Expect(err).ToNot(HaveOccurred())
 
-			os.Remove(fileA) // creates a broken symlink
+			// creates a broken symlink
+			os.Remove(fileA) //nolint:errcheck
 
 			err = osFs.Symlink(fileB, symlinkPath)
 			Expect(err).ToNot(HaveOccurred())
@@ -604,7 +604,7 @@ var _ = Describe("OS FileSystem", func() {
 			Expect(err).To(Succeed())
 			Expect(s).To(Equal(Content))
 
-			names, err := ioutil.ReadDir(targetDir)
+			names, err := os.ReadDir(targetDir)
 			Expect(err).To(Succeed())
 			Expect(names).To(HaveLen(1))
 			Expect(names[0].Name()).To(Equal("file.txt"))
@@ -634,7 +634,7 @@ var _ = Describe("OS FileSystem", func() {
 		containingDir := filepath.Join(TempDir, "SubDir")
 		symlinkPath := filepath.Join(containingDir, "SymlinkTestSymlink")
 
-		osFs.WriteFileString(targetPath, "some content")
+		osFs.WriteFileString(targetPath, "some content") //nolint:errcheck
 		defer os.Remove(targetPath)
 
 		err := osFs.Symlink(targetPath, symlinkPath)
@@ -667,9 +667,9 @@ var _ = Describe("OS FileSystem", func() {
 		})
 
 		AfterEach(func() {
-			os.Remove(symlinkPath)
-			os.Remove(targetPath)
-			os.Remove(containingDir)
+			os.Remove(symlinkPath)   //nolint:errcheck
+			os.Remove(targetPath)    //nolint:errcheck
+			os.Remove(containingDir) //nolint:errcheck
 		})
 
 		Context("when the link does not exist", func() {
@@ -759,12 +759,12 @@ var _ = Describe("OS FileSystem", func() {
 		})
 
 		AfterEach(func() {
-			os.Remove(TempDir)
+			os.Remove(TempDir) //nolint:errcheck
 		})
 
 		Context("a temp root is set", func() {
 			BeforeEach(func() {
-				osFs.ChangeTempRoot(TempDir)
+				osFs.ChangeTempRoot(TempDir) //nolint:errcheck
 			})
 
 			It("creates temp files under that root", func() {
@@ -807,7 +807,7 @@ var _ = Describe("OS FileSystem", func() {
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(dstFile.Name())
 
-			err = osFs.CopyFile(srcPath, dstFile.Name())
+			err = osFs.CopyFile(srcPath, dstFile.Name()) //nolint:ineffassign,staticcheck
 
 			fooContent, err := osFs.ReadFileString(dstFile.Name())
 			Expect(err).ToNot(HaveOccurred())
@@ -869,7 +869,7 @@ var _ = Describe("OS FileSystem", func() {
 			srcPath := "test_assets/test_copy_dir_entries"
 			dstPath, err := osFs.TempDir("CopyDirTestDir")
 			Expect(err).ToNot(HaveOccurred())
-			defer osFs.RemoveAll(dstPath)
+			defer osFs.RemoveAll(dstPath) //nolint:errcheck
 
 			err = osFs.CopyDir(srcPath, dstPath)
 			Expect(err).ToNot(HaveOccurred())
@@ -899,7 +899,7 @@ var _ = Describe("OS FileSystem", func() {
 			srcPath := "test_assets/test_copy_dir_entries"
 			dstPath, err := osFs.TempDir("CopyDirTestDir")
 			Expect(err).ToNot(HaveOccurred())
-			defer osFs.RemoveAll(dstPath)
+			defer osFs.RemoveAll(dstPath) //nolint:errcheck
 
 			err = osFs.CopyDir(srcPath, dstPath)
 			Expect(err).ToNot(HaveOccurred())
@@ -946,7 +946,7 @@ var _ = Describe("OS FileSystem", func() {
 
 		dstPath := dstFile.Name()
 		defer os.Remove(dstPath)
-		dstFile.Close()
+		dstFile.Close() //nolint:errcheck
 
 		err = osFs.RemoveAll(dstFile.Name())
 		Expect(err).ToNot(HaveOccurred())
