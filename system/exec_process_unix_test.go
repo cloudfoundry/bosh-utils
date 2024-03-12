@@ -5,7 +5,6 @@ package system_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -56,7 +55,7 @@ var _ = Describe("execProcess", func() {
 				err error
 			)
 
-			buildDir, err = ioutil.TempDir("", "TerminateNicely")
+			buildDir, err = os.MkdirTemp("", "TerminateNicely")
 			Expect(err).ToNot(HaveOccurred())
 
 			exesToCompile := []string{
@@ -76,7 +75,7 @@ var _ = Describe("execProcess", func() {
 		})
 
 		AfterEach(func() {
-			os.RemoveAll(buildDir)
+			os.RemoveAll(buildDir) //nolint:errcheck
 		})
 
 		//for _, keepAttached := range []bool{true, false} {

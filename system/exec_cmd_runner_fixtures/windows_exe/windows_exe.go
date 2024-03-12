@@ -10,7 +10,7 @@ import (
 func main() {
 	sigCh := make(chan os.Signal, 1)
 
-	signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGKILL)
+	signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGKILL) //nolint:staticcheck
 
 	done := make(chan struct{})
 	var exitStatus int

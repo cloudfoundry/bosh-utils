@@ -2,16 +2,15 @@ package httpclient_test
 
 import (
 	"bytes"
-	"io/ioutil"
+	"crypto/tls"
+	"io"
 	"net"
 	"net/http"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"
-
-	"crypto/tls"
-	"time"
 
 	. "github.com/cloudfoundry/bosh-utils/httpclient"
 	"github.com/cloudfoundry/bosh-utils/logger/loggerfakes"
@@ -70,7 +69,7 @@ var _ = Describe("HTTPClient", func() {
 
 			defer response.Body.Close()
 
-			responseBody, err := ioutil.ReadAll(response.Body)
+			responseBody, err := io.ReadAll(response.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(responseBody).To(Equal([]byte("post-response")))
@@ -95,7 +94,7 @@ var _ = Describe("HTTPClient", func() {
 
 			setHeaders := func(r *http.Request) {
 				r.Header.Add("X-Custom", "custom")
-				r.Body = ioutil.NopCloser(bytes.NewBufferString("post-request-override"))
+				r.Body = io.NopCloser(bytes.NewBufferString("post-request-override"))
 				r.ContentLength = 21
 			}
 
@@ -104,7 +103,7 @@ var _ = Describe("HTTPClient", func() {
 
 			defer response.Body.Close()
 
-			responseBody, err := ioutil.ReadAll(response.Body)
+			responseBody, err := io.ReadAll(response.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(responseBody).To(Equal([]byte("post-response")))
@@ -162,7 +161,7 @@ var _ = Describe("HTTPClient", func() {
 
 				url := "https://oauth-url?refresh_token=abc&param2=xyz"
 
-				httpClient.PostCustomized(url, []byte("post-request"), func(r *http.Request) {})
+				httpClient.PostCustomized(url, []byte("post-request"), func(r *http.Request) {}) //nolint:errcheck
 				_, _, args := logger.DebugArgsForCall(0)
 				Expect(args[0]).To(ContainSubstring("param2=xyz"))
 				Expect(args[0]).To(ContainSubstring("refresh_token=abc"))
@@ -198,7 +197,7 @@ var _ = Describe("HTTPClient", func() {
 				It("redacts every query param from endpoint for https calls", func() {
 					url := "https://oauth-url?refresh_token=abc&param2=xyz"
 
-					httpClient.PostCustomized(url, []byte("post-request"), func(r *http.Request) {})
+					httpClient.PostCustomized(url, []byte("post-request"), func(r *http.Request) {}) //nolint:errcheck
 					_, _, args := logger.DebugArgsForCall(0)
 					Expect(args[0]).To(ContainSubstring("param2=<redacted>"))
 					Expect(args[0]).To(ContainSubstring("refresh_token=<redacted>"))
@@ -266,7 +265,7 @@ var _ = Describe("HTTPClient", func() {
 			It("does not redact every query param from endpoint for https calls", func() {
 				url := "https://oauth-url?refresh_token=abc&param2=xyz"
 
-				httpClient.Delete(url)
+				httpClient.Delete(url) //nolint:errcheck
 				_, _, args := logger.DebugArgsForCall(0)
 				Expect(args[0]).To(ContainSubstring("param2=xyz"))
 				Expect(args[0]).To(ContainSubstring("refresh_token=abc"))
@@ -302,7 +301,7 @@ var _ = Describe("HTTPClient", func() {
 				It("redacts every query param from endpoint for https calls", func() {
 					url := "https://oauth-url?refresh_token=abc&param2=xyz"
 
-					httpClient.Delete(url)
+					httpClient.Delete(url) //nolint:errcheck
 					_, _, args := logger.DebugArgsForCall(0)
 					Expect(args[0]).To(ContainSubstring("param2=<redacted>"))
 					Expect(args[0]).To(ContainSubstring("refresh_token=<redacted>"))
@@ -330,7 +329,7 @@ var _ = Describe("HTTPClient", func() {
 
 			defer response.Body.Close()
 
-			responseBody, err := ioutil.ReadAll(response.Body)
+			responseBody, err := io.ReadAll(response.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(responseBody).To(Equal([]byte("put-response")))
@@ -355,7 +354,7 @@ var _ = Describe("HTTPClient", func() {
 
 			setHeaders := func(r *http.Request) {
 				r.Header.Add("X-Custom", "custom")
-				r.Body = ioutil.NopCloser(bytes.NewBufferString("put-request-override"))
+				r.Body = io.NopCloser(bytes.NewBufferString("put-request-override"))
 				r.ContentLength = 20
 			}
 
@@ -364,7 +363,7 @@ var _ = Describe("HTTPClient", func() {
 
 			defer response.Body.Close()
 
-			responseBody, err := ioutil.ReadAll(response.Body)
+			responseBody, err := io.ReadAll(response.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(responseBody).To(Equal([]byte("put-response")))
@@ -421,7 +420,7 @@ var _ = Describe("HTTPClient", func() {
 			It("does not redact every query param from endpoint for https calls", func() {
 				url := "https://oauth-url?refresh_token=abc&param2=xyz"
 
-				httpClient.PutCustomized(url, []byte("post-request"), func(r *http.Request) {})
+				httpClient.PutCustomized(url, []byte("post-request"), func(r *http.Request) {}) //nolint:errcheck
 				_, _, args := logger.DebugArgsForCall(0)
 				Expect(args[0]).To(ContainSubstring("param2=xyz"))
 				Expect(args[0]).To(ContainSubstring("refresh_token=abc"))
@@ -457,7 +456,7 @@ var _ = Describe("HTTPClient", func() {
 				It("redacts every query param from endpoint for https calls", func() {
 					url := "https://oauth-url?refresh_token=abc&param2=xyz"
 
-					httpClient.PutCustomized(url, []byte("post-request"), func(r *http.Request) {})
+					httpClient.PutCustomized(url, []byte("post-request"), func(r *http.Request) {}) //nolint:errcheck
 					_, _, args := logger.DebugArgsForCall(0)
 					Expect(args[0]).To(ContainSubstring("param2=<redacted>"))
 					Expect(args[0]).To(ContainSubstring("refresh_token=<redacted>"))
@@ -484,7 +483,7 @@ var _ = Describe("HTTPClient", func() {
 
 			defer response.Body.Close()
 
-			responseBody, err := ioutil.ReadAll(response.Body)
+			responseBody, err := io.ReadAll(response.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(responseBody).To(Equal([]byte("get-response")))
@@ -515,7 +514,7 @@ var _ = Describe("HTTPClient", func() {
 
 			defer response.Body.Close()
 
-			responseBody, err := ioutil.ReadAll(response.Body)
+			responseBody, err := io.ReadAll(response.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(responseBody).To(Equal([]byte("get-response")))
@@ -572,7 +571,7 @@ var _ = Describe("HTTPClient", func() {
 			It("does not redact every query param from endpoint for https calls", func() {
 				url := "https://oauth-url?refresh_token=abc&param2=xyz"
 
-				httpClient.GetCustomized(url, func(r *http.Request) {})
+				httpClient.GetCustomized(url, func(r *http.Request) {}) //nolint:errcheck
 				_, _, args := logger.DebugArgsForCall(0)
 				Expect(args[0]).To(ContainSubstring("param2=xyz"))
 				Expect(args[0]).To(ContainSubstring("refresh_token=abc"))
@@ -608,7 +607,7 @@ var _ = Describe("HTTPClient", func() {
 				It("redacts every query param from endpoint for https calls", func() {
 					url := "https://oauth-url?refresh_token=abc&param2=xyz"
 
-					httpClient.GetCustomized(url, func(r *http.Request) {})
+					httpClient.GetCustomized(url, func(r *http.Request) {}) //nolint:errcheck
 					_, _, args := logger.DebugArgsForCall(0)
 					Expect(args[0]).To(ContainSubstring("param2=<redacted>"))
 					Expect(args[0]).To(ContainSubstring("refresh_token=<redacted>"))

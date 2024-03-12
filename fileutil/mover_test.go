@@ -25,7 +25,7 @@ var _ = Describe("Mover", func() {
 		oldLocation = "/path/to/old_file"
 		newLocation = "/path/to/new_file"
 
-		fs.WriteFileString(oldLocation, "some content")
+		fs.WriteFileString(oldLocation, "some content") //nolint:errcheck
 	})
 
 	It("renames the file", func() {

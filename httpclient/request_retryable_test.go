@@ -1,10 +1,11 @@
 package httpclient_test
 
 import (
+	"bytes"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 
@@ -13,9 +14,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"
-
-	"bytes"
-	"os"
 
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 )
@@ -34,7 +32,7 @@ var _ = Describe("RequestRetryable", func() {
 			logger = boshlog.NewLogger(boshlog.LevelNone)
 
 			var err error
-			request, err = http.NewRequest("GET", server.URL(), ioutil.NopCloser(strings.NewReader("fake-request-body")))
+			request, err = http.NewRequest("GET", server.URL(), io.NopCloser(strings.NewReader("fake-request-body")))
 			Expect(err).NotTo(HaveOccurred())
 
 			client := &http.Client{Transport: &http.Transport{}}
@@ -100,7 +98,7 @@ var _ = Describe("RequestRetryable", func() {
 
 			It("os.File conforms to the Seekable interface", func() {
 				var seekable io.ReadSeeker
-				seekable, err := ioutil.TempFile(os.TempDir(), "seekable")
+				seekable, err := os.CreateTemp(os.TempDir(), "seekable")
 				Expect(err).ToNot(HaveOccurred())
 				_, err = seekable.Seek(0, 0)
 				Expect(err).ToNot(HaveOccurred())
@@ -306,7 +304,7 @@ func NewSeekableReadClose(content []byte) *seekableReadClose {
 	return &seekableReadClose{
 		Seeked:     false,
 		content:    content,
-		readCloser: ioutil.NopCloser(bytes.NewReader(content)),
+		readCloser: io.NopCloser(bytes.NewReader(content)),
 	}
 }
 
@@ -314,7 +312,7 @@ func (s *seekableReadClose) Seek(offset int64, whence int) (ret int64, err error
 	s.readCloserMutex.Lock()
 	defer s.readCloserMutex.Unlock()
 
-	s.readCloser = ioutil.NopCloser(bytes.NewReader(s.content))
+	s.readCloser = io.NopCloser(bytes.NewReader(s.content))
 	s.Seeked = true
 	return 0, nil
 }
@@ -337,7 +335,7 @@ func (s *seekableReadClose) Close() error {
 
 func readString(body io.ReadCloser) string {
 	defer body.Close()
-	content, err := ioutil.ReadAll(body)
+	content, err := io.ReadAll(body)
 	Expect(err).ToNot(HaveOccurred())
 	return string(content)
 }

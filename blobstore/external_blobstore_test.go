@@ -66,7 +66,7 @@ var _ = Describe("externalBlobstore", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			fs.ReturnTempFile = tempFile
-			defer fs.RemoveAll(tempFile.Name())
+			defer fs.RemoveAll(tempFile.Name()) //nolint:errcheck
 
 			fileName, err := blobstore.Get("fake-blob-id")
 			Expect(err).ToNot(HaveOccurred())
@@ -97,7 +97,7 @@ var _ = Describe("externalBlobstore", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			fs.ReturnTempFile = tempFile
-			defer fs.RemoveAll(tempFile.Name())
+			defer fs.RemoveAll(tempFile.Name()) //nolint:errcheck
 
 			expectedCmd := []string{
 				"bosh-blobstore-fake-provider", "-c", configPath, "get",
@@ -121,7 +121,7 @@ var _ = Describe("externalBlobstore", func() {
 			Expect(err).ToNot(HaveOccurred())
 			fileName := file.Name()
 
-			defer fs.RemoveAll(fileName)
+			defer fs.RemoveAll(fileName) //nolint:errcheck
 
 			err = blobstore.CleanUp(fileName)
 			Expect(err).ToNot(HaveOccurred())

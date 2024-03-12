@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	"strings"
 
 	. "github.com/cloudfoundry/bosh-utils/fileutil"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
@@ -44,8 +43,8 @@ func beDir() beDirMatcher {
 type beDirMatcher struct {
 }
 
-//FailureMessage(actual interface{}) (message string)
-//NegatedFailureMessage(actual interface{}) (message string)
+// FailureMessage(actual interface{}) (message string)
+// NegatedFailureMessage(actual interface{}) (message string)
 func (m beDirMatcher) Match(actual interface{}) (bool, error) {
 	path, ok := actual.(string)
 	if !ok {
@@ -93,11 +92,11 @@ var _ = Describe("tarballCompressor", func() {
 	})
 
 	BeforeEach(func() {
-		fs.MkdirAll(dstDir, os.ModePerm)
+		fs.MkdirAll(dstDir, os.ModePerm) //nolint:errcheck
 	})
 
 	AfterEach(func() {
-		fs.RemoveAll(dstDir)
+		fs.RemoveAll(dstDir) //nolint:errcheck
 	})
 
 	Describe("CompressFilesInDir", func() {
@@ -176,7 +175,7 @@ var _ = Describe("tarballCompressor", func() {
 				"app.stderr.log",
 			}))
 
-			_, _, _, err = cmdRunner.RunCommand("cp", tgzName, "/tmp")
+			_, _, _, err = cmdRunner.RunCommand("cp", tgzName, "/tmp") //nolint:ineffassign,staticcheck
 
 			_, _, _, err = cmdRunner.RunCommand("tar", "-xzpf", tgzName, "-C", dstDir)
 			Expect(err).ToNot(HaveOccurred())
@@ -217,7 +216,7 @@ var _ = Describe("tarballCompressor", func() {
 		})
 
 		It("returns error if the destination does not exist", func() {
-			fs.RemoveAll(dstDir)
+			fs.RemoveAll(dstDir) //nolint:errcheck
 
 			err := compressor.DecompressFileToDir(fixtureSrcTgz(), dstDir, CompressorOptions{})
 			Expect(err).To(HaveOccurred())

@@ -109,8 +109,8 @@ var _ = Describe("FakeFileSystem", func() {
 
 	Describe("RemoveAll", func() {
 		It("removes the specified file", func() {
-			fs.WriteFileString("foobar", "asdfghjk")
-			fs.WriteFileString("foobarbaz", "qwertyuio")
+			fs.WriteFileString("foobar", "asdfghjk")     //nolint:errcheck
+			fs.WriteFileString("foobarbaz", "qwertyuio") //nolint:errcheck
 
 			err := fs.RemoveAll("foobar")
 			Expect(err).ToNot(HaveOccurred())
@@ -125,10 +125,10 @@ var _ = Describe("FakeFileSystem", func() {
 		})
 
 		It("works with windows drives", func() {
-			fs.WriteFileString("D:/env1", "fake-content1")
+			fs.WriteFileString("D:/env1", "fake-content1") //nolint:errcheck
 			Expect(fs.FileExists("D:/env1")).To(BeTrue())
 
-			fs.WriteFileString("C:/env2", "fake-content2")
+			fs.WriteFileString("C:/env2", "fake-content2") //nolint:errcheck
 			Expect(fs.FileExists("C:/env2")).To(BeTrue())
 		})
 
@@ -182,7 +182,7 @@ var _ = Describe("FakeFileSystem", func() {
 					called = true
 					return nil
 				}
-				fs.WriteFileString("foobar", "asdfghjk")
+				fs.WriteFileString("foobar", "asdfghjk") //nolint:errcheck
 
 				err := fs.RemoveAll("foobar")
 				Expect(err).ToNot(HaveOccurred())
@@ -214,7 +214,7 @@ var _ = Describe("FakeFileSystem", func() {
 
 		BeforeEach(func() {
 			for fixtureFile, contents := range fixtureFiles {
-				fs.WriteFileString(filepath.Join(fixtureDirPath, fixtureFile), contents)
+				fs.WriteFileString(filepath.Join(fixtureDirPath, fixtureFile), contents) //nolint:errcheck
 			}
 		})
 
@@ -222,7 +222,7 @@ var _ = Describe("FakeFileSystem", func() {
 			srcPath := fixtureDirPath
 			tmpDir, err := fs.TempDir("CopyDirTestDir")
 			Expect(err).ToNot(HaveOccurred())
-			defer fs.RemoveAll(tmpDir)
+			defer fs.RemoveAll(tmpDir) //nolint:errcheck
 
 			destPath := filepath.Join(tmpDir, "dest")
 
@@ -259,7 +259,7 @@ var _ = Describe("FakeFileSystem", func() {
 
 			dstPath, err := fs.TempDir("CopyDirTestDest")
 			Expect(err).ToNot(HaveOccurred())
-			defer fs.RemoveAll(dstPath)
+			defer fs.RemoveAll(dstPath) //nolint:errcheck
 
 			err = fs.CopyDir(srcPath, dstPath)
 			Expect(err).ToNot(HaveOccurred())
@@ -452,7 +452,7 @@ var _ = Describe("FakeFileSystem", func() {
 
 		Context("when the target path exists", func() {
 			It("returns the target path without error", func() {
-				fs.WriteFileString("foobarTarget", "asdfasdf")
+				fs.WriteFileString("foobarTarget", "asdfasdf") //nolint:errcheck
 				Expect(fs.FileExists("foobarTarget")).To(Equal(true))
 
 				err := fs.Symlink("foobarTarget", "foobarSymlink")
@@ -482,7 +482,7 @@ var _ = Describe("FakeFileSystem", func() {
 
 		Context("when there is an error", func() {
 			It("return the error", func() {
-				fs.WriteFileString("foobarTarget", "asdfasdf")
+				fs.WriteFileString("foobarTarget", "asdfasdf") //nolint:errcheck
 				Expect(fs.FileExists("foobarTarget")).To(Equal(true))
 
 				err := fs.Symlink("foobarTarget", "foobarSymlink")
@@ -499,7 +499,7 @@ var _ = Describe("FakeFileSystem", func() {
 
 	Describe("RegisterReadFileError", func() {
 		It("errors when specified path is read", func() {
-			fs.WriteFileString("/some/path", "asdfasdf")
+			fs.WriteFileString("/some/path", "asdfasdf") //nolint:errcheck
 
 			fs.RegisterReadFileError("/some/path", errors.New("read error"))
 
@@ -510,7 +510,7 @@ var _ = Describe("FakeFileSystem", func() {
 
 	Describe("UnregisterReadFileError", func() {
 		It("does not throw an error", func() {
-			fs.WriteFileString("/some/path", "asdfasdf")
+			fs.WriteFileString("/some/path", "asdfasdf") //nolint:errcheck
 
 			fs.RegisterReadFileError("/some/path", errors.New("read error"))
 			fs.UnregisterReadFileError("/some/path")
@@ -521,7 +521,7 @@ var _ = Describe("FakeFileSystem", func() {
 
 		Context("When UnregisterReadFileError is called without registering an error", func() {
 			It("should not panic or throw an error", func() {
-				fs.WriteFileString("/some/path", "asdfasdf")
+				fs.WriteFileString("/some/path", "asdfasdf") //nolint:errcheck
 
 				fs.UnregisterReadFileError("/some/path")
 
@@ -533,7 +533,7 @@ var _ = Describe("FakeFileSystem", func() {
 
 	Describe("ReadFileWithOpts", func() {
 		It("reads the file", func() {
-			fs.WriteFileQuietly("foo", []byte("hello"))
+			fs.WriteFileQuietly("foo", []byte("hello")) //nolint:errcheck
 
 			writtenContent, err := fs.ReadFileWithOpts("foo", boshsys.ReadOpts{})
 			Expect(err).ToNot(HaveOccurred())
@@ -541,9 +541,9 @@ var _ = Describe("FakeFileSystem", func() {
 		})
 
 		It("Records the number of times the method was called", func() {
-			fs.WriteFileQuietly("foo", []byte("hello"))
-			fs.ReadFileWithOpts("foo", boshsys.ReadOpts{})
-			fs.ReadFileWithOpts("foo", boshsys.ReadOpts{Quiet: true})
+			fs.WriteFileQuietly("foo", []byte("hello"))               //nolint:errcheck
+			fs.ReadFileWithOpts("foo", boshsys.ReadOpts{})            //nolint:errcheck
+			fs.ReadFileWithOpts("foo", boshsys.ReadOpts{Quiet: true}) //nolint:errcheck
 
 			Expect(fs.ReadFileWithOptsCallCount).To(Equal(2))
 		})
@@ -551,7 +551,7 @@ var _ = Describe("FakeFileSystem", func() {
 
 	Describe("WriteFileQuietly", func() {
 		It("Writes the file", func() {
-			fs.WriteFileQuietly("foo", []byte("hello"))
+			fs.WriteFileQuietly("foo", []byte("hello")) //nolint:errcheck
 
 			writtenContent, err := fs.ReadFileString("foo")
 			Expect(err).ToNot(HaveOccurred())
@@ -559,8 +559,8 @@ var _ = Describe("FakeFileSystem", func() {
 		})
 
 		It("Records the number of times the method was called", func() {
-			fs.WriteFileQuietly("foo", []byte("hello"))
-			fs.WriteFileQuietly("bar", []byte("hello"))
+			fs.WriteFileQuietly("foo", []byte("hello")) //nolint:errcheck
+			fs.WriteFileQuietly("bar", []byte("hello")) //nolint:errcheck
 
 			Expect(fs.WriteFileQuietlyCallCount).To(Equal(2))
 		})
@@ -607,7 +607,7 @@ var _ = Describe("FakeFileSystem", func() {
 
 	Describe("WriteFile", func() {
 		It("Writes the file", func() {
-			fs.WriteFile("foo", []byte("hello"))
+			fs.WriteFile("foo", []byte("hello")) //nolint:errcheck
 
 			writtenContent, err := fs.ReadFileString("foo")
 			Expect(err).ToNot(HaveOccurred())
@@ -615,8 +615,8 @@ var _ = Describe("FakeFileSystem", func() {
 		})
 
 		It("Records the number of times the method was called", func() {
-			fs.WriteFile("foo", []byte("hello"))
-			fs.WriteFile("bar", []byte("hello"))
+			fs.WriteFile("foo", []byte("hello")) //nolint:errcheck
+			fs.WriteFile("bar", []byte("hello")) //nolint:errcheck
 
 			Expect(fs.WriteFileCallCount).To(Equal(2))
 		})

@@ -35,8 +35,8 @@ var _ = Describe("NewFileLogger", func() {
 	})
 
 	AfterEach(func() {
-		logFile.Close()
-		fs.RemoveAll(logFile.Name())
+		logFile.Close()              //nolint:errcheck
+		fs.RemoveAll(logFile.Name()) //nolint:errcheck
 	})
 
 	It("logs the formatted DEBUG message to the file", func() {

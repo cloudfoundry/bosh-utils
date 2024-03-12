@@ -19,10 +19,9 @@ var _ = Describe("Default HTTP clients", func() {
 			Expect(client).ToNot(BeNil())
 			Expect(client).To(Equal(DefaultClient))
 		})
-		It("disables HTTP Transport keep-alive (disables HTTP/1.[01] connection reuse)", func() {
-			var client *http.Client
-			client = DefaultClient
 
+		It("disables HTTP Transport keep-alive (disables HTTP/1.[01] connection reuse)", func() {
+			client := DefaultClient
 			Expect(client.Transport.(*http.Transport).DisableKeepAlives).To(Equal(true))
 		})
 	})
@@ -79,16 +78,16 @@ var _ = Describe("Default HTTP clients", func() {
 			clientTransport, _ := client.Transport.(*http.Transport)
 
 			originalProxyEnv := os.Getenv("BOSH_ALL_PROXY")
-			os.Setenv("BOSH_ALL_PROXY", "socks5://127.0.0.1:22")
+			os.Setenv("BOSH_ALL_PROXY", "socks5://127.0.0.1:22") //nolint:errcheck
 			ResetDialerContext()
-			os.Setenv("BOSH_ALL_PROXY", originalProxyEnv)
+			os.Setenv("BOSH_ALL_PROXY", originalProxyEnv) //nolint:errcheck
 			clientAfterReset := CreateDefaultClient(nil)
 			clientAfterResetTransport, _ := clientAfterReset.Transport.(*http.Transport)
 			clientDialContextPointer := reflect.ValueOf(clientTransport.DialContext).Pointer()
 			clientAfterResetDialContextPointer := reflect.ValueOf(clientAfterResetTransport.DialContext).Pointer()
 			Expect(clientAfterResetDialContextPointer).ToNot(Equal(clientDialContextPointer))
 			// don't pollute other tests with a PROXY'd dialer
-			os.Unsetenv("BOSH_ALL_PROXY")
+			os.Unsetenv("BOSH_ALL_PROXY") //nolint:errcheck
 			ResetDialerContext()
 		})
 	})

@@ -204,7 +204,7 @@ var _ = Describe("genericCpCopier", func() {
 	Describe("CleanUp", func() {
 		It("cleans up", func() {
 			tempDir := filepath.Join(os.TempDir(), "test-copier-cleanup")
-			fs.MkdirAll(tempDir, os.ModePerm)
+			fs.MkdirAll(tempDir, os.ModePerm) //nolint:errcheck
 
 			cpCopier.CleanUp(tempDir)
 

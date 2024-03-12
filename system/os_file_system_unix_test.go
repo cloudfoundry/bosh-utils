@@ -6,12 +6,11 @@ package system_test
 import (
 	"os"
 	"path/filepath"
+	"runtime"
+	"syscall"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	"runtime"
-	"syscall"
 )
 
 var _ = Describe("OS FileSystem", func() {
@@ -116,7 +115,7 @@ var _ = Describe("OS FileSystem", func() {
 
 			dstPath, err := osFs.TempDir("CopyDirTestDest")
 			Expect(err).ToNot(HaveOccurred())
-			defer osFs.RemoveAll(dstPath)
+			defer osFs.RemoveAll(dstPath) //nolint:errcheck
 
 			err = osFs.CopyDir(srcPath, dstPath)
 			Expect(err).ToNot(HaveOccurred())

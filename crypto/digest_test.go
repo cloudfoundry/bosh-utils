@@ -6,7 +6,6 @@ import (
 
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -114,10 +113,10 @@ var _ = Describe("digestImpl", func() {
 
 		BeforeEach(func() {
 			var err error
-			file, err = ioutil.TempFile("", "multiple-digest")
+			file, err = os.CreateTemp("", "multiple-digest")
 			Expect(err).ToNot(HaveOccurred())
 			defer file.Close()
-			file.Write([]byte("fake-contents"))
+			file.Write([]byte("fake-contents")) //nolint:errcheck
 
 			digest = NewDigest(DigestAlgorithmSHA1, "978ad524a02039f261773fe93d94973ae7de6470")
 		})

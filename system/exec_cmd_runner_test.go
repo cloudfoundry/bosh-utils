@@ -141,7 +141,7 @@ var _ = Describe("execCmdRunner", func() {
 			cmd := GetPlatformCommand("env")
 			cmd.UseIsolatedEnv = true
 			if runtime.GOOS == "windows" {
-				Expect(func() { runner.RunComplexCommand(cmd) }).To(Panic())
+				Expect(func() { runner.RunComplexCommand(cmd) }).To(Panic()) //nolint:errcheck
 			} else {
 				stdout, stderr, status, err := runner.RunComplexCommand(cmd)
 				Expect(err).ToNot(HaveOccurred())
@@ -155,7 +155,7 @@ var _ = Describe("execCmdRunner", func() {
 		})
 
 		setupWindowsEnvTest := func(cmdVars map[string]string) (map[string]string, error) {
-			os.Setenv("_FOO", "BAR")
+			os.Setenv("_FOO", "BAR") //nolint:errcheck
 			defer os.Unsetenv("_FOO")
 
 			cmd := GetPlatformCommand("env")
