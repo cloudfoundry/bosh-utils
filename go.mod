@@ -1,6 +1,6 @@
 module github.com/cloudfoundry/bosh-utils
 
-go 1.21.0
+go 1.23.0
 
 require (
 	code.cloudfoundry.org/clock v1.0.0
