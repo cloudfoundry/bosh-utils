@@ -17,11 +17,8 @@ import (
 var (
 	DefaultClient            = CreateDefaultClientInsecureSkipVerify()
 	defaultDialerContextFunc = SOCKS5DialContextFuncFromEnvironment((&net.Dialer{
-		Timeout: 30 * time.Second,
-		KeepAliveConfig: net.KeepAliveConfig{
-			Enable:   true,
-			Interval: 30 * time.Second,
-		},
+		Timeout:   30 * time.Second,
+		KeepAlive: 30 * time.Second,
 	}), proxy.NewSocks5Proxy(proxy.NewHostKey(), log.New(io.Discard, "", log.LstdFlags), 1*time.Minute))
 )
 
@@ -59,11 +56,8 @@ func CreateDefaultClientInsecureSkipVerify() *http.Client {
 
 func ResetDialerContext() {
 	defaultDialerContextFunc = SOCKS5DialContextFuncFromEnvironment((&net.Dialer{
-		Timeout: 30 * time.Second,
-		KeepAliveConfig: net.KeepAliveConfig{
-			Enable:   true,
-			Interval: 30 * time.Second,
-		},
+		Timeout:   30 * time.Second,
+		KeepAlive: 30 * time.Second,
 	}), proxy.NewSocks5Proxy(proxy.NewHostKey(), log.New(io.Discard, "", log.LstdFlags), 1*time.Minute))
 }
 
