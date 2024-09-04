@@ -26,6 +26,7 @@ jobs:
           trigger: true
         - get: bosh-utils
         - get: golang-release
+        - get: golang-image
       - task: bump-deps
         file: golang-release/ci/tasks/shared/bump-deps.yml
         input_mapping:
@@ -36,6 +37,7 @@ jobs:
         input_mapping:
           bosh-utils: bumped-bosh-utils
         file: bosh-utils/ci/tasks/test-unit.yml
+        image: golang-image
       - task: test-unit-windows
         input_mapping:
           bosh-utils: bumped-bosh-utils
@@ -126,6 +128,11 @@ jobs:
           skip_download: true
 
 resources:
+  - name: golang-image
+    type: registry-image
+    source:
+      repository: golang
+      tag: 1.22
   - name: weekly
     type: time
     source:
