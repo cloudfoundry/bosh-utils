@@ -52,11 +52,9 @@ var _ = Describe("Linux-specific tests", func() {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(sockoptValue).To(Equal(0x1))
 
-		sockoptValue, err = syscall.GetsockoptInt(int(f.Fd()), syscall.IPPROTO_TCP, syscall.TCP_KEEPINTVL)
+		sockoptValue, err = syscall.GetsockoptInt(int(f.Fd()), syscall.IPPROTO_TCP, syscall.TCP_KEEPIDLE)
 		err = os.NewSyscallError("getsockopt", err)
 		Expect(err).ToNot(HaveOccurred())
-		// TODO: Dialer KeepAlive has changed in 1.23, but the old value is not backwards compatible. Fix this once
-		// 1.24 is out and we no longer support 1.22
-		//Expect(sockoptValue).To(Equal(30))
+		Expect(sockoptValue).To(Equal(30))
 	})
 })
