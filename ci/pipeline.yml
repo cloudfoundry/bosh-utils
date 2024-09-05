@@ -26,7 +26,7 @@ jobs:
           trigger: true
         - get: bosh-utils
         - get: golang-release
-        - get: golang-image
+        - get: bosh-utils-image
       - task: bump-deps
         file: golang-release/ci/tasks/shared/bump-deps.yml
         input_mapping:
@@ -37,7 +37,7 @@ jobs:
         input_mapping:
           bosh-utils: bumped-bosh-utils
         file: bosh-utils/ci/tasks/test-unit.yml
-        image: golang-image
+        image: bosh-utils-image
       - task: test-unit-windows
         input_mapping:
           bosh-utils: bumped-bosh-utils
@@ -51,14 +51,17 @@ jobs:
   - name: test-unit
     serial: true
     plan:
-      - get: bosh-utils
-        trigger: true
-      - get: bosh-utils-registry-image
-        trigger: true
-      - get: version-semver
-        params: {bump: patch}
+      - in_parallel:
+        - get: bosh-utils
+          trigger: true
+        - get: bosh-utils-registry-image
+          trigger: true
+        - get: version-semver
+          params: {bump: patch}
+        - get: bosh-utils-image
       - in_parallel:
         - task: test-unit
+          image: bosh-utils-image
           file: bosh-utils/ci/tasks/test-unit.yml
         - task: test-unit-windows
           file: bosh-utils/ci/tasks/test-unit-windows.yml
@@ -128,11 +131,6 @@ jobs:
           skip_download: true
 
 resources:
-  - name: golang-image
-    type: registry-image
-    source:
-      repository: golang
-      tag: 1.22
   - name: weekly
     type: time
     source:
