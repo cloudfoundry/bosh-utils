@@ -232,7 +232,8 @@ var _ = Describe("tarballCompressor", func() {
 
 			BeforeEach(func() {
 				tmpTarballPath := filepath.Join(os.TempDir(), "TestNoSameOwner.tgz")
-				_, _, _, err := cmdRunner.RunCommand("tar", "--owner=root", "--group=root", "-czf", tarballPath, "-C", fixtureSrcDir(), ".")
+				_, _, _, err := cmdRunner.RunCommand("tar", "--owner=root", "--group=root", "-czf", tmpTarballPath, "-C", fixtureSrcDir(), ".")
+				Expect(err).ToNot(HaveOccurred())
 
 				tarballPath = "/tmp/tarball.tgz"
 				dstDir = "/tmp/dest"

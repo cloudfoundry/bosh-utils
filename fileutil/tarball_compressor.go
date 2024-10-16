@@ -42,6 +42,10 @@ func (c tarballCompressor) CompressSpecificFilesInDir(dir string, files []string
 
 	for _, file := range files {
 		err = c.fs.Walk(filepath.Join(dir, file), func(f string, fi os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
 			if filepath.Base(f) == ".DS_Store" {
 				return nil
 			}
@@ -90,31 +94,6 @@ func (c tarballCompressor) CompressSpecificFilesInDir(dir string, files []string
 }
 
 func (c tarballCompressor) DecompressFileToDir(tarballPath string, dir string, options CompressorOptions) error {
-    // 	sameOwnerOption := "--no-same-owner"
-    // 	if options.SameOwner {
-    // 		sameOwnerOption = "--same-owner"
-    // 	}
-
-    // 	args := []string{sameOwnerOption, "-xzf", tarballPath, "-C", dir}
-    // 	if options.StripComponents != 0 {
-    // 		args = append(args, fmt.Sprintf("--strip-components=%d", options.StripComponents))
-    // 	}
-
-    // 	if options.PathInArchive != "" {
-    // 		args = append(args, options.PathInArchive)
-    // 	}
-    // 	_, _, _, err := c.cmdRunner.RunCommand("tar", args...)
-    // 	if err != nil {
-    // 		return bosherr.WrapError(err, "Shelling out to tar")
-    // 	}
-
-    // 	return nil
-
-    // 	    uncompressedStream, err := gzip.NewReader(gzipStream)
-    // if err != nil {
-    //     return err
-	// }
-
 	if _, err := c.fs.Stat(dir); os.IsNotExist(err) {
 		return bosherr.WrapError(err, "Determine target dir")
 	}
@@ -131,7 +110,7 @@ func (c tarballCompressor) DecompressFileToDir(tarballPath string, dir string, o
 
 	tr := tar.NewReader(zr)
 
-	for true {
+	for {
 		header, err := tr.Next()
 		if err == io.EOF {
 			break
@@ -154,8 +133,7 @@ func (c tarballCompressor) DecompressFileToDir(tarballPath string, dir string, o
 				continue
 			}
 
-			fullName = filepath.Join(append([]string{dir},
-				components[options.StripComponents:len(components)]...)...)
+			fullName = filepath.Join(append([]string{dir}, components[options.StripComponents:]...)...)
 		}
 
 		switch header.Typeflag {
@@ -185,6 +163,7 @@ func (c tarballCompressor) DecompressFileToDir(tarballPath string, dir string, o
 	}
 	return nil
 }
+
 func (c tarballCompressor) CleanUp(tarballPath string) error {
 	return c.fs.RemoveAll(tarballPath)
 }
