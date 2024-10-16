@@ -36,6 +36,12 @@ func createTestSymlink() (string, error) {
 	return symlinkPath, os.Symlink(symlinkTarget, symlinkPath)
 }
 
+func createMacOSMetadataFile() (string, error) {
+	path := filepath.Join(fixtureSrcDir(), ".DS_Store")
+	_, err := os.Create(path)
+	return path, err
+}
+
 func beDir() beDirMatcher {
 	return beDirMatcher{}
 }
@@ -106,6 +112,10 @@ var _ = Describe("tarballCompressor", func() {
 			symlinkPath, err := createTestSymlink()
 			Expect(err).To(Succeed())
 			defer os.Remove(symlinkPath)
+
+			metadataPath, err := createMacOSMetadataFile()
+			Expect(err).To(Succeed())
+			defer os.Remove(metadataPath)
 
 			tgzName, err := compressor.CompressFilesInDir(srcDir)
 			Expect(err).ToNot(HaveOccurred())
