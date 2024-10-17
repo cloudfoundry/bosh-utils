@@ -36,6 +36,12 @@ func createTestSymlink() (string, error) {
 	return symlinkPath, os.Symlink(symlinkTarget, symlinkPath)
 }
 
+func createMacOSMetadataFile() (string, error) {
+	path := filepath.Join(fixtureSrcDir(), ".DS_Store")
+	_, err := os.Create(path)
+	return path, err
+}
+
 func beDir() beDirMatcher {
 	return beDirMatcher{}
 }
@@ -88,7 +94,7 @@ var _ = Describe("tarballCompressor", func() {
 		tmpDir, err := fs.TempDir("tarballCompressor-test")
 		Expect(err).NotTo(HaveOccurred())
 		dstDir = filepath.Join(tmpDir, "TestCompressor")
-		compressor = NewTarballCompressor(cmdRunner, fs)
+		compressor = NewTarballCompressor(fs)
 	})
 
 	BeforeEach(func() {
@@ -107,6 +113,10 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(err).To(Succeed())
 			defer os.Remove(symlinkPath)
 
+			metadataPath, err := createMacOSMetadataFile()
+			Expect(err).To(Succeed())
+			defer os.Remove(metadataPath)
+
 			tgzName, err := compressor.CompressFilesInDir(srcDir)
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(tgzName)
@@ -117,19 +127,19 @@ var _ = Describe("tarballCompressor", func() {
 			contentElements := strings.Fields(strings.TrimSpace(tarballContents))
 
 			Expect(contentElements).To(ConsistOf(
-				"./",
-				"./app.stderr.log",
-				"./app.stdout.log",
-				"./other_logs/",
-				"./some_directory/",
-				"./some_directory/sub_dir/",
-				"./some_directory/sub_dir/other_sub_dir/",
-				"./some_directory/sub_dir/other_sub_dir/.keep",
-				"./symlink_dir",
-				"./other_logs/more_logs/",
-				"./other_logs/other_app.stderr.log",
-				"./other_logs/other_app.stdout.log",
-				"./other_logs/more_logs/more.stdout.log",
+				".",
+				"app.stderr.log",
+				"app.stdout.log",
+				"other_logs",
+				"some_directory",
+				"some_directory/sub_dir",
+				"some_directory/sub_dir/other_sub_dir",
+				"some_directory/sub_dir/other_sub_dir/.keep",
+				"symlink_dir",
+				"other_logs/more_logs",
+				"other_logs/other_app.stderr.log",
+				"other_logs/other_app.stdout.log",
+				"other_logs/more_logs/more.stdout.log",
 			))
 
 			_, _, _, err = cmdRunner.RunCommand("tar", "-xzpf", tgzName, "-C", dstDir)
@@ -168,9 +178,9 @@ var _ = Describe("tarballCompressor", func() {
 
 			Expect(contentElements).To(Equal([]string{
 				"app.stdout.log",
-				"some_directory/",
-				"some_directory/sub_dir/",
-				"some_directory/sub_dir/other_sub_dir/",
+				"some_directory",
+				"some_directory/sub_dir",
+				"some_directory/sub_dir/other_sub_dir",
 				"some_directory/sub_dir/other_sub_dir/.keep",
 				"app.stderr.log",
 			}))
@@ -223,89 +233,103 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(err.Error()).To(ContainSubstring(dstDir))
 		})
 
-		It("uses no same owner option", func() {
-			cmdRunner := fakesys.NewFakeCmdRunner()
-			compressor := NewTarballCompressor(cmdRunner, fs)
+		Context("with tarball contents owned by root", func() {
 
-			tarballPath := fixtureSrcTgz()
-			err := compressor.DecompressFileToDir(tarballPath, dstDir, CompressorOptions{})
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(1).To(Equal(len(cmdRunner.RunCommands)))
-			Expect(cmdRunner.RunCommands[0]).To(Equal(
-				[]string{
-					"tar", "--no-same-owner",
-					"-xzf", tarballPath,
-					"-C", dstDir,
-				},
-			))
-		})
-
-		It("uses same owner option", func() {
-			cmdRunner := fakesys.NewFakeCmdRunner()
-			compressor := NewTarballCompressor(cmdRunner, fs)
-
-			tarballPath := fixtureSrcTgz()
-			err := compressor.DecompressFileToDir(
-				tarballPath,
-				dstDir,
-				CompressorOptions{SameOwner: true},
+			var (
+				tarballPath string
+				fs *fakesys.FakeFileSystem
 			)
-			Expect(err).ToNot(HaveOccurred())
 
-			Expect(1).To(Equal(len(cmdRunner.RunCommands)))
-			Expect(cmdRunner.RunCommands[0]).To(Equal(
-				[]string{
-					"tar", "--same-owner",
-					"-xzf", tarballPath,
-					"-C", dstDir,
-				},
-			))
+			BeforeEach(func() {
+				tmpTarballPath := filepath.Join(os.TempDir(), "TestNoSameOwner.tgz")
+				_, _, _, err := cmdRunner.RunCommand("tar", "--owner=root", "--group=root", "-czf", tmpTarballPath, "-C", fixtureSrcDir(), ".")
+				Expect(err).ToNot(HaveOccurred())
+
+				tarballPath = "/tmp/tarball.tgz"
+				dstDir = "/tmp/dest"
+				content, err := os.ReadFile(tmpTarballPath)
+				Expect(err).ToNot(HaveOccurred())
+
+				fs = fakesys.NewFakeFileSystem()
+				err = fs.WriteFile(tarballPath, content)
+				Expect(err).ToNot(HaveOccurred())
+				err = fs.MkdirAll(dstDir, 0775)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+
+			It("uses no same owner option", func() {
+				compressor := NewTarballCompressor(fs)
+				err := compressor.DecompressFileToDir(tarballPath, dstDir, CompressorOptions{})
+				Expect(err).ToNot(HaveOccurred())
+
+				stat, err := fs.FindFileStats(filepath.Join(dstDir, "app.stderr.log"))
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(stat.Username).To(Equal(""))
+				Expect(stat.Groupname).To(Equal(""))
+			})
+
+			It("uses same owner option", func() {
+				compressor := NewTarballCompressor(fs)
+				err := compressor.DecompressFileToDir(
+					tarballPath,
+					dstDir,
+					CompressorOptions{SameOwner: true},
+				)
+				Expect(err).ToNot(HaveOccurred())
+
+				stat, err := fs.FindFileStats(filepath.Join(dstDir, "app.stderr.log"))
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(stat.Username).To(Equal("root"))
+				Expect(stat.Groupname).To(Equal("root"))
+			})
+
 		})
 
 		It("uses PathInArchive to select files from archive", func() {
-			cmdRunner := fakesys.NewFakeCmdRunner()
-			compressor := NewTarballCompressor(cmdRunner, fs)
+			compressor := NewTarballCompressor(fs)
 
 			tarballPath := fixtureSrcTgz()
-			err := compressor.DecompressFileToDir(tarballPath, dstDir, CompressorOptions{PathInArchive: "some/path/in/archive"})
+			err := compressor.DecompressFileToDir(tarballPath, dstDir,
+				CompressorOptions{PathInArchive: "dir/nested-file"})
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(1).To(Equal(len(cmdRunner.RunCommands)))
-			Expect(cmdRunner.RunCommands[0]).To(Equal(
-				[]string{
-					"tar", "--no-same-owner",
-					"-xzf", tarballPath,
-					"-C", dstDir,
-					"some/path/in/archive",
-				},
-			))
+			dstContents, _, _, err := cmdRunner.RunCommand("find", dstDir,
+				"-mindepth", "1", "-printf", "%P\n")
+			Expect(err).ToNot(HaveOccurred())
+			dstElements := strings.Fields(strings.TrimSpace(dstContents))
+
+			Expect(dstElements).To(Equal([]string{
+				"dir",
+				"dir/nested-file",
+			}))
 		})
 
 		It("uses StripComponents option", func() {
-			cmdRunner := fakesys.NewFakeCmdRunner()
-			compressor := NewTarballCompressor(cmdRunner, fs)
+			compressor := NewTarballCompressor(fs)
 
 			tarballPath := fixtureSrcTgz()
-			err := compressor.DecompressFileToDir(tarballPath, dstDir, CompressorOptions{StripComponents: 3})
+			err := compressor.DecompressFileToDir(tarballPath, dstDir,
+				CompressorOptions{StripComponents: 2})
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(1).To(Equal(len(cmdRunner.RunCommands)))
-			Expect(cmdRunner.RunCommands[0]).To(Equal(
-				[]string{
-					"tar", "--no-same-owner",
-					"-xzf", tarballPath,
-					"-C", dstDir,
-					"--strip-components=3",
-				},
-			))
+			dstContents, _, _, err := cmdRunner.RunCommand("find", dstDir,
+				"-mindepth", "1", "-printf", "%P\n")
+			Expect(err).ToNot(HaveOccurred())
+			dstElements := strings.Fields(strings.TrimSpace(dstContents))
+
+			Expect(dstElements).To(Equal([]string{
+				"double-nested-file",
+			}))
 		})
 	})
 
 	Describe("CleanUp", func() {
 		It("removes tarball path", func() {
 			fs := fakesys.NewFakeFileSystem()
-			compressor := NewTarballCompressor(cmdRunner, fs)
+			compressor := NewTarballCompressor(fs)
 
 			err := fs.WriteFileString("/fake-tarball.tar", "")
 			Expect(err).ToNot(HaveOccurred())
@@ -318,7 +342,7 @@ var _ = Describe("tarballCompressor", func() {
 
 		It("returns error if removing tarball path fails", func() {
 			fs := fakesys.NewFakeFileSystem()
-			compressor := NewTarballCompressor(cmdRunner, fs)
+			compressor := NewTarballCompressor(fs)
 
 			fs.RemoveAllStub = func(_ string) error {
 				return errors.New("fake-remove-all-err")
