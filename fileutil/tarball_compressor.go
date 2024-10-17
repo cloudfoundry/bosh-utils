@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 
 	"archive/tar"
-	gzip "github.com/klauspost/pgzip"
+	"github.com/klauspost/pgzip"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshsys "github.com/cloudfoundry/bosh-utils/system"
@@ -37,7 +37,7 @@ func (c tarballCompressor) CompressSpecificFilesInDir(dir string, files []string
 
 	defer tarball.Close()
 
-	zw := gzip.NewWriter(tarball)
+	zw := pgzip.NewWriter(tarball)
 	tw := tar.NewWriter(zw)
 
 	for _, file := range files {
@@ -66,10 +66,12 @@ func (c tarballCompressor) CompressSpecificFilesInDir(dir string, files []string
 			}
 
 			if fi.Mode().IsRegular() {
-				data, err := os.Open(f)
+				data, err := c.fs.OpenFile(f, os.O_RDONLY, 0)
 				if err != nil {
 					return bosherr.WrapError(err, "Reading tar source file")
 				}
+				defer data.Close()
+
 				if _, err := io.Copy(tw, data); err != nil {
 					return bosherr.WrapError(err, "Copying data into tar")
 				}
@@ -102,11 +104,13 @@ func (c tarballCompressor) DecompressFileToDir(tarballPath string, dir string, o
 	if err != nil {
 		return bosherr.WrapError(err, "Opening tarball")
 	}
+	defer tarball.Close()
 
-	zr, err := gzip.NewReader(tarball)
+	zr, err := pgzip.NewReader(tarball)
 	if err != nil {
 		return bosherr.WrapError(err, "Creating gzip reader")
 	}
+	defer zr.Close()
 
 	tr := tar.NewReader(zr)
 
@@ -151,7 +155,7 @@ func (c tarballCompressor) DecompressFileToDir(tarballPath string, dir string, o
 				return bosherr.WrapError(err, "Decompressing file contents")
 			}
 		default:
-			return fmt.Errorf("uknown type: %v in %s for tar: %s",
+			return fmt.Errorf("unknown type: %v in %s for tar: %s",
 				header.Typeflag, header.Name, tarballPath)
 		}
 
