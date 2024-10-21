@@ -145,6 +145,7 @@ func (c tarballCompressor) DecompressFileToDir(tarballPath string, dir string, o
 			if err := c.fs.MkdirAll(fullName, fs.FileMode(header.Mode)); err != nil {
 				return bosherr.WrapError(err, "Decompressing directory")
 			}
+
 		case tar.TypeReg:
 			outFile, err := c.fs.OpenFile(fullName, os.O_CREATE|os.O_WRONLY, fs.FileMode(header.Mode))
 			if err != nil {
@@ -154,6 +155,17 @@ func (c tarballCompressor) DecompressFileToDir(tarballPath string, dir string, o
 			if _, err := io.Copy(outFile, tr); err != nil {
 				return bosherr.WrapError(err, "Decompressing file contents")
 			}
+
+		case tar.TypeLink:
+                        if err := c.fs.Symlink(header.Linkname, fullName); err != nil {
+				return bosherr.WrapError(err, "Decompressing link")
+			}
+
+                case tar.TypeSymlink:
+                        if err := c.fs.Symlink(header.Linkname, fullName); err != nil {
+				return bosherr.WrapError(err, "Decompressing symlink")
+			}
+
 		default:
 			return fmt.Errorf("unknown type: %v in %s for tar: %s",
 				header.Typeflag, header.Name, tarballPath)

@@ -36,6 +36,14 @@ func createTestSymlink() (string, error) {
 	return symlinkPath, os.Symlink(symlinkTarget, symlinkPath)
 }
 
+func createTestLink() (string, error) {
+	srcDir := fixtureSrcDir()
+	linkPath := filepath.Join(srcDir, "latest.log")
+	linkTarget := filepath.Join(srcDir, "app.stdout.log")
+	os.Remove(linkPath)
+	return linkPath, os.Link(linkTarget, linkPath)
+}
+
 func createMacOSMetadataFile() (string, error) {
 	path := filepath.Join(fixtureSrcDir(), ".DS_Store")
 	_, err := os.Create(path)
@@ -286,6 +294,43 @@ var _ = Describe("tarballCompressor", func() {
 				Expect(stat.Groupname).To(Equal("root"))
 			})
 
+		})
+
+		It("respects symlinks and hardlinks", func() {
+			symlinkPath, err := createTestSymlink()
+			Expect(err).To(Succeed())
+			defer os.Remove(symlinkPath)
+
+			hardLinkPath, err := createTestLink()
+			Expect(err).To(Succeed())
+			defer os.Remove(hardLinkPath)
+
+			tmpTarballPath := filepath.Join(os.TempDir(), "TestNoSameOwner.tgz")
+			_, _, _, err = cmdRunner.RunCommand("tar", "-czf", tmpTarballPath, "-C", fixtureSrcDir(), ".")
+			Expect(err).ToNot(HaveOccurred())
+
+			tarballPath := "/tmp/tarball.tgz"
+			dstDir = "/tmp/dest"
+			content, err := os.ReadFile(tmpTarballPath)
+			Expect(err).ToNot(HaveOccurred())
+
+			fs = fakesys.NewFakeFileSystem()
+			err = fs.WriteFile(tarballPath, content)
+			Expect(err).ToNot(HaveOccurred())
+			err = fs.MkdirAll(dstDir, 0775)
+			Expect(err).ToNot(HaveOccurred())
+
+			compressor := NewTarballCompressor(fs)
+			err = compressor.DecompressFileToDir(tarballPath, dstDir, CompressorOptions{})
+			Expect(err).ToNot(HaveOccurred())
+
+			link, err := fs.Readlink(filepath.Join(dstDir, "symlink_dir"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(link).To(Equal(filepath.Join(fixtureSrcDir(), "../symlink_target")))
+
+			link, err = fs.Readlink(filepath.Join(dstDir, "latest.log"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(link).To(Equal("app.stdout.log"))
 		})
 
 		It("uses PathInArchive to select files from archive", func() {
