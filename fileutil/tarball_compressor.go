@@ -125,7 +125,7 @@ func (c tarballCompressor) DecompressFileToDir(tarballPath string, dir string, o
 		}
 
 		if options.PathInArchive != "" && !strings.HasPrefix(
-			filepath.Clean(options.PathInArchive), filepath.Clean(header.Name)) {
+			filepath.Clean(header.Name), filepath.Clean(options.PathInArchive)) {
 				continue
 		}
 

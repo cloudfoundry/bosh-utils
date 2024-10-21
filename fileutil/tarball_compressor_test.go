@@ -293,7 +293,7 @@ var _ = Describe("tarballCompressor", func() {
 
 			tarballPath := fixtureSrcTgz()
 			err := compressor.DecompressFileToDir(tarballPath, dstDir,
-				CompressorOptions{PathInArchive: "dir/nested-file"})
+				CompressorOptions{PathInArchive: "dir/nested-dir"})
 			Expect(err).ToNot(HaveOccurred())
 
 			dstContents, _, _, err := cmdRunner.RunCommand("find", dstDir,
@@ -303,7 +303,8 @@ var _ = Describe("tarballCompressor", func() {
 
 			Expect(dstElements).To(Equal([]string{
 				"dir",
-				"dir/nested-file",
+				"dir/nested-dir",
+				"dir/nested-dir/double-nested-file",
 			}))
 		})
 
