@@ -90,32 +90,14 @@ jobs:
         passed: [test-unit]
       - get: version-semver
         passed: [test-unit]
-      - in_parallel:
-        - task: build-multidigest-binary-darwin
-          file: bosh-utils/ci/tasks/build-multidigest-binary.yml
-          output_mapping: { out: compiled-darwin }
-          params:
-            GOOS: darwin
-            GOARCH: amd64
-        - task: build-multidigest-binary-linux
-          file: bosh-utils/ci/tasks/build-multidigest-binary.yml
-          output_mapping: { out: compiled-linux }
-          params:
-            GOOS: linux
-            GOARCH: amd64
-        - task: build-multidigest-binary-linux-ppc64le
-          file: bosh-utils/ci/tasks/build-multidigest-binary.yml
-          output_mapping: { out: compiled-linux-ppc64le }
-          params:
-            GOOS: linux
-            GOARCH: ppc64le
-      - in_parallel:
-        - put: release-bucket-linux
-          params: {file: compiled-linux/verify-multidigest-*-linux-amd64}
-        - put: release-bucket-darwin
-          params: {file: compiled-darwin/verify-multidigest-*-darwin-amd64}
-        - put: release-bucket-linux-ppc64le
-          params: {file: compiled-linux-ppc64le/verify-multidigest-*-linux-ppc64le}
+      - task: build-multidigest-binary-linux
+        file: bosh-utils/ci/tasks/build-multidigest-binary.yml
+        output_mapping: { out: compiled-linux }
+        params:
+          GOOS: linux
+          GOARCH: amd64
+      - put: release-bucket-linux
+        params: {file: compiled-linux/verify-multidigest-*-linux-amd64}
 
   - name: build-bosh-utils-image
     serial: true
@@ -174,35 +156,12 @@ resources:
     source:
       uri: https://github.com/cloudfoundry/bosh-package-golang-release.git
 
-  - name: release-bucket-darwin
-    type: s3
-    source:
-      regexp: verify-multidigest-(.*)-darwin-amd64
-      bucket: verify-multidigest
-      region_name: us-east-1
-      access_key_id: ((bosh-verify-multidigest-upload_assume_aws_access_key.username))
-      secret_access_key: ((bosh-verify-multidigest-upload_assume_aws_access_key.password))
-      aws_role_arn: ((bosh-verify-multidigest-upload_assume_aws_access_key.role_arn))
-
   - name: release-bucket-linux
-    type: s3
+    type: gcs
     source:
-      regexp: verify-multidigest-(.*)-linux-amd64
-      bucket: verify-multidigest
-      region_name: us-east-1
-      access_key_id: ((bosh-verify-multidigest-upload_assume_aws_access_key.username))
-      secret_access_key: ((bosh-verify-multidigest-upload_assume_aws_access_key.password))
-      aws_role_arn: ((bosh-verify-multidigest-upload_assume_aws_access_key.role_arn))
-
-  - name: release-bucket-linux-ppc64le
-    type: s3
-    source:
-      regexp: verify-multidigest-(.*)-linux-ppc64le
-      bucket: verify-multidigest
-      region_name: us-east-1
-      access_key_id: ((bosh-verify-multidigest-upload_assume_aws_access_key.username))
-      secret_access_key: ((bosh-verify-multidigest-upload_assume_aws_access_key.password))
-      aws_role_arn: ((bosh-verify-multidigest-upload_assume_aws_access_key.role_arn))
+      regexp: verify-multidigest/verify-multidigest-(.*)-linux-amd64
+      bucket: bosh-director-pipeline
+      json_key: ((cloud-foundry-gcp-credentials))
 
   - name: version-semver
     type: semver
@@ -246,3 +205,7 @@ resource_types:
     source:
       repository: concourse/semver-resource
       tag: 1.6
+  - name: gcs
+    type: docker-image
+    source:
+      repository: frodenas/gcs-resource
