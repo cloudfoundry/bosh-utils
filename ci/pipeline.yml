@@ -166,12 +166,12 @@ resources:
   - name: version-semver
     type: semver
     source:
-      initial_version: 0.0.1
-      key: verify-multidigest-current-version
-      bucket: verify-multidigest
-      access_key_id: ((bosh-verify-multidigest-upload_assume_aws_access_key.username))
-      secret_access_key: ((bosh-verify-multidigest-upload_assume_aws_access_key.password))
-      assume_role_arn: ((bosh-verify-multidigest-upload_assume_aws_access_key.role_arn))
+      driver: git
+      uri: git@github.com:cloudfoundry/bosh-utils.git
+      branch: release-semver
+      file: verify-multidigest/VERSION
+      private_key: ((github_deploy_key_bosh-utils.private_key))
+      initial_version: '0.0.500'
 
   - name: bosh-utils-image
     type: docker-image
