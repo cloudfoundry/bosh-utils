@@ -31,23 +31,31 @@ func fixtureSrcTgz() string {
 func createTestSymlink() (string, error) {
 	srcDir := fixtureSrcDir()
 	symlinkPath := filepath.Join(srcDir, "symlink_dir")
-	symlinkTarget := filepath.Join(srcDir, "../symlink_target")
+	symlinkTarget := filepath.Join(srcDir, filepath.FromSlash("../symlink_target"))
 	os.Remove(symlinkPath)
 	return symlinkPath, os.Symlink(symlinkTarget, symlinkPath)
-}
-
-func createTestLink() (string, error) {
-	srcDir := fixtureSrcDir()
-	linkPath := filepath.Join(srcDir, "latest.log")
-	linkTarget := filepath.Join(srcDir, "app.stdout.log")
-	os.Remove(linkPath)
-	return linkPath, os.Link(linkTarget, linkPath)
 }
 
 func createMacOSMetadataFile() (string, error) {
 	path := filepath.Join(fixtureSrcDir(), ".DS_Store")
 	_, err := os.Create(path)
 	return path, err
+}
+
+func pathsInDir(dir string) (out []string, err error) {
+	err = filepath.Walk(dir,
+		func(path string, _ os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			p, err := filepath.Rel(dir, path)
+			if err != nil {
+				return err
+			}
+			out = append(out, p)
+			return nil
+		})
+	return
 }
 
 func beDir() beDirMatcher {
@@ -140,28 +148,28 @@ var _ = Describe("tarballCompressor", func() {
 				"app.stdout.log",
 				"other_logs",
 				"some_directory",
-				"some_directory/sub_dir",
-				"some_directory/sub_dir/other_sub_dir",
-				"some_directory/sub_dir/other_sub_dir/.keep",
+				filepath.FromSlash("some_directory/sub_dir"),
+				filepath.FromSlash("some_directory/sub_dir/other_sub_dir"),
+				filepath.FromSlash("some_directory/sub_dir/other_sub_dir/.keep"),
 				"symlink_dir",
-				"other_logs/more_logs",
-				"other_logs/other_app.stderr.log",
-				"other_logs/other_app.stdout.log",
-				"other_logs/more_logs/more.stdout.log",
+				filepath.FromSlash("other_logs/more_logs"),
+				filepath.FromSlash("other_logs/other_app.stderr.log"),
+				filepath.FromSlash("other_logs/other_app.stdout.log"),
+				filepath.FromSlash("other_logs/more_logs/more.stdout.log"),
 			))
 
 			_, _, _, err = cmdRunner.RunCommand("tar", "-xzpf", tgzName, "-C", dstDir)
 			Expect(err).ToNot(HaveOccurred())
 
-			content, err := fs.ReadFileString(dstDir + "/app.stdout.log")
+			content, err := fs.ReadFileString(filepath.FromSlash(dstDir + "/app.stdout.log"))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(content).To(ContainSubstring("this is app stdout"))
 
-			content, err = fs.ReadFileString(dstDir + "/app.stderr.log")
+			content, err = fs.ReadFileString(filepath.FromSlash(dstDir + "/app.stderr.log"))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(content).To(ContainSubstring("this is app stderr"))
 
-			content, err = fs.ReadFileString(dstDir + "/other_logs/other_app.stdout.log")
+			content, err = fs.ReadFileString(filepath.FromSlash(dstDir + "/other_logs/other_app.stdout.log"))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(content).To(ContainSubstring("this is other app stdout"))
 		})
@@ -187,26 +195,24 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(contentElements).To(Equal([]string{
 				"app.stdout.log",
 				"some_directory",
-				"some_directory/sub_dir",
-				"some_directory/sub_dir/other_sub_dir",
-				"some_directory/sub_dir/other_sub_dir/.keep",
+				filepath.FromSlash("some_directory/sub_dir"),
+				filepath.FromSlash("some_directory/sub_dir/other_sub_dir"),
+				filepath.FromSlash("some_directory/sub_dir/other_sub_dir/.keep"),
 				"app.stderr.log",
 			}))
-
-			_, _, _, err = cmdRunner.RunCommand("cp", tgzName, "/tmp") //nolint:ineffassign,staticcheck
 
 			_, _, _, err = cmdRunner.RunCommand("tar", "-xzpf", tgzName, "-C", dstDir)
 			Expect(err).ToNot(HaveOccurred())
 
-			content, err := fs.ReadFileString(dstDir + "/app.stdout.log")
+			content, err := fs.ReadFileString(filepath.FromSlash(dstDir + "/app.stdout.log"))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(content).To(ContainSubstring("this is app stdout"))
 
-			content, err = fs.ReadFileString(dstDir + "/app.stderr.log")
+			content, err = fs.ReadFileString(filepath.FromSlash(dstDir + "/app.stderr.log"))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(content).To(ContainSubstring("this is app stderr"))
 
-			content, err = fs.ReadFileString(dstDir + "/some_directory/sub_dir/other_sub_dir/.keep")
+			content, err = fs.ReadFileString(filepath.FromSlash(dstDir + "/some_directory/sub_dir/other_sub_dir/.keep"))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(content).To(ContainSubstring("this is a .keep file"))
 		})
@@ -217,20 +223,20 @@ var _ = Describe("tarballCompressor", func() {
 			err := compressor.DecompressFileToDir(fixtureSrcTgz(), dstDir, CompressorOptions{})
 			Expect(err).ToNot(HaveOccurred())
 
-			content, err := fs.ReadFileString(dstDir + "/not-nested-file")
+			content, err := fs.ReadFileString(filepath.FromSlash(dstDir + "/not-nested-file"))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(content).To(ContainSubstring("not-nested-file"))
 
-			content, err = fs.ReadFileString(dstDir + "/dir/nested-file")
+			content, err = fs.ReadFileString(filepath.FromSlash(dstDir + "/dir/nested-file"))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(content).To(ContainSubstring("nested-file"))
 
-			content, err = fs.ReadFileString(dstDir + "/dir/nested-dir/double-nested-file")
+			content, err = fs.ReadFileString(filepath.FromSlash(dstDir + "/dir/nested-dir/double-nested-file"))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(content).To(ContainSubstring("double-nested-file"))
 
-			Expect(dstDir + "/empty-dir").To(beDir())
-			Expect(dstDir + "/dir/empty-nested-dir").To(beDir())
+			Expect(filepath.FromSlash(dstDir + "/empty-dir")).To(beDir())
+			Expect(filepath.FromSlash(dstDir + "/dir/empty-nested-dir")).To(beDir())
 		})
 
 		It("returns error if the destination does not exist", func() {
@@ -249,12 +255,9 @@ var _ = Describe("tarballCompressor", func() {
 			)
 
 			BeforeEach(func() {
-				tmpTarballPath := filepath.Join(os.TempDir(), "TestNoSameOwner.tgz")
-				_, _, _, err := cmdRunner.RunCommand("tar", "--owner=root", "--group=root", "-czf", tmpTarballPath, "-C", fixtureSrcDir(), ".")
-				Expect(err).ToNot(HaveOccurred())
-
-				tarballPath = "/tmp/tarball.tgz"
-				dstDir = "/tmp/dest"
+				tmpTarballPath := filepath.Join(fixtureSrcDir(), filepath.FromSlash("../compressor-decompress-owner-root.tgz"))
+				tarballPath = filepath.FromSlash("/tmp/tarball.tgz")
+				dstDir = filepath.FromSlash("/tmp/dest")
 				content, err := os.ReadFile(tmpTarballPath)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -297,20 +300,9 @@ var _ = Describe("tarballCompressor", func() {
 		})
 
 		It("respects symlinks and hardlinks", func() {
-			symlinkPath, err := createTestSymlink()
-			Expect(err).To(Succeed())
-			defer os.Remove(symlinkPath)
-
-			hardLinkPath, err := createTestLink()
-			Expect(err).To(Succeed())
-			defer os.Remove(hardLinkPath)
-
-			tmpTarballPath := filepath.Join(os.TempDir(), "TestNoSameOwner.tgz")
-			_, _, _, err = cmdRunner.RunCommand("tar", "-czf", tmpTarballPath, "-C", fixtureSrcDir(), ".")
-			Expect(err).ToNot(HaveOccurred())
-
-			tarballPath := "/tmp/tarball.tgz"
-			dstDir = "/tmp/dest"
+			tmpTarballPath := filepath.Join(fixtureSrcDir(), filepath.FromSlash("../compressor-decompress-with-links.tgz"))
+			tarballPath := filepath.FromSlash("/tmp/tarball.tgz")
+			dstDir = filepath.FromSlash("/tmp/dest")
 			content, err := os.ReadFile(tmpTarballPath)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -326,7 +318,7 @@ var _ = Describe("tarballCompressor", func() {
 
 			link, err := fs.Readlink(filepath.Join(dstDir, "symlink_dir"))
 			Expect(err).ToNot(HaveOccurred())
-			Expect(link).To(Equal(filepath.Join(fixtureSrcDir(), "../symlink_target")))
+			Expect(link).To(Equal(filepath.FromSlash("../symlink_target")))
 
 			link, err = fs.Readlink(filepath.Join(dstDir, "latest.log"))
 			Expect(err).ToNot(HaveOccurred())
@@ -338,18 +330,17 @@ var _ = Describe("tarballCompressor", func() {
 
 			tarballPath := fixtureSrcTgz()
 			err := compressor.DecompressFileToDir(tarballPath, dstDir,
-				CompressorOptions{PathInArchive: "dir/nested-dir"})
+				CompressorOptions{PathInArchive: filepath.FromSlash("dir/nested-dir")})
 			Expect(err).ToNot(HaveOccurred())
 
-			dstContents, _, _, err := cmdRunner.RunCommand("find", dstDir,
-				"-mindepth", "1", "-printf", "%P\n")
+			dstElements, err := pathsInDir(dstDir)
 			Expect(err).ToNot(HaveOccurred())
-			dstElements := strings.Fields(strings.TrimSpace(dstContents))
 
 			Expect(dstElements).To(Equal([]string{
+				".",
 				"dir",
-				"dir/nested-dir",
-				"dir/nested-dir/double-nested-file",
+				filepath.FromSlash("dir/nested-dir"),
+				filepath.FromSlash("dir/nested-dir/double-nested-file"),
 			}))
 		})
 
@@ -361,12 +352,11 @@ var _ = Describe("tarballCompressor", func() {
 				CompressorOptions{StripComponents: 2})
 			Expect(err).ToNot(HaveOccurred())
 
-			dstContents, _, _, err := cmdRunner.RunCommand("find", dstDir,
-				"-mindepth", "1", "-printf", "%P\n")
+			dstElements, err := pathsInDir(dstDir)
 			Expect(err).ToNot(HaveOccurred())
-			dstElements := strings.Fields(strings.TrimSpace(dstContents))
 
 			Expect(dstElements).To(Equal([]string{
+				".",
 				"double-nested-file",
 			}))
 		})
@@ -377,13 +367,13 @@ var _ = Describe("tarballCompressor", func() {
 			fs := fakesys.NewFakeFileSystem()
 			compressor := NewTarballCompressor(fs)
 
-			err := fs.WriteFileString("/fake-tarball.tar", "")
+			err := fs.WriteFileString(filepath.FromSlash("/fake-tarball.tar"), "")
 			Expect(err).ToNot(HaveOccurred())
 
-			err = compressor.CleanUp("/fake-tarball.tar")
+			err = compressor.CleanUp(filepath.FromSlash("/fake-tarball.tar"))
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(fs.FileExists("/fake-tarball.tar")).To(BeFalse())
+			Expect(fs.FileExists(filepath.FromSlash("/fake-tarball.tar"))).To(BeFalse())
 		})
 
 		It("returns error if removing tarball path fails", func() {
@@ -394,7 +384,7 @@ var _ = Describe("tarballCompressor", func() {
 				return errors.New("fake-remove-all-err")
 			}
 
-			err := compressor.CleanUp("/fake-tarball.tar")
+			err := compressor.CleanUp(filepath.FromSlash("/fake-tarball.tar"))
 			Expect(err).To(MatchError("fake-remove-all-err"))
 		})
 	})
