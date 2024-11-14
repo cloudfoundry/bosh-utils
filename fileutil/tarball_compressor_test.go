@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -44,13 +43,17 @@ func createMacOSMetadataFile() (string, error) {
 
 func pathsInDir(dir string) (out []string, err error) {
 	err = filepath.Walk(dir,
-		func(path string, _ os.FileInfo, err error) error {
+		func(path string, fi os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
 			p, err := filepath.Rel(dir, path)
 			if err != nil {
 				return err
+			}
+			p = filepath.ToSlash(p)
+			if fi.IsDir() {
+				p = p + "/"
 			}
 			out = append(out, p)
 			return nil
@@ -137,29 +140,27 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(tgzName)
 
-			tarballContents, _, _, err := cmdRunner.RunCommand("tar", "-tf", tgzName)
-			Expect(err).ToNot(HaveOccurred())
-
-			contentElements := strings.Fields(strings.TrimSpace(tarballContents))
-
-			Expect(contentElements).To(ConsistOf(
-				".",
-				"app.stderr.log",
-				"app.stdout.log",
-				"other_logs",
-				"some_directory",
-				filepath.FromSlash("some_directory/sub_dir"),
-				filepath.FromSlash("some_directory/sub_dir/other_sub_dir"),
-				filepath.FromSlash("some_directory/sub_dir/other_sub_dir/.keep"),
-				"symlink_dir",
-				filepath.FromSlash("other_logs/more_logs"),
-				filepath.FromSlash("other_logs/other_app.stderr.log"),
-				filepath.FromSlash("other_logs/other_app.stdout.log"),
-				filepath.FromSlash("other_logs/more_logs/more.stdout.log"),
-			))
-
 			_, _, _, err = cmdRunner.RunCommand("tar", "-xzpf", tgzName, "-C", dstDir)
 			Expect(err).ToNot(HaveOccurred())
+
+			dstElements, err := pathsInDir(dstDir)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(dstElements).To(ConsistOf(
+				"./",
+				"app.stderr.log",
+				"app.stdout.log",
+				"other_logs/",
+				"some_directory/",
+				"some_directory/sub_dir/",
+				"some_directory/sub_dir/other_sub_dir/",
+				"some_directory/sub_dir/other_sub_dir/.keep",
+				"symlink_dir",
+				"other_logs/more_logs/",
+				"other_logs/other_app.stderr.log",
+				"other_logs/other_app.stdout.log",
+				"other_logs/more_logs/more.stdout.log",
+			))
+
 
 			content, err := fs.ReadFileString(filepath.FromSlash(dstDir + "/app.stdout.log"))
 			Expect(err).ToNot(HaveOccurred())
@@ -180,29 +181,27 @@ var _ = Describe("tarballCompressor", func() {
 			srcDir := fixtureSrcDir()
 			files := []string{
 				"app.stdout.log",
-				"some_directory",
+				filepath.FromSlash("some_directory/"),
 				"app.stderr.log",
 			}
 			tgzName, err := compressor.CompressSpecificFilesInDir(srcDir, files)
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(tgzName)
 
-			tarballContents, _, _, err := cmdRunner.RunCommand("tar", "-tf", tgzName)
-			Expect(err).ToNot(HaveOccurred())
-
-			contentElements := strings.Fields(strings.TrimSpace(tarballContents))
-
-			Expect(contentElements).To(Equal([]string{
-				"app.stdout.log",
-				"some_directory",
-				filepath.FromSlash("some_directory/sub_dir"),
-				filepath.FromSlash("some_directory/sub_dir/other_sub_dir"),
-				filepath.FromSlash("some_directory/sub_dir/other_sub_dir/.keep"),
-				"app.stderr.log",
-			}))
-
 			_, _, _, err = cmdRunner.RunCommand("tar", "-xzpf", tgzName, "-C", dstDir)
 			Expect(err).ToNot(HaveOccurred())
+
+			dstElements, err := pathsInDir(dstDir)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(dstElements).To(ConsistOf(
+				"./",
+				"app.stdout.log",
+				"some_directory/",
+				"some_directory/sub_dir/",
+				"some_directory/sub_dir/other_sub_dir/",
+				"some_directory/sub_dir/other_sub_dir/.keep",
+				"app.stderr.log",
+			))
 
 			content, err := fs.ReadFileString(filepath.FromSlash(dstDir + "/app.stdout.log"))
 			Expect(err).ToNot(HaveOccurred())
@@ -318,7 +317,7 @@ var _ = Describe("tarballCompressor", func() {
 
 			link, err := fs.Readlink(filepath.Join(dstDir, "symlink_dir"))
 			Expect(err).ToNot(HaveOccurred())
-			Expect(link).To(Equal(filepath.FromSlash("../symlink_target")))
+			Expect(link).To(Equal("../symlink_target"))
 
 			link, err = fs.Readlink(filepath.Join(dstDir, "latest.log"))
 			Expect(err).ToNot(HaveOccurred())
@@ -335,12 +334,11 @@ var _ = Describe("tarballCompressor", func() {
 
 			dstElements, err := pathsInDir(dstDir)
 			Expect(err).ToNot(HaveOccurred())
-
 			Expect(dstElements).To(Equal([]string{
-				".",
-				"dir",
-				filepath.FromSlash("dir/nested-dir"),
-				filepath.FromSlash("dir/nested-dir/double-nested-file"),
+				"./",
+				"dir/",
+				"dir/nested-dir/",
+				"dir/nested-dir/double-nested-file",
 			}))
 		})
 
@@ -356,7 +354,7 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(dstElements).To(Equal([]string{
-				".",
+				"./",
 				"double-nested-file",
 			}))
 		})
