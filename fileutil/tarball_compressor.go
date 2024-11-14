@@ -50,7 +50,15 @@ func (c tarballCompressor) CompressSpecificFilesInDir(dir string, files []string
 				return nil
 			}
 
-			header, err := tar.FileInfoHeader(fi, "")
+			link := ""
+			if fi.Mode()&fs.ModeSymlink != 0 {
+				link, err = os.Readlink(f)
+				if err != nil {
+					return bosherr.WrapError(err, "Reading symlink target")
+				}
+			}
+
+			header, err := tar.FileInfoHeader(fi, link)
 			if err != nil {
 				return bosherr.WrapError(err, "Reading tar header")
 			}
