@@ -50,16 +50,28 @@ func (c tarballCompressor) CompressSpecificFilesInDir(dir string, files []string
 				return nil
 			}
 
-			header, err := tar.FileInfoHeader(fi, f)
+			link := ""
+			if fi.Mode()&fs.ModeSymlink != 0 {
+				link, err = os.Readlink(f)
+				if err != nil {
+					return bosherr.WrapError(err, "Reading symlink target")
+				}
+			}
+
+			header, err := tar.FileInfoHeader(fi, link)
 			if err != nil {
 				return bosherr.WrapError(err, "Reading tar header")
 			}
 
-			relPath, err := filepath.Rel(dir, filepath.ToSlash(f))
+			relPath, err := filepath.Rel(dir, f)
 			if err != nil {
 				return bosherr.WrapError(err, "Resovling relative tar path")
 			}
-			header.Name = relPath
+
+			if fi.IsDir() {
+				relPath = relPath + "/"
+			}
+			header.Name = filepath.FromSlash(relPath)
 
 			if err := tw.WriteHeader(header); err != nil {
 				return bosherr.WrapError(err, "Writing tar header")
@@ -129,7 +141,7 @@ func (c tarballCompressor) DecompressFileToDir(tarballPath string, dir string, o
 				continue
 		}
 
-		fullName := filepath.Join(dir, header.Name)
+		fullName := filepath.Join(dir, filepath.FromSlash(header.Name))
 
 		if options.StripComponents > 0 {
 			components := strings.Split(filepath.Clean(header.Name), string(filepath.Separator))

@@ -375,18 +375,17 @@ var _ = Describe("FakeFileSystem", func() {
 
 		Context("when the target is located in a parent directory", func() {
 			It("returns the target", func() {
-				sysRoot := os.Getenv("SYSTEMROOT")
-				err := fs.WriteFileString(filepath.Join(sysRoot, "foobarbaz"), "asdfghjk")
+				err := fs.WriteFileString(filepath.FromSlash("/foobarbaz"), "asdfghjk")
 				Expect(err).ToNot(HaveOccurred())
 
-				err = fs.Symlink(filepath.Join(sysRoot, "a", "b", "..", "..", "foobarbaz"), "foobar")
+				err = fs.Symlink(filepath.FromSlash("/a/b/../../foobarbaz"), "foobar")
 				Expect(err).ToNot(HaveOccurred())
 
 				targetPath, err := fs.ReadAndFollowLink("foobar")
 				Expect(err).ToNot(HaveOccurred())
 				absTarget, err := filepath.Abs(targetPath)
 				Expect(err).ToNot(HaveOccurred())
-				absExpected, err := filepath.Abs(filepath.Join(sysRoot, "foobarbaz"))
+				absExpected, err := filepath.Abs(filepath.FromSlash("/foobarbaz"))
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(absTarget).To(Equal(absExpected))
