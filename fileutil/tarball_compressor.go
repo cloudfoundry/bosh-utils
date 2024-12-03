@@ -1,6 +1,7 @@
 package fileutil
 
 import (
+	"archive/tar"
 	"fmt"
 	"io"
 	"io/fs"
@@ -9,13 +10,13 @@ import (
 	"runtime"
 	"strings"
 
-	"archive/tar"
-
 	"github.com/klauspost/pgzip"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshsys "github.com/cloudfoundry/bosh-utils/system"
 )
+
+const forwardSlash string = "/"
 
 type tarballCompressor struct {
 	fs boshsys.FileSystem
@@ -72,7 +73,7 @@ func (c tarballCompressor) CompressSpecificFilesInDir(dir string, files []string
 
 			header.Name = relPath
 			if runtime.GOOS == "windows" {
-				header.Name = strings.ReplaceAll(relPath, "\\", "/")
+				header.Name = strings.ReplaceAll(relPath, "\\", forwardSlash)
 			}
 
 			if err := tw.WriteHeader(header); err != nil {
@@ -146,7 +147,7 @@ func (c tarballCompressor) DecompressFileToDir(tarballPath string, dir string, o
 		fullName := filepath.Join(dir, filepath.FromSlash(header.Name))
 
 		if options.StripComponents > 0 {
-			components := strings.Split(header.Name, string(filepath.Separator))
+			components := strings.Split(header.Name, forwardSlash)
 			if len(components) <= options.StripComponents {
 				continue
 			}
