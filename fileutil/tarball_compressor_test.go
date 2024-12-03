@@ -161,7 +161,6 @@ var _ = Describe("tarballCompressor", func() {
 				"other_logs/more_logs/more.stdout.log",
 			))
 
-
 			content, err := fs.ReadFileString(filepath.FromSlash(dstDir + "/app.stdout.log"))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(content).To(ContainSubstring("this is app stdout"))
@@ -250,7 +249,7 @@ var _ = Describe("tarballCompressor", func() {
 
 			var (
 				tarballPath string
-				fs *fakesys.FakeFileSystem
+				fs          *fakesys.FakeFileSystem
 			)
 
 			BeforeEach(func() {
@@ -266,7 +265,6 @@ var _ = Describe("tarballCompressor", func() {
 				err = fs.MkdirAll(dstDir, 0775)
 				Expect(err).ToNot(HaveOccurred())
 			})
-
 
 			It("uses no same owner option", func() {
 				compressor := NewTarballCompressor(fs)
@@ -353,9 +351,15 @@ var _ = Describe("tarballCompressor", func() {
 			dstElements, err := pathsInDir(dstDir)
 			Expect(err).ToNot(HaveOccurred())
 
+			// tar --strip-components treats a leading `./` in the file headers as its own component.
+			// So ./dir/some-file becomes dir/some-file with strip-components = 1.
+			// The example tar file in this test contains the leading ./ for each of its files.
 			Expect(dstElements).To(Equal([]string{
 				"./",
-				"double-nested-file",
+				"empty-nested-dir/",
+				"nested-dir/",
+				"nested-dir/double-nested-file",
+				"nested-file",
 			}))
 		})
 	})
