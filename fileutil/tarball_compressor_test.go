@@ -161,7 +161,6 @@ var _ = Describe("tarballCompressor", func() {
 				"other_logs/more_logs/more.stdout.log",
 			))
 
-
 			content, err := fs.ReadFileString(filepath.FromSlash(dstDir + "/app.stdout.log"))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(content).To(ContainSubstring("this is app stdout"))
@@ -250,7 +249,7 @@ var _ = Describe("tarballCompressor", func() {
 
 			var (
 				tarballPath string
-				fs *fakesys.FakeFileSystem
+				fs          *fakesys.FakeFileSystem
 			)
 
 			BeforeEach(func() {
@@ -266,7 +265,6 @@ var _ = Describe("tarballCompressor", func() {
 				err = fs.MkdirAll(dstDir, 0775)
 				Expect(err).ToNot(HaveOccurred())
 			})
-
 
 			It("uses no same owner option", func() {
 				compressor := NewTarballCompressor(fs)
