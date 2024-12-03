@@ -353,9 +353,15 @@ var _ = Describe("tarballCompressor", func() {
 			dstElements, err := pathsInDir(dstDir)
 			Expect(err).ToNot(HaveOccurred())
 
+			// tar --strip-components treats a leading `./` in the file headers as its own component.
+			// So ./dir/some-file becomes dir/some-file with strip-components = 1.
+			// The example tar file in this test contains the leading ./ for each of its files.
 			Expect(dstElements).To(Equal([]string{
 				"./",
-				"double-nested-file",
+				"empty-nested-dir/",
+				"nested-dir/",
+				"nested-dir/double-nested-file",
+				"nested-file",
 			}))
 		})
 	})

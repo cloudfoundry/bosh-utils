@@ -146,7 +146,7 @@ func (c tarballCompressor) DecompressFileToDir(tarballPath string, dir string, o
 		fullName := filepath.Join(dir, filepath.FromSlash(header.Name))
 
 		if options.StripComponents > 0 {
-			components := strings.Split(filepath.Clean(header.Name), string(filepath.Separator))
+			components := strings.Split(header.Name, string(filepath.Separator))
 			if len(components) <= options.StripComponents {
 				continue
 			}
