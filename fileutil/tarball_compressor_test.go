@@ -245,6 +245,27 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(err.Error()).To(ContainSubstring(dstDir))
 		})
 
+		It("creates sub-directories even if the tarball does not have a header entry for the directory", func() {
+			compressor := NewTarballCompressor(fs)
+
+			// The contents of this tarball does not contain entries for the dir/ or dir/nested-dir/ directories. The tar executable
+			// automatically creates these directories when extracting files listed under the directories.
+			tarballPath := filepath.Join(fixtureSrcDir(), filepath.FromSlash("../compressor-decompress-missing-directory-header.tgz"))
+			err := compressor.DecompressFileToDir(tarballPath, dstDir, CompressorOptions{})
+			Expect(err).ToNot(HaveOccurred())
+
+			dstElements, err := pathsInDir(dstDir)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(dstElements).To(Equal([]string{
+				"./",
+				"dir/",
+				"dir/file1",
+				"dir/file2",
+				"dir/nested-dir/",
+				"dir/nested-dir/file3",
+			}))
+		})
+
 		Context("with tarball contents owned by root", func() {
 
 			var (
