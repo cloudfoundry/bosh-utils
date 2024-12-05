@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -140,26 +141,30 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(tgzName)
 
-			_, _, _, err = cmdRunner.RunCommand("tar", "-xzpf", tgzName, "-C", dstDir)
+			tarballContents, _, _, err := cmdRunner.RunCommand("tar", "-tf", tgzName)
 			Expect(err).ToNot(HaveOccurred())
 
-			dstElements, err := pathsInDir(dstDir)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(dstElements).To(ConsistOf(
+			contentElements := strings.Fields(strings.TrimSpace(tarballContents))
+
+			Expect(contentElements).To(ConsistOf(
 				"./",
-				"app.stderr.log",
-				"app.stdout.log",
-				"other_logs/",
-				"some_directory/",
-				"some_directory/sub_dir/",
-				"some_directory/sub_dir/other_sub_dir/",
-				"some_directory/sub_dir/other_sub_dir/.keep",
-				"symlink_dir",
-				"other_logs/more_logs/",
-				"other_logs/other_app.stderr.log",
-				"other_logs/other_app.stdout.log",
-				"other_logs/more_logs/more.stdout.log",
+				"./.keep",
+				"./app.stderr.log",
+				"./app.stdout.log",
+				"./other_logs/",
+				"./some_directory/",
+				"./some_directory/sub_dir/",
+				"./some_directory/sub_dir/other_sub_dir/",
+				"./some_directory/sub_dir/other_sub_dir/.keep",
+				"./symlink_dir",
+				"./other_logs/more_logs/",
+				"./other_logs/other_app.stderr.log",
+				"./other_logs/other_app.stdout.log",
+				"./other_logs/more_logs/more.stdout.log",
 			))
+
+			_, _, _, err = cmdRunner.RunCommand("tar", "-xzpf", tgzName, "-C", dstDir)
+			Expect(err).ToNot(HaveOccurred())
 
 			content, err := fs.ReadFileString(filepath.FromSlash(dstDir + "/app.stdout.log"))
 			Expect(err).ToNot(HaveOccurred())
