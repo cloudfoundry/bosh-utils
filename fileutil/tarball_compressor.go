@@ -80,8 +80,8 @@ func (c tarballCompressor) CompressSpecificFilesInDir(dir string, files []string
 				header.Name = header.Name + forwardSlash
 			}
 
-			if len(header.Name) < 2 || header.Name[0:2] != "."+forwardSlash {
-				header.Name = "." + forwardSlash + header.Name
+			if len(header.Name) < 2 || header.Name[0:2] != fmt.Sprintf(".%s", forwardSlash) {
+				header.Name = fmt.Sprintf(".%s%s", forwardSlash, header.Name)
 			}
 
 			if err := tw.WriteHeader(header); err != nil {
