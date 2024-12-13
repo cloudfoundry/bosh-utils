@@ -37,15 +37,10 @@ var _ = Describe("Long Paths", func() {
 	)
 
 	BeforeEach(func() {
-		LongPath = filepath.Join(os.TempDir(), randSeq(LONG_PATH_LENGTH))
-		rootPath, LongDir = randLongPath()
+		LongPath = filepath.Join(GinkgoT().TempDir(), randSeq(LONG_PATH_LENGTH))
+		rootPath = GinkgoT().TempDir()
+		LongDir = randLongPath(rootPath)
 		osFs = createOsFs()
-	})
-
-	AfterEach(func() {
-		// don't check for error!
-		fs.RemoveAll(rootPath) //nolint:errcheck
-		fs.Remove(LongPath)    //nolint:errcheck
 	})
 
 	// TODO: make sure we can cleanup before running tests
