@@ -1,7 +1,6 @@
 package system_test
 
 import (
-	"bytes"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,17 +12,6 @@ import (
 
 	. "github.com/cloudfoundry/bosh-utils/system"
 )
-
-func MakePath() string {
-	var buf bytes.Buffer
-	for i := 0; i < 2; i++ {
-		for i := byte('A'); i <= 'Z'; i++ {
-			buf.Write(bytes.Repeat([]byte{i}, 5))
-			buf.WriteRune(filepath.Separator)
-		}
-	}
-	return buf.String()
-}
 
 var _ = Describe("Long Paths", func() {
 	const LongPathLength = 240
