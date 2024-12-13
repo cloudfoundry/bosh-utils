@@ -2,13 +2,15 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
+	"github.com/jessevdk/go-flags"
+
 	boshcrypto "github.com/cloudfoundry/bosh-utils/crypto"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	boshsys "github.com/cloudfoundry/bosh-utils/system"
-	"github.com/jessevdk/go-flags"
-	"os"
-	"strings"
 )
 
 type opts struct {
