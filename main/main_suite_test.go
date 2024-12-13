@@ -11,7 +11,7 @@ import (
 
 var pathToBoshUtils string
 
-func TestMain(t *testing.T) {
+func TestVerifyMultidigestMain(t *testing.T) {
 	RegisterFailHandler(Fail)
 	BeforeSuite(func() {
 		var err error
@@ -22,5 +22,6 @@ func TestMain(t *testing.T) {
 	AfterSuite(func() {
 		gexec.CleanupBuildArtifacts()
 	})
-	RunSpecs(t, "Main Suite")
+
+	RunSpecs(t, "Verify Multidigest (main) Suite")
 }
