@@ -143,7 +143,7 @@ var _ = Describe("Long Paths", func() {
 		Expect(osFs.Symlink(LongPath, newPath)).To(Succeed())
 
 		target, err := osFs.Readlink(newPath)
-		if Windows {
+		if isWindows {
 			target = strings.TrimPrefix(target, `\\?\`)
 		}
 		Expect(err).To(Succeed())

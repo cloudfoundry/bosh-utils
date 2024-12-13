@@ -14,7 +14,7 @@ import (
 	"github.com/onsi/gomega/gexec"
 )
 
-const Windows = runtime.GOOS == "windows"
+const isWindows = runtime.GOOS == "windows"
 
 func TestSystem(t *testing.T) {
 	RegisterFailHandler(Fail)

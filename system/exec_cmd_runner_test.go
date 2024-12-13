@@ -185,7 +185,7 @@ var _ = Describe("execCmdRunner", func() {
 		})
 
 		It("performs a case-sensitive comparison of env vars when on *Nix", func() {
-			if Windows {
+			if isWindows {
 				Skip("*Nix only test")
 			}
 			envVars, err := setupWindowsEnvTest(map[string]string{
@@ -201,7 +201,7 @@ var _ = Describe("execCmdRunner", func() {
 		})
 
 		It("env var comparison is case-insensitive on Windows", func() {
-			if !Windows {
+			if !isWindows {
 				Skip("Windows only test")
 			}
 			envVars, err := setupWindowsEnvTest(map[string]string{
@@ -213,7 +213,7 @@ var _ = Describe("execCmdRunner", func() {
 		})
 
 		It("deterministically handles duplicate env vars on Windows", func() {
-			if !Windows {
+			if !isWindows {
 				Skip("Windows only test")
 			}
 			envVars, err := setupWindowsEnvTest(map[string]string{
