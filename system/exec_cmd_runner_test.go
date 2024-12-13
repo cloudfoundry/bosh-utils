@@ -18,7 +18,7 @@ import (
 const ErrExitCode = 14
 
 func osSpecificCommand(cmdName string) Command {
-	if runtime.GOOS == "windows" {
+	if isWindows {
 		return windowsCommand(cmdName)
 	}
 	return unixCommand(cmdName)
@@ -158,85 +158,113 @@ var _ = Describe("execCmdRunner", func() {
 			}
 		})
 
-		setupWindowsEnvTest := func(cmdVars map[string]string) (map[string]string, error) {
-			os.Setenv("_FOO", "BAR") //nolint:errcheck
-			defer os.Unsetenv("_FOO")
+		It("uses the env vars specified in the Command", func() {
+			GinkgoT().Setenv("_FOO", "BAR")
 
 			cmd := osSpecificCommand("env")
-			cmd.Env = cmdVars
-			stdout, _, _, err := runner.RunComplexCommand(cmd)
-			if err != nil {
-				return nil, err
-			}
-
-			// don't upper case key names we want to assert that the lower case
-			// duplicates provided in Command.Env are used.  also, Windows does
-			// not care about key case.
-			envVars := parseEnvFields(stdout, false)
-			return envVars, nil
-		}
-
-		It("uses the env vars specified in the Command", func() {
-			envVars, err := setupWindowsEnvTest(map[string]string{
+			cmd.Env = map[string]string{
 				"_FOO": "BAZZZ",
-			})
+			}
+			stdout, _, _, err := runner.RunComplexCommand(cmd)
 			Expect(err).ToNot(HaveOccurred())
+
+			envVars := parseEnvFields(stdout, false)
 			Expect(envVars).To(HaveKeyWithValue("_FOO", "BAZZZ"))
 		})
 
-		It("performs a case-sensitive comparison of env vars when on *Nix", func() {
-			if isWindows {
-				Skip("*Nix only test")
-			}
-			envVars, err := setupWindowsEnvTest(map[string]string{
-				"_foo": "BAZZZ",
-				"ABC":  "XYZ",
-				"abc":  "xyz",
+		Context("unix specific behavior", func() {
+			BeforeEach(func() {
+				if isWindows {
+					Skip("unix only test")
+				}
 			})
-			Expect(envVars).To(HaveKeyWithValue("_FOO", "BAR"))
-			Expect(envVars).To(HaveKeyWithValue("_foo", "BAZZZ"))
-			Expect(err).ToNot(HaveOccurred())
-			Expect(envVars).To(HaveKeyWithValue("ABC", "XYZ"))
-			Expect(envVars).To(HaveKeyWithValue("abc", "xyz"))
+
+			It("performs a case-sensitive comparison of env vars when on *Nix", func() {
+				GinkgoT().Setenv("_FOO", "BAR")
+
+				cmd := osSpecificCommand("env")
+				cmd.Env = map[string]string{
+					"_foo": "BAZZZ",
+					"ABC":  "XYZ",
+					"abc":  "xyz",
+				}
+				stdout, _, _, err := runner.RunComplexCommand(cmd)
+				Expect(err).ToNot(HaveOccurred())
+
+				envVars := parseEnvFields(stdout, false)
+				Expect(envVars).To(HaveKeyWithValue("_FOO", "BAR"))
+				Expect(envVars).To(HaveKeyWithValue("_foo", "BAZZZ"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(envVars).To(HaveKeyWithValue("ABC", "XYZ"))
+				Expect(envVars).To(HaveKeyWithValue("abc", "xyz"))
+			})
 		})
 
-		It("env var comparison is case-insensitive on Windows", func() {
-			if !isWindows {
-				Skip("Windows only test")
-			}
-			envVars, err := setupWindowsEnvTest(map[string]string{
-				"_foo": "BAZZZ",
+		Context("windows specific behavior", func() {
+			BeforeEach(func() {
+				if !isWindows {
+					Skip("Windows only test")
+				}
 			})
-			Expect(err).ToNot(HaveOccurred())
-			Expect(envVars).ToNot(HaveKey("_FOO"))
-			Expect(envVars).To(HaveKeyWithValue("_foo", "BAZZZ"))
-		})
 
-		It("deterministically handles duplicate env vars on Windows", func() {
-			if !isWindows {
-				Skip("Windows only test")
+			setupWindowsEnvTest := func(cmdVars map[string]string) (map[string]string, error) {
+				os.Setenv("_FOO", "BAR") //nolint:errcheck
+				defer os.Unsetenv("_FOO")
+
+				cmd := osSpecificCommand("env")
+				cmd.Env = cmdVars
+				stdout, _, _, err := runner.RunComplexCommand(cmd)
+				if err != nil {
+					return nil, err
+				}
+
+				// don't upper case key names we want to assert that the lower case
+				// duplicates provided in Command.Env are used.  also, Windows does
+				// not care about key case.
+				envVars := parseEnvFields(stdout, false)
+				return envVars, nil
 			}
-			envVars, err := setupWindowsEnvTest(map[string]string{
-				"_foo": "BAZZZ",
-				"_bar": "alpha=second",
-				"_BAR": "alpha=first",
+
+			It("uses the env vars specified in the Command", func() {
+				envVars, err := setupWindowsEnvTest(map[string]string{
+					"_FOO": "BAZZZ",
+				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(envVars).To(HaveKeyWithValue("_FOO", "BAZZZ"))
 			})
-			Expect(err).ToNot(HaveOccurred())
 
-			// vars in Command.Env replace System vars with the same name,
-			// compared case-insensitively. Therefore, the lower case '_foo'
-			// replaces the upper case '_FOO'.
-			//
-			Expect(envVars).ToNot(HaveKey("_FOO"))
-			Expect(envVars).To(HaveKeyWithValue("_foo", "BAZZZ"))
+			It("env var comparison is case-insensitive on Windows", func() {
+				envVars, err := setupWindowsEnvTest(map[string]string{
+					"_foo": "BAZZZ",
+				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(envVars).ToNot(HaveKey("_FOO"))
+				Expect(envVars).To(HaveKeyWithValue("_foo", "BAZZZ"))
+			})
 
-			// Duplicate env vars in Command.Env are de-duped before being
-			// merged with the System env vars.  Since the Command.Env is
-			// a map we sort the keys alphabetically before de-duping so
-			// that the result is deterministic.
-			//
-			Expect(envVars).ToNot(HaveKey("_bar"))
-			Expect(envVars).To(HaveKeyWithValue("_BAR", "alpha=first"))
+			It("deterministically handles duplicate env vars on Windows", func() {
+				envVars, err := setupWindowsEnvTest(map[string]string{
+					"_foo": "BAZZZ",
+					"_bar": "alpha=second",
+					"_BAR": "alpha=first",
+				})
+				Expect(err).ToNot(HaveOccurred())
+
+				// vars in Command.Env replace System vars with the same name,
+				// compared case-insensitively. Therefore, the lower case '_foo'
+				// replaces the upper case '_FOO'.
+				//
+				Expect(envVars).ToNot(HaveKey("_FOO"))
+				Expect(envVars).To(HaveKeyWithValue("_foo", "BAZZZ"))
+
+				// Duplicate env vars in Command.Env are de-duped before being
+				// merged with the System env vars.  Since the Command.Env is
+				// a map we sort the keys alphabetically before de-duping so
+				// that the result is deterministic.
+				//
+				Expect(envVars).ToNot(HaveKey("_bar"))
+				Expect(envVars).To(HaveKeyWithValue("_BAR", "alpha=first"))
+			})
 		})
 
 		It("run complex command with stdin", func() {
