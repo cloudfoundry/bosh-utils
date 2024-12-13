@@ -270,7 +270,7 @@ var _ = Describe("execCmdRunner", func() {
 		It("run complex command with stdin", func() {
 			input := "This is STDIN\nWith another line."
 			cmd := Command{
-				Name:  CatExePath,
+				Name:  catPath,
 				Stdin: strings.NewReader(input),
 			}
 			stdout, stderr, status, err := runner.RunComplexCommand(cmd)
@@ -289,7 +289,7 @@ var _ = Describe("execCmdRunner", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			cmd := Command{
-				Name:   CatExePath,
+				Name:   catPath,
 				Args:   []string{"-stdout", "fake-out", "-stderr", "fake-err"},
 				Stdout: stdoutFile,
 				Stderr: stderrFile,
@@ -327,7 +327,7 @@ var _ = Describe("execCmdRunner", func() {
 
 		It("populates stdout and stderr", func() {
 			cmd := Command{
-				Name: CatExePath,
+				Name: catPath,
 				Args: []string{"-stdout", "STDOUT", "-stderr", "STDERR"},
 			}
 			process, err := runner.RunComplexCommandAsync(cmd)
@@ -402,7 +402,7 @@ var _ = Describe("execCmdRunner", func() {
 		})
 
 		It("run command with error", func() {
-			stdout, stderr, status, err := runner.RunCommand(FalseExePath)
+			stdout, stderr, status, err := runner.RunCommand(falsePath)
 			Expect(err).To(HaveOccurred())
 			Expect(stderr).To(BeEmpty())
 			Expect(stdout).To(BeEmpty())
@@ -410,9 +410,9 @@ var _ = Describe("execCmdRunner", func() {
 		})
 
 		It("run command with error with args", func() {
-			stdout, stderr, status, err := runner.RunCommand(FalseExePath, "second arg")
+			stdout, stderr, status, err := runner.RunCommand(falsePath, "second arg")
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal(fmt.Sprintf("Running command: '%s second arg', stdout: '', stderr: '': exit status 1", FalseExePath)))
+			Expect(err.Error()).To(Equal(fmt.Sprintf("Running command: '%s second arg', stdout: '', stderr: '': exit status 1", falsePath)))
 			Expect(stderr).To(BeEmpty())
 			Expect(stdout).To(BeEmpty())
 			Expect(status).To(Equal(1))
@@ -432,7 +432,7 @@ var _ = Describe("execCmdRunner", func() {
 
 	Describe("RunCommandWithInput", func() {
 		It("run command with input", func() {
-			stdout, stderr, status, err := runner.RunCommandWithInput("foo\nbar\nbaz", CatExePath)
+			stdout, stderr, status, err := runner.RunCommandWithInput("foo\nbar\nbaz", catPath)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(stdout).To(Equal("foo\nbar\nbaz"))
 			Expect(stderr).To(BeEmpty())

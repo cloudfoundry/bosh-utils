@@ -24,7 +24,7 @@ var _ = Describe("execProcess", func() {
 			It("only excludes logging stdout and stderr contents", func() {
 				quietLogging := true
 
-				command := exec.Command(CatExePath, "--stdout", "someStdout", "--stderr", "someStderr")
+				command := exec.Command(catPath, "--stdout", "someStdout", "--stderr", "someStderr")
 				process := NewExecProcess(command, false, quietLogging, logger)
 				err = process.Start()
 				Expect(err).ToNot(HaveOccurred())
@@ -49,7 +49,7 @@ var _ = Describe("execProcess", func() {
 			It("logs the contents of stderr and stdout", func() {
 				quietLogging := false
 
-				command := exec.Command(CatExePath, "--stdout", "someStdout", "--stderr", "someStderr")
+				command := exec.Command(catPath, "--stdout", "someStdout", "--stderr", "someStderr")
 				process := NewExecProcess(command, false, quietLogging, logger)
 				err = process.Start()
 				Expect(err).ToNot(HaveOccurred())

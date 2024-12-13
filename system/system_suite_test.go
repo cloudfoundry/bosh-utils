@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -19,23 +20,37 @@ func TestSystem(t *testing.T) {
 	RunSpecs(t, "System Suite")
 }
 
-var CatExePath string
-var FalseExePath string
-var WindowsExePath string
+var catPath string
+var falsePath string
+var windowsExePath string
 
-var _ = BeforeSuite(func() {
-	var err error
-	CatExePath, err = gexec.Build("exec_cmd_runner_fixtures/cat/cat.go")
-	Expect(err).ToNot(HaveOccurred())
+var _ = SynchronizedBeforeSuite(func() []byte {
+	var paths []string
 
-	FalseExePath, err = gexec.Build("exec_cmd_runner_fixtures/false/false.go")
+	catBin, err := gexec.Build("exec_cmd_runner_fixtures/cat/cat.go")
 	Expect(err).ToNot(HaveOccurred())
+	paths = append(paths, catBin)
 
-	WindowsExePath, err = gexec.Build("exec_cmd_runner_fixtures/windows_exe/windows_exe.go")
+	falseBin, err := gexec.Build("exec_cmd_runner_fixtures/false/false.go")
 	Expect(err).ToNot(HaveOccurred())
+	paths = append(paths, falseBin)
+
+	windowsExeBin, err := gexec.Build("exec_cmd_runner_fixtures/windows_exe/windows_exe.go")
+	Expect(err).ToNot(HaveOccurred())
+	paths = append(paths, windowsExeBin)
+
+	Expect(paths).To(HaveLen(3))
+	return []byte(strings.Join(paths, "|"))
+}, func(data []byte) {
+	paths := strings.Split(string(data), "|")
+	Expect(paths).To(HaveLen(3))
+
+	catPath = paths[0]
+	falsePath = paths[1]
+	windowsExePath = paths[2]
 })
 
-var _ = AfterSuite(func() {
+var _ = SynchronizedAfterSuite(func() {}, func() {
 	gexec.CleanupBuildArtifacts()
 })
 
