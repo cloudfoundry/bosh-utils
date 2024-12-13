@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-var pathToBoshUtils string
+var verifyMultidigestBinPath string
 
 func TestVerifyMultidigestMain(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -21,7 +21,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	return []byte(verifyMultidigestBin)
 }, func(data []byte) {
-	pathToBoshUtils = string(data)
+	verifyMultidigestBinPath = string(data)
 })
 
 var _ = SynchronizedAfterSuite(func() {}, func() {
