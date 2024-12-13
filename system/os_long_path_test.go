@@ -25,9 +25,8 @@ func MakePath() string {
 	return buf.String()
 }
 
-const LONG_PATH_LENGTH = 240
-
 var _ = Describe("Long Paths", func() {
+	const LongPathLength = 240
 
 	var (
 		LongPath string
@@ -37,7 +36,7 @@ var _ = Describe("Long Paths", func() {
 	)
 
 	BeforeEach(func() {
-		LongPath = filepath.Join(GinkgoT().TempDir(), randSeq(LONG_PATH_LENGTH))
+		LongPath = filepath.Join(GinkgoT().TempDir(), randSeq(LongPathLength))
 		rootPath = GinkgoT().TempDir()
 		LongDir = randLongPath(rootPath)
 		osFs = createOsFs()
@@ -116,9 +115,9 @@ var _ = Describe("Long Paths", func() {
 	})
 
 	It("can rename a file with a long path", func() {
-		newPath := filepath.Join(os.TempDir(), randSeq(LONG_PATH_LENGTH))
+		newPath := filepath.Join(os.TempDir(), randSeq(LongPathLength))
 		for newPath == LongPath {
-			newPath = filepath.Join(os.TempDir(), randSeq(LONG_PATH_LENGTH))
+			newPath = filepath.Join(os.TempDir(), randSeq(LongPathLength))
 		}
 		defer fs.Remove(newPath) //nolint:errcheck
 
@@ -128,9 +127,9 @@ var _ = Describe("Long Paths", func() {
 	})
 
 	It("can create and read symlinks with long paths", func() {
-		newPath := filepath.Join(os.TempDir(), randSeq(LONG_PATH_LENGTH))
+		newPath := filepath.Join(os.TempDir(), randSeq(LongPathLength))
 		for newPath == LongPath {
-			newPath = filepath.Join(os.TempDir(), randSeq(LONG_PATH_LENGTH))
+			newPath = filepath.Join(os.TempDir(), randSeq(LongPathLength))
 		}
 		defer fs.Remove(newPath) //nolint:errcheck
 
@@ -147,9 +146,9 @@ var _ = Describe("Long Paths", func() {
 
 	It("can copy files with long paths", func() {
 		const content = "abc"
-		newPath := filepath.Join(os.TempDir(), randSeq(LONG_PATH_LENGTH))
+		newPath := filepath.Join(os.TempDir(), randSeq(LongPathLength))
 		for newPath == LongPath {
-			newPath = filepath.Join(os.TempDir(), randSeq(LONG_PATH_LENGTH))
+			newPath = filepath.Join(os.TempDir(), randSeq(LongPathLength))
 		}
 		defer fs.Remove(newPath) //nolint:errcheck
 
