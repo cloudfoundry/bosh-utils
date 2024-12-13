@@ -3,7 +3,6 @@ package system_test
 import (
 	"bytes"
 	"math/rand"
-	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -49,12 +48,9 @@ func randSeq(n int) string {
 	return string(b)
 }
 
-// returns a long directory path rooted at a temp directory root.
-// To cleanup delete the root directory.
-func randLongPath() (root, path string) {
-	tmpdir, err := os.MkdirTemp("", "")
-	Expect(err).To(Succeed())
-	volume := tmpdir + string(filepath.Separator)
+// returns a long directory path rooted at tmpDir
+func randLongPath(tmpDir string) string {
+	volume := tmpDir + string(filepath.Separator)
 	buf := bytes.NewBufferString(volume)
 	for i := 0; i < 2; i++ {
 		for i := byte('A'); i <= 'Z'; i++ {
@@ -64,5 +60,5 @@ func randLongPath() (root, path string) {
 	}
 	buf.WriteString(randSeq(10))
 	buf.WriteRune(filepath.Separator)
-	return tmpdir, filepath.Clean(buf.String())
+	return filepath.Clean(buf.String())
 }
