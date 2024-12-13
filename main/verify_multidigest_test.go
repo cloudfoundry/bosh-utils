@@ -3,6 +3,7 @@ package main_test
 import (
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -10,33 +11,26 @@ import (
 	"github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("Verify_multidigest", func() {
-	var session *gexec.Session
-	var act func(arg ...string)
-	var tempFile *os.File
+func runVerifyMultidigest(argCommands ...string) (*gexec.Session, error) {
+	return gexec.Start(exec.Command(verifyMultidigestBinPath, argCommands...), GinkgoWriter, GinkgoWriter)
+}
+
+var _ = Describe("VerifyMultidigest", func() {
+	var filePath string
 
 	BeforeEach(func() {
-		var err error
-		tempFile, err = os.CreateTemp("", "multi-digest-test")
-		Expect(err).ToNot(HaveOccurred())
-		_, err = tempFile.WriteString("sample content")
-		Expect(err).ToNot(HaveOccurred())
+		tmpDir := GinkgoT().TempDir()
+		fileContent := []byte("sample content")
+		filePath = filepath.Join(tmpDir, "test")
 
-		act = func(argCommands ...string) {
-			var err error
-			command := exec.Command(verifyMultidigestBinPath, argCommands...)
-			session, err = gexec.Start(command, GinkgoWriter, GinkgoWriter)
-			Expect(err).ShouldNot(HaveOccurred())
-		}
-	})
-
-	AfterEach(func() {
-		os.Remove(tempFile.Name()) //nolint:errcheck
+		err := os.WriteFile(filePath, fileContent, 0755)
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	Describe("version option", func() {
 		It("has a version flag", func() {
-			act("--version")
+			session, err := runVerifyMultidigest("--version")
+			Expect(err).ToNot(HaveOccurred())
 			Eventually(session).Should(gexec.Exit(0))
 			Eventually(session.Out).Should(gbytes.Say("version \\[DEV BUILD\\]"))
 		})
@@ -45,20 +39,23 @@ var _ = Describe("Verify_multidigest", func() {
 	Context("verification", func() {
 		Context("when correct args are passed to verify-multi-digest command", func() {
 			It("exits 0", func() {
-				act("verify-multi-digest", tempFile.Name(), "c4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6")
+				session, err := runVerifyMultidigest("verify-multi-digest", filePath, "c4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6")
+				Expect(err).ToNot(HaveOccurred())
 				Eventually(session).Should(gexec.Exit(0))
 			})
 		})
 
 		Context("when passing incorrect args", func() {
 			It("exits 1 when digest does not match", func() {
-				act("verify-multi-digest", tempFile.Name(), "incorrectdigest")
+				session, err := runVerifyMultidigest("verify-multi-digest", filePath, "incorrectdigest")
+				Expect(err).ToNot(HaveOccurred())
 				Eventually(session).Should(gexec.Exit(1))
 				Eventually(session.Err).Should(gbytes.Say("Expected stream to have digest 'incorrectdigest' but was 'c4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6'"))
 			})
 
 			It("exits 1 when file does not exist", func() {
-				act("verify-multi-digest", "potato", "c4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6")
+				session, err := runVerifyMultidigest("verify-multi-digest", "potato", "c4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6")
+				Expect(err).ToNot(HaveOccurred())
 				Eventually(session).Should(gexec.Exit(1))
 				Eventually(session.Err).Should(gbytes.Say("open potato:"))
 			})
@@ -68,35 +65,41 @@ var _ = Describe("Verify_multidigest", func() {
 	Context("digest creation", func() {
 		Context("when correct args are passed to create-multi-digest command", func() {
 			It("sha1", func() {
-				act("create-multi-digest", "sha1", tempFile.Name())
+				session, err := runVerifyMultidigest("create-multi-digest", "sha1", filePath)
+				Expect(err).NotTo(HaveOccurred())
 				Eventually(session).Should(gexec.Exit(0))
 				Eventually(session).Should(gbytes.Say("c4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6"))
 			})
 
 			It("sha256", func() {
-				act("create-multi-digest", "sha256", tempFile.Name())
+				session, err := runVerifyMultidigest("create-multi-digest", "sha256", filePath)
+				Expect(err).NotTo(HaveOccurred())
 				Eventually(session).Should(gexec.Exit(0))
 				Eventually(session).Should(gbytes.Say("sha256:571ca3b4ef92a81f8c062f2c2437b9116435d1575589a7b64a5c607d058fde0d"))
 			})
 
 			It("sha512", func() {
-				act("create-multi-digest", "sha512", tempFile.Name())
+				session, err := runVerifyMultidigest("create-multi-digest", "sha512", filePath)
+				Expect(err).NotTo(HaveOccurred())
 				Eventually(session).Should(gexec.Exit(0))
 				Eventually(session).Should(gbytes.Say("sha512:bd9686023e9b5ddca02fe00ca0fcfe4dccbee6470ff90795aa005809c374b3a9f00cde7eba1a8266b715a0789041d08650d5cc4182856091ed93cfd3dd1195c8"))
 			})
 
 			It("sha1,sha256", func() {
-				act("create-multi-digest", "sha1,sha256", tempFile.Name())
+				session, err := runVerifyMultidigest("create-multi-digest", "sha1,sha256", filePath)
+				Expect(err).NotTo(HaveOccurred())
 				Eventually(session).Should(gexec.Exit(0))
 				Eventually(session).Should(gbytes.Say("c4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6;sha256:571ca3b4ef92a81f8c062f2c2437b9116435d1575589a7b64a5c607d058fde0d"))
 			})
 
 			It("does not emit any newlines or other whitespace", func() {
-				act("create-multi-digest", "sha1,sha256", tempFile.Name())
+				session, err := runVerifyMultidigest("create-multi-digest", "sha1,sha256", filePath)
+				Expect(err).NotTo(HaveOccurred())
 				Eventually(session).Should(gexec.Exit(0))
 				Eventually(session).Should(gbytes.Say(`\Ac4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6;sha256:571ca3b4ef92a81f8c062f2c2437b9116435d1575589a7b64a5c607d058fde0d\z`))
 
-				act("create-multi-digest", "sha1", tempFile.Name())
+				session, err = runVerifyMultidigest("create-multi-digest", "sha1", filePath)
+				Expect(err).NotTo(HaveOccurred())
 				Eventually(session).Should(gexec.Exit(0))
 				Eventually(session).Should(gbytes.Say(`\Ac4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6\z`))
 			})
@@ -104,13 +107,15 @@ var _ = Describe("Verify_multidigest", func() {
 
 		Context("when passing incorrect args", func() {
 			It("exits 1 when file does not exist", func() {
-				act("create-multi-digest", "sha1", "potato")
+				session, err := runVerifyMultidigest("create-multi-digest", "sha1", "potato")
+				Expect(err).NotTo(HaveOccurred())
 				Eventually(session).Should(gexec.Exit(1))
 				Eventually(session.Err).Should(gbytes.Say("Calculating digest of 'potato': open potato:"))
 			})
 
 			It("exits 1 when the algorithm is unknown", func() {
-				act("create-multi-digest", "potoato", tempFile.Name())
+				session, err := runVerifyMultidigest("create-multi-digest", "potoato", filePath)
+				Expect(err).NotTo(HaveOccurred())
 				Eventually(session).Should(gexec.Exit(1))
 				Eventually(session.Err).Should(gbytes.Say("unknown algorithm 'potoato'"))
 			})
