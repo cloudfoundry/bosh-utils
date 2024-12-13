@@ -4,4 +4,4 @@ set -e
 bin=$(dirname $0)
 
 echo -e "\n Testing packages..."
-go run github.com/onsi/ginkgo/v2/ginkgo -r -race -trace --skip-package="vendor" $@
+go run github.com/onsi/ginkgo/v2/ginkgo run -r --race --trace --keep-going "${@}"
