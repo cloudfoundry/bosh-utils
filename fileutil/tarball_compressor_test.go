@@ -2,7 +2,6 @@ package fileutil_test
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,6 +9,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/cloudfoundry/bosh-utils/assert"
 	. "github.com/cloudfoundry/bosh-utils/fileutil"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	boshsys "github.com/cloudfoundry/bosh-utils/system"
@@ -36,41 +36,8 @@ func createTestSymlink() (string, error) {
 	return symlinkPath, os.Symlink(symlinkTarget, symlinkPath)
 }
 
-func beDir() beDirMatcher {
-	return beDirMatcher{}
-}
-
-type beDirMatcher struct {
-}
-
-// FailureMessage(actual interface{}) (message string)
-// NegatedFailureMessage(actual interface{}) (message string)
-func (m beDirMatcher) Match(actual interface{}) (bool, error) {
-	path, ok := actual.(string)
-	if !ok {
-		return false, fmt.Errorf("`%s' is not a valid path", actual)
-	}
-
-	dir, err := os.Open(path)
-	if err != nil {
-		return false, fmt.Errorf("Could not open `%s'", actual)
-	}
-	defer dir.Close()
-
-	dirInfo, err := dir.Stat()
-	if err != nil {
-		return false, fmt.Errorf("Could not stat `%s'", actual)
-	}
-
-	return dirInfo.IsDir(), nil
-}
-
-func (m beDirMatcher) FailureMessage(actual interface{}) string {
-	return fmt.Sprintf("Expected `%s' to be a directory", actual)
-}
-
-func (m beDirMatcher) NegatedFailureMessage(actual interface{}) string {
-	return fmt.Sprintf("Expected `%s' to not be a directory", actual)
+func beDir() assert.BeDir {
+	return assert.BeDir{}
 }
 
 var _ = Describe("tarballCompressor", func() {
