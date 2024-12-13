@@ -5,7 +5,7 @@ trap {
 
 go.exe version
 
-go.exe run github.com/onsi/ginkgo/v2/ginkgo -r -keep-going --skip-package="vendor"
+go.exe run github.com/onsi/ginkgo/v2/ginkgo -r -keep-going
 if ($LastExitCode -ne 0)
 {
     Write-Error $_
