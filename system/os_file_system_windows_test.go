@@ -14,7 +14,7 @@ import (
 
 var _ = Describe("Windows Specific tests", func() {
 	It("HomeDir returns an error if 'username' is not the current user", func() {
-		if !Windows {
+		if !isWindows {
 			Skip("Windows only test")
 		}
 		osFs := createOsFs()

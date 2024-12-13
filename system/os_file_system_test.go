@@ -54,7 +54,7 @@ var _ = Describe("OS FileSystem", func() {
 	It("home dir", func() {
 		superuser := "root"
 		expDir := "/root"
-		if Windows {
+		if isWindows {
 			u, err := osuser.Current()
 			Expect(err).ToNot(HaveOccurred())
 			superuser = u.Name
@@ -65,7 +65,7 @@ var _ = Describe("OS FileSystem", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		// path and user names are case-insensitive
-		if Windows {
+		if isWindows {
 			Expect(strings.ToLower(homeDir)).To(ContainSubstring(strings.ToLower(expDir)))
 		} else {
 			Expect(homeDir).To(ContainSubstring(expDir))
@@ -816,7 +816,7 @@ var _ = Describe("OS FileSystem", func() {
 
 		It("does not leak file descriptors", func() {
 			cmdName := "lsof"
-			if Windows {
+			if isWindows {
 				if _, err := exec.LookPath("handle.exe"); err != nil {
 					Skip("This test requires handle.exe it can be downloaded here:\n" +
 						"https://technet.microsoft.com/en-us/sysinternals/handle.aspx")
@@ -887,7 +887,7 @@ var _ = Describe("OS FileSystem", func() {
 
 		It("does not leak file descriptors", func() {
 			cmdName := "lsof"
-			if Windows {
+			if isWindows {
 				if _, err := exec.LookPath("handle.exe"); err != nil {
 					Skip("This test requires handle.exe it can be downloaded here:\n" +
 						"https://technet.microsoft.com/en-us/sysinternals/handle.aspx")
