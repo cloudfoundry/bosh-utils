@@ -126,7 +126,6 @@ var _ = Describe("execCmdRunner", func() {
 
 		It("run complex command with env", func() {
 			cmd := GetPlatformCommand("env")
-			cmd.UseIsolatedEnv = false
 			stdout, stderr, status, err := runner.RunComplexCommand(cmd)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -135,23 +134,6 @@ var _ = Describe("execCmdRunner", func() {
 			Expect(envVars).To(HaveKey("PATH"))
 			Expect(stderr).To(BeEmpty())
 			Expect(status).To(Equal(0))
-		})
-
-		It("runs complex command with specific env", func() {
-			cmd := GetPlatformCommand("env")
-			cmd.UseIsolatedEnv = true
-			if runtime.GOOS == "windows" {
-				Expect(func() { runner.RunComplexCommand(cmd) }).To(Panic()) //nolint:errcheck
-			} else {
-				stdout, stderr, status, err := runner.RunComplexCommand(cmd)
-				Expect(err).ToNot(HaveOccurred())
-
-				envVars := parseEnvFields(stdout, true)
-				Expect(envVars).To(HaveKeyWithValue("FOO", "BAR"))
-				Expect(envVars).ToNot(HaveKey("PATH"))
-				Expect(stderr).To(BeEmpty())
-				Expect(status).To(Equal(0))
-			}
 		})
 
 		setupWindowsEnvTest := func(cmdVars map[string]string) (map[string]string, error) {
@@ -319,7 +301,6 @@ var _ = Describe("execCmdRunner", func() {
 
 		It("allows setting custom env variable in addition to inheriting process env variables", func() {
 			cmd := GetPlatformCommand("env")
-			cmd.UseIsolatedEnv = false
 
 			process, err := runner.RunComplexCommandAsync(cmd)
 			Expect(err).ToNot(HaveOccurred())
