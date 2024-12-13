@@ -24,7 +24,7 @@ var _ = Describe("Verify_multidigest", func() {
 
 		act = func(argCommands ...string) {
 			var err error
-			command := exec.Command(pathToBoshUtils, argCommands...)
+			command := exec.Command(verifyMultidigestBinPath, argCommands...)
 			session, err = gexec.Start(command, GinkgoWriter, GinkgoWriter)
 			Expect(err).ShouldNot(HaveOccurred())
 		}
