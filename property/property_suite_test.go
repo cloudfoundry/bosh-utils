@@ -1,13 +1,13 @@
-package crypto_test
+package property_test
 
 import (
+	"testing"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	"testing"
 )
 
 func TestReg(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "crypto")
+	RunSpecs(t, "Property Suite")
 }
