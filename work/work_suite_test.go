@@ -1,4 +1,4 @@
-package property_test
+package work_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestReg(t *testing.T) {
+func TestWork(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "property")
+	RunSpecs(t, "Work Suite")
 }
