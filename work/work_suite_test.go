@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestReg(t *testing.T) {
+func TestWork(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "work")
+	RunSpecs(t, "Work Suite")
 }

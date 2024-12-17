@@ -9,5 +9,5 @@ import (
 
 func TestReg(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "property")
+	RunSpecs(t, "Property Suite")
 }

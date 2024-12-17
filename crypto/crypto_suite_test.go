@@ -1,4 +1,4 @@
-package fileutil_test
+package crypto_test
 
 import (
 	. "github.com/onsi/ginkgo/v2"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestCommands(t *testing.T) {
+func TestReg(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Fileutil Suite")
+	RunSpecs(t, "Crypto Suite")
 }

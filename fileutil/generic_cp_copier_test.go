@@ -14,29 +14,31 @@ import (
 	boshsys "github.com/cloudfoundry/bosh-utils/system"
 )
 
+func filesInDir(dir string) []string {
+	var copiedFiles []string
+
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			copiedFiles = append(copiedFiles, path)
+		}
+		return nil
+	})
+
+	Expect(err).ToNot(HaveOccurred())
+
+	sort.Strings(copiedFiles)
+
+	return copiedFiles
+}
+
 var _ = Describe("genericCpCopier", func() {
 	var (
 		fs       boshsys.FileSystem
 		cpCopier Copier
 	)
-	filesInDir := func(dir string) []string {
-		copiedFiles := []string{}
-		err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if !info.IsDir() {
-				copiedFiles = append(copiedFiles, path)
-			}
-			return nil
-		})
-
-		Expect(err).ToNot(HaveOccurred())
-
-		sort.Strings(copiedFiles)
-
-		return copiedFiles
-	}
 
 	BeforeEach(func() {
 		logger := boshlog.NewLogger(boshlog.LevelNone)
@@ -47,7 +49,6 @@ var _ = Describe("genericCpCopier", func() {
 	Describe("FilteredCopyToTemp", func() {
 
 		It("copies all regular files from filtered copy to temp", func() {
-			srcDir := fixtureSrcDir()
 			filters := []string{
 				filepath.Join("**", "*.stdout.log"),
 				"*.stderr.log",
@@ -56,14 +57,11 @@ var _ = Describe("genericCpCopier", func() {
 				filepath.Join("some_directory", "**", "*"),
 			}
 
-			dstDir, err := cpCopier.FilteredCopyToTemp(srcDir, filters)
+			dstDir, err := cpCopier.FilteredCopyToTemp(testAssetsFixtureDir, filters)
 			Expect(err).ToNot(HaveOccurred())
-
 			defer os.RemoveAll(dstDir)
 
 			copiedFiles := filesInDir(dstDir)
-
-			Expect(err).ToNot(HaveOccurred())
 
 			Expect(copiedFiles[0:5]).To(Equal([]string{
 				filepath.Join(dstDir, "app.stderr.log"),
@@ -105,10 +103,11 @@ var _ = Describe("genericCpCopier", func() {
 				Skip("Pending on Windows, relative symlinks are not supported")
 			}
 
-			srcDir := fixtureSrcDir()
-			symlinkPath, err := createTestSymlink()
+			symlinkBasename := "symlink_dir"
+			symlinkPath := filepath.Join(testAssetsFixtureDir, symlinkBasename)
+			symlinkTarget := filepath.Join(testAssetsDir, "symlink_target")
+			err := os.Symlink(symlinkTarget, symlinkPath)
 			Expect(err).To(Succeed())
-			defer os.Remove(symlinkPath)
 
 			filters := []string{
 				filepath.Join("**", "*.stdout.log"),
@@ -118,9 +117,8 @@ var _ = Describe("genericCpCopier", func() {
 				filepath.Join("some_directory", "**", "*"),
 			}
 
-			dstDir, err := cpCopier.FilteredCopyToTemp(srcDir, filters)
+			dstDir, err := cpCopier.FilteredCopyToTemp(testAssetsFixtureDir, filters)
 			Expect(err).ToNot(HaveOccurred())
-
 			defer os.RemoveAll(dstDir)
 
 			copiedFiles := filesInDir(dstDir)
@@ -128,8 +126,8 @@ var _ = Describe("genericCpCopier", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(copiedFiles[5:]).To(Equal([]string{
-				filepath.Join(dstDir, "symlink_dir", "app.stdout.log"),
-				filepath.Join(dstDir, "symlink_dir", "sub_dir", "sub_app.stdout.log"),
+				filepath.Join(dstDir, symlinkBasename, "app.stdout.log"),
+				filepath.Join(dstDir, symlinkBasename, "sub_dir", "sub_app.stdout.log"),
 			}))
 		})
 
@@ -142,14 +140,12 @@ var _ = Describe("genericCpCopier", func() {
 			})
 
 			It("fixes permissions on destination directory", func() {
-				srcDir := fixtureSrcDir()
 				filters := []string{
 					"**/*",
 				}
 
-				dstDir, err := cpCopier.FilteredCopyToTemp(srcDir, filters)
+				dstDir, err := cpCopier.FilteredCopyToTemp(testAssetsFixtureDir, filters)
 				Expect(err).ToNot(HaveOccurred())
-
 				defer os.RemoveAll(dstDir)
 
 				tarDirStat, err := os.Stat(dstDir)
@@ -159,14 +155,12 @@ var _ = Describe("genericCpCopier", func() {
 		})
 
 		It("copies the content of directories when specified as a filter", func() {
-			srcDir := fixtureSrcDir()
 			filters := []string{
 				"some_directory",
 			}
 
-			dstDir, err := cpCopier.FilteredCopyToTemp(srcDir, filters)
+			dstDir, err := cpCopier.FilteredCopyToTemp(testAssetsFixtureDir, filters)
 			Expect(err).ToNot(HaveOccurred())
-
 			defer os.RemoveAll(dstDir)
 
 			copiedFiles := filesInDir(dstDir)
@@ -179,18 +173,16 @@ var _ = Describe("genericCpCopier", func() {
 
 	Describe("FilteredMultiCopyToTemp", func() {
 		It("copies all regular files from each provided directory to temp", func() {
-			srcDir := fixtureSrcDir()
 			filters := []string{
 				"**/*",
 			}
 			srcDirs := []DirToCopy{
-				{Dir: filepath.Join(srcDir), Prefix: "first_prefix"},
-				{Dir: filepath.Join(srcDir, "some_directory"), Prefix: "second_prefix"},
-				{Dir: filepath.Join(srcDir, "some_directory")},
+				{Dir: filepath.Join(testAssetsFixtureDir), Prefix: "first_prefix"},
+				{Dir: filepath.Join(testAssetsFixtureDir, "some_directory"), Prefix: "second_prefix"},
+				{Dir: filepath.Join(testAssetsFixtureDir, "some_directory")},
 			}
 			dstDir, err := cpCopier.FilteredMultiCopyToTemp(srcDirs, filters)
 			Expect(err).ToNot(HaveOccurred())
-
 			defer os.RemoveAll(dstDir)
 
 			copiedFiles := filesInDir(dstDir)

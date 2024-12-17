@@ -16,15 +16,12 @@ import (
 var _ = Describe("OS FileSystem", func() {
 	Describe("chown", func() {
 		var testPath string
+
 		BeforeEach(func() {
-			testPath = filepath.Join(os.TempDir(), "ChownTestDir")
+			testPath = filepath.Join(GinkgoT().TempDir(), "ChownTestDir")
 
 			err := os.Mkdir(testPath, os.FileMode(0700))
 			Expect(err).ToNot(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			defer os.RemoveAll(testPath)
 		})
 
 		if runtime.GOOS == "linux" && os.Getenv("USER") == "root" {

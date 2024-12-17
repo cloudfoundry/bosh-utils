@@ -41,7 +41,7 @@ var _ = Describe("execCmdRunner", func() {
 	Describe("TerminateNicely", func() {
 		Context("when process exists", func() {
 			It("kills the process and returns its exit status", func() {
-				execProcess := NewExecProcess(exec.Command(WindowsExePath), false, false, logger)
+				execProcess := NewExecProcess(exec.Command(windowsExePath), false, false, logger)
 				err := execProcess.Start()
 				Expect(err).ToNot(HaveOccurred())
 
@@ -64,7 +64,7 @@ var _ = Describe("execCmdRunner", func() {
 
 		Context("when process does not exist", func() {
 			It("returns no error", func() {
-				execProcess := NewExecProcess(exec.Command(WindowsExePath), false, false, logger)
+				execProcess := NewExecProcess(exec.Command(windowsExePath), false, false, logger)
 				err := execProcess.Start()
 				Expect(err).ToNot(HaveOccurred())
 

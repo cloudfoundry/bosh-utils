@@ -14,7 +14,7 @@ import (
 
 var _ = Describe("Windows Specific tests", func() {
 	It("HomeDir returns an error if 'username' is not the current user", func() {
-		if !Windows {
+		if !isWindows {
 			Skip("Windows only test")
 		}
 		osFs := createOsFs()
@@ -53,9 +53,8 @@ var _ = Describe("Windows Specific tests", func() {
 	It("can remove a directory long path", func() {
 		osFs := createOsFs()
 
-		rootPath, longPath := randLongPath()
+		longPath := randLongPath(GinkgoT().TempDir())
 		err := fsWrapper.MkdirAll(longPath, 0755)
-		defer fsWrapper.RemoveAll(rootPath) //nolint:errcheck
 		Expect(err).ToNot(HaveOccurred())
 
 		dstFile, err := os.CreateTemp(`\\?\`+longPath, "")
