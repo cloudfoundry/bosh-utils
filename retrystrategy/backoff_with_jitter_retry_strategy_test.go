@@ -7,17 +7,17 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	fakelogger "github.com/cloudfoundry/bosh-utils/logger/fakes"
+	"github.com/cloudfoundry/bosh-utils/logger/loggerfakes"
 	. "github.com/cloudfoundry/bosh-utils/retrystrategy"
 )
 
 var _ = Describe("BackoffWithJitterRetryStrategy", func() {
 	var (
-		logger *fakelogger.FakeLogger
+		logger *loggerfakes.FakeLogger
 	)
 
 	BeforeEach(func() {
-		logger = &fakelogger.FakeLogger{}
+		logger = &loggerfakes.FakeLogger{}
 	})
 
 	Describe("Try", func() {
