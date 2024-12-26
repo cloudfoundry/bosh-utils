@@ -3,14 +3,16 @@ on:
   push:
   pull_request:
 jobs:
-  verify:
+  verify: # <- name
     strategy:
       matrix:
-        os: [windows-2019, ubuntu-latest]
+        os: [macos-latest, ubuntu-latest, windows-2019]
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
     - uses: golangci/golangci-lint-action@v6
     - name: Unit Tests (Windows)
       if: runner.os == 'Windows'
