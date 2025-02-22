@@ -7,7 +7,7 @@ require (
 	code.cloudfoundry.org/tlsconfig v0.18.0
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/charlievieth/fs v0.0.3
-	github.com/cloudfoundry/socks5-proxy v0.2.142
+	github.com/cloudfoundry/socks5-proxy v0.2.143
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/jpillora/backoff v1.0.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.11.2
@@ -31,7 +31,7 @@ require (
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
-	golang.org/x/crypto v0.33.0 // indirect
+	golang.org/x/crypto v0.34.0 // indirect
 	golang.org/x/mod v0.23.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
