@@ -123,16 +123,18 @@ resources:
   - name: bosh-utils
     type: git
     source:
-      uri: git@github.com:cloudfoundry/bosh-utils.git
+      uri: https://github.com/cloudfoundry/bosh-utils.git
       branch: develop
-      private_key: ((github_deploy_key_bosh-utils.private_key))
+      username: bosh-admin-bot
+      password: ((github_public_repo_token))
 
   - name: bosh-utils-promoted
     type: git
     source:
-      uri: git@github.com:cloudfoundry/bosh-utils.git
+      uri: https://github.com/cloudfoundry/bosh-utils.git
       branch: master
-      private_key: ((github_deploy_key_bosh-utils.private_key))
+      username: bosh-admin-bot
+      password: ((github_public_repo_token))
 
   - name: bosh-utils-commit-status
     type: github-status
@@ -145,9 +147,10 @@ resources:
   - name: bosh-utils-dockerfiles
     type: git
     source:
-      uri: git@github.com:cloudfoundry/bosh-utils.git
+      uri: https://github.com/cloudfoundry/bosh-utils.git
       branch: develop
-      private_key: ((github_deploy_key_bosh-utils.private_key))
+      username: bosh-admin-bot
+      password: ((github_public_repo_token))
       paths:
       - "ci/docker"
 
@@ -167,10 +170,11 @@ resources:
     type: semver
     source:
       driver: git
-      uri: git@github.com:cloudfoundry/bosh-utils.git
+      uri: https://github.com/cloudfoundry/bosh-utils.git
+      username: bosh-admin-bot
+      password: ((github_public_repo_token))
       branch: release-semver
       file: verify-multidigest/VERSION
-      private_key: ((github_deploy_key_bosh-utils.private_key))
       initial_version: '0.0.500'
 
   - name: bosh-utils-image
