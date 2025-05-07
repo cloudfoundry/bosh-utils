@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	osuser "os/user"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -55,10 +56,20 @@ var _ = Describe("OS FileSystem", func() {
 		superuser := "root"
 		expDir := "/root"
 		if isWindows {
-			u, err := osuser.Current()
+			currentUser, err := osuser.Current()
 			Expect(err).ToNot(HaveOccurred())
-			superuser = u.Name
-			expDir = "\\systemprofile"
+
+			// If a regular user, the home directory will end with the username
+			superuser = currentUser.Name
+			expDir = fmt.Sprintf(`\%s`, filepath.Base(currentUser.Name))
+
+			// If a System or LocalSystem user, the home directory will be different
+			// ref: https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-identifiers
+			groupIds, err := currentUser.GroupIds()
+			Expect(err).ToNot(HaveOccurred())
+			if slices.Contains(groupIds, "S-1-5-18") {
+				expDir = `C:\Windows\system32\config\systemprofile`
+			}
 		}
 
 		homeDir, err := createOsFs().HomeDir(superuser)
