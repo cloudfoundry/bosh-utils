@@ -58,7 +58,7 @@ var _ = Describe("OS FileSystem", func() {
 			u, err := osuser.Current()
 			Expect(err).ToNot(HaveOccurred())
 			superuser = u.Name
-			expDir = `\` + u.Name
+			expDir = "\\systemprofile"
 		}
 
 		homeDir, err := createOsFs().HomeDir(superuser)
