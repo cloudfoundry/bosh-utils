@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	osuser "os/user"
+	"os/user"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -53,15 +53,12 @@ var _ = Describe("OS FileSystem", func() {
 	})
 
 	It("home dir", func() {
-		superuser := "root"
-		expDir := "/root"
 		if isWindows {
-			currentUser, err := osuser.Current()
+			currentUser, err := user.Current()
 			Expect(err).ToNot(HaveOccurred())
 
 			// If a regular user, the home directory will end with the username
-			superuser = currentUser.Name
-			expDir = fmt.Sprintf(`\%s`, filepath.Base(currentUser.Name))
+			expDir := fmt.Sprintf(`\%s`, filepath.Base(currentUser.Name))
 
 			// If a System or LocalSystem user, the home directory will be different
 			// ref: https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-identifiers
@@ -70,15 +67,17 @@ var _ = Describe("OS FileSystem", func() {
 			if slices.Contains(groupIds, "S-1-5-18") {
 				expDir = `C:\Windows\system32\config\systemprofile`
 			}
-		}
 
-		homeDir, err := createOsFs().HomeDir(superuser)
-		Expect(err).ToNot(HaveOccurred())
+			homeDir, err := createOsFs().HomeDir(currentUser.Name)
+			Expect(err).ToNot(HaveOccurred())
 
-		// path and user names are case-insensitive
-		if isWindows {
 			Expect(strings.ToLower(homeDir)).To(ContainSubstring(strings.ToLower(expDir)))
 		} else {
+			superuser := "root"
+			expDir := "/root"
+			homeDir, err := createOsFs().HomeDir(superuser)
+			Expect(err).ToNot(HaveOccurred())
+
 			Expect(homeDir).To(ContainSubstring(expDir))
 		}
 	})
@@ -89,7 +88,7 @@ var _ = Describe("OS FileSystem", func() {
 		expandedPath, err := osFs.ExpandPath("~/fake-dir/fake-file.txt")
 		Expect(err).ToNot(HaveOccurred())
 
-		currentUser, err := osuser.Current()
+		currentUser, err := user.Current()
 		Expect(err).ToNot(HaveOccurred())
 		Expect(expandedPath).To(MatchPath(currentUser.HomeDir + "/fake-dir/fake-file.txt"))
 
