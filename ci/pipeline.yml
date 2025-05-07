@@ -33,17 +33,18 @@ jobs:
           input_repo: bosh-utils
         output_mapping:
           output_repo: bumped-bosh-utils
-      - task: test-unit
-        input_mapping:
-          bosh-utils: bumped-bosh-utils
-        file: bosh-utils/ci/tasks/test-unit.yml
-        image: bosh-utils-image
-      - task: test-unit-windows
-        input_mapping:
-          bosh-utils: bumped-bosh-utils
-        file: bosh-utils/ci/tasks/test-unit-windows.yml
-        tags:
-          - windows-nimbus
+      - in_parallel:
+        - task: test-unit
+          input_mapping:
+            bosh-utils: bumped-bosh-utils
+          file: bosh-utils/ci/tasks/test-unit.yml
+          image: bosh-utils-image
+        - task: test-unit-windows
+          input_mapping:
+            bosh-utils: bumped-bosh-utils
+          file: bosh-utils/ci/tasks/test-unit-windows.yml
+          tags:
+            - windows-nimbus
       - put: bosh-utils
         params:
           repository: bumped-bosh-utils
