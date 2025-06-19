@@ -58,7 +58,7 @@ var _ = Describe("OS FileSystem", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			// If a regular user, the home directory will end with the username
-			expDir := fmt.Sprintf(`\%s`, filepath.Base(currentUser.Name))
+			expDir := fmt.Sprintf(`\%s`, filepath.Base(currentUser.Username))
 
 			// If a System or LocalSystem user, the home directory will be different
 			// ref: https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-identifiers
