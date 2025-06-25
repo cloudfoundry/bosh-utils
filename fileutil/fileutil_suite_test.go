@@ -59,10 +59,12 @@ func localCopyFSForGo122(dir string, fsys fs.FS) error {
 var _ = BeforeEach(func() {
 	assetsDirFS := os.DirFS(filepath.Join(".", "test_assets"))
 
-	testAssetsDir = GinkgoT().TempDir()
+	var err error
+	testAssetsDir, err = filepath.EvalSymlinks(GinkgoT().TempDir())
+	Expect(err).ToNot(HaveOccurred())
 
 	// TODO: use `os.CopyFS` instead of `localCopyFSForGo122` once we upgrade Golang versions
-	err := localCopyFSForGo122(testAssetsDir, assetsDirFS)
+	err = localCopyFSForGo122(testAssetsDir, assetsDirFS)
 	Expect(err).NotTo(HaveOccurred())
 
 	testAssetsFixtureDir = filepath.Join(testAssetsDir, "fixture_dir")

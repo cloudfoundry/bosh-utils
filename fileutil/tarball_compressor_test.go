@@ -35,7 +35,9 @@ var _ = Describe("tarballCompressor", func() {
 		cmdRunner = boshsys.NewExecCmdRunner(logger)
 		fs = boshsys.NewOsFileSystem(logger)
 
-		dstDir = GinkgoT().TempDir()
+		var err error
+		dstDir, err = filepath.EvalSymlinks(GinkgoT().TempDir())
+		Expect(err).ToNot(HaveOccurred())
 		compressor = NewTarballCompressor(cmdRunner, fs)
 
 		fixtureSrcTgz = filepath.Join(testAssetsDir, "compressor-decompress-file-to-dir.tgz")
