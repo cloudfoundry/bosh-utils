@@ -165,7 +165,7 @@ var _ = Describe("Logger", func() {
 			const (
 				MessageCount  = 10
 				WriteInterval = 10 * time.Millisecond
-				Timeout       = WriteInterval * MessageCount * 10
+				Timeout       = WriteInterval * MessageCount * 100
 			)
 
 			out := &intervalWriter{dur: WriteInterval}

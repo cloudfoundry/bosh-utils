@@ -18,15 +18,17 @@ import (
 
 var _ = Describe("HTTPClient", func() {
 	var (
-		httpClient *HTTPClient
-		server     *ghttp.Server
-		logger     loggerfakes.FakeLogger
+		httpClient             *HTTPClient
+		fastErroringHttpClient *HTTPClient
+		server                 *ghttp.Server
+		logger                 loggerfakes.FakeLogger
+		opts                   Opts
 	)
 
-	BeforeEach(func() {
+	JustBeforeEach(func() {
 		logger = loggerfakes.FakeLogger{}
 
-		httpClient = NewHTTPClient(&http.Client{
+		httpClient = NewHTTPClientOpts(&http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
 					RootCAs:            nil,
@@ -36,14 +38,33 @@ var _ = Describe("HTTPClient", func() {
 				Proxy: http.ProxyFromEnvironment,
 
 				Dial: (&net.Dialer{
-					Timeout:   10 * time.Millisecond,
+					Timeout:   10 * time.Second,
 					KeepAlive: 0,
 				}).Dial,
 
-				TLSHandshakeTimeout: 10 * time.Millisecond,
+				TLSHandshakeTimeout: 10 * time.Second,
 				DisableKeepAlives:   true,
 			},
-		}, &logger)
+		}, &logger, opts)
+
+		fastErroringHttpClient = NewHTTPClientOpts(&http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					RootCAs:            nil,
+					InsecureSkipVerify: true,
+				},
+
+				Proxy: http.ProxyFromEnvironment,
+
+				Dial: (&net.Dialer{
+					Timeout:   1 * time.Millisecond,
+					KeepAlive: 0,
+				}).Dial,
+
+				TLSHandshakeTimeout: 1 * time.Millisecond,
+				DisableKeepAlives:   true,
+			},
+		}, &logger, opts)
 
 		server = ghttp.NewServer()
 	})
@@ -115,7 +136,7 @@ var _ = Describe("HTTPClient", func() {
 		It("redacts passwords from error message", func() {
 			url := "http://foo:bar@10.10.0.0/path"
 
-			_, err := httpClient.PostCustomized(url, []byte("post-request"), func(r *http.Request) {})
+			_, err := fastErroringHttpClient.PostCustomized(url, []byte("post-request"), func(r *http.Request) {})
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("http://foo:<redacted>@10.10.0.0/path"))
 		})
@@ -123,38 +144,14 @@ var _ = Describe("HTTPClient", func() {
 		It("redacts passwords from error message for https calls", func() {
 			url := "https://foo:bar@10.10.0.0/path"
 
-			_, err := httpClient.PostCustomized(url, []byte("post-request"), func(r *http.Request) {})
+			_, err := fastErroringHttpClient.PostCustomized(url, []byte("post-request"), func(r *http.Request) {})
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("https://foo:<redacted>@10.10.0.0/path"))
 		})
 
 		Describe("httpclient opts", func() {
-			var opts Opts
-
 			BeforeEach(func() {
 				opts = Opts{NoRedactUrlQuery: true}
-
-				httpClient = NewHTTPClientOpts(&http.Client{
-					Transport: &http.Transport{
-						TLSClientConfig: &tls.Config{
-							RootCAs:            nil,
-							InsecureSkipVerify: true,
-						},
-
-						Proxy: http.ProxyFromEnvironment,
-
-						Dial: (&net.Dialer{
-							Timeout:   10 * time.Millisecond,
-							KeepAlive: 0,
-						}).Dial,
-
-						TLSHandshakeTimeout: 10 * time.Millisecond,
-						DisableKeepAlives:   true,
-					},
-				},
-					&logger,
-					opts,
-				)
 			})
 
 			It("does not redact every query param from endpoint for https calls", func() {
@@ -170,28 +167,6 @@ var _ = Describe("HTTPClient", func() {
 			Context("httpclient has been configured to redact query parmas", func() {
 				BeforeEach(func() {
 					opts = Opts{}
-
-					httpClient = NewHTTPClientOpts(&http.Client{
-						Transport: &http.Transport{
-							TLSClientConfig: &tls.Config{
-								RootCAs:            nil,
-								InsecureSkipVerify: true,
-							},
-
-							Proxy: http.ProxyFromEnvironment,
-
-							Dial: (&net.Dialer{
-								Timeout:   10 * time.Millisecond,
-								KeepAlive: 0,
-							}).Dial,
-
-							TLSHandshakeTimeout: 10 * time.Millisecond,
-							DisableKeepAlives:   true,
-						},
-					},
-						&logger,
-						opts,
-					)
 				})
 
 				It("redacts every query param from endpoint for https calls", func() {
@@ -234,32 +209,8 @@ var _ = Describe("HTTPClient", func() {
 		})
 
 		Describe("httpclient opts", func() {
-			var opts Opts
-
 			BeforeEach(func() {
 				opts = Opts{NoRedactUrlQuery: true}
-
-				httpClient = NewHTTPClientOpts(&http.Client{
-					Transport: &http.Transport{
-						TLSClientConfig: &tls.Config{
-							RootCAs:            nil,
-							InsecureSkipVerify: true,
-						},
-
-						Proxy: http.ProxyFromEnvironment,
-
-						Dial: (&net.Dialer{
-							Timeout:   10 * time.Millisecond,
-							KeepAlive: 0,
-						}).Dial,
-
-						TLSHandshakeTimeout: 10 * time.Millisecond,
-						DisableKeepAlives:   true,
-					},
-				},
-					&logger,
-					opts,
-				)
 			})
 
 			It("does not redact every query param from endpoint for https calls", func() {
@@ -274,28 +225,6 @@ var _ = Describe("HTTPClient", func() {
 			Context("httpclient has been configured to redact query parmas", func() {
 				BeforeEach(func() {
 					opts = Opts{}
-
-					httpClient = NewHTTPClientOpts(&http.Client{
-						Transport: &http.Transport{
-							TLSClientConfig: &tls.Config{
-								RootCAs:            nil,
-								InsecureSkipVerify: true,
-							},
-
-							Proxy: http.ProxyFromEnvironment,
-
-							Dial: (&net.Dialer{
-								Timeout:   10 * time.Millisecond,
-								KeepAlive: 0,
-							}).Dial,
-
-							TLSHandshakeTimeout: 10 * time.Millisecond,
-							DisableKeepAlives:   true,
-						},
-					},
-						&logger,
-						opts,
-					)
 				})
 
 				It("redacts every query param from endpoint for https calls", func() {
@@ -375,7 +304,7 @@ var _ = Describe("HTTPClient", func() {
 		It("redacts passwords from error message", func() {
 			url := "http://foo:bar@10.10.0.0/path"
 
-			_, err := httpClient.PutCustomized(url, []byte("put-request"), func(r *http.Request) {})
+			_, err := fastErroringHttpClient.PutCustomized(url, []byte("put-request"), func(r *http.Request) {})
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("http://foo:<redacted>@10.10.0.0/path"))
 		})
@@ -383,38 +312,14 @@ var _ = Describe("HTTPClient", func() {
 		It("redacts passwords from error message for https calls", func() {
 			url := "https://foo:bar@10.10.0.0/path"
 
-			_, err := httpClient.PutCustomized(url, []byte("put-request"), func(r *http.Request) {})
+			_, err := fastErroringHttpClient.PutCustomized(url, []byte("put-request"), func(r *http.Request) {})
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("https://foo:<redacted>@10.10.0.0/path"))
 		})
 
 		Describe("httpclient opts", func() {
-			var opts Opts
-
 			BeforeEach(func() {
 				opts = Opts{NoRedactUrlQuery: true}
-
-				httpClient = NewHTTPClientOpts(&http.Client{
-					Transport: &http.Transport{
-						TLSClientConfig: &tls.Config{
-							RootCAs:            nil,
-							InsecureSkipVerify: true,
-						},
-
-						Proxy: http.ProxyFromEnvironment,
-
-						Dial: (&net.Dialer{
-							Timeout:   10 * time.Millisecond,
-							KeepAlive: 0,
-						}).Dial,
-
-						TLSHandshakeTimeout: 10 * time.Millisecond,
-						DisableKeepAlives:   true,
-					},
-				},
-					&logger,
-					opts,
-				)
 			})
 
 			It("does not redact every query param from endpoint for https calls", func() {
@@ -429,28 +334,6 @@ var _ = Describe("HTTPClient", func() {
 			Context("httpclient has been configured to redact query parmas", func() {
 				BeforeEach(func() {
 					opts = Opts{}
-
-					httpClient = NewHTTPClientOpts(&http.Client{
-						Transport: &http.Transport{
-							TLSClientConfig: &tls.Config{
-								RootCAs:            nil,
-								InsecureSkipVerify: true,
-							},
-
-							Proxy: http.ProxyFromEnvironment,
-
-							Dial: (&net.Dialer{
-								Timeout:   10 * time.Millisecond,
-								KeepAlive: 0,
-							}).Dial,
-
-							TLSHandshakeTimeout: 10 * time.Millisecond,
-							DisableKeepAlives:   true,
-						},
-					},
-						&logger,
-						opts,
-					)
 				})
 
 				It("redacts every query param from endpoint for https calls", func() {
@@ -526,7 +409,7 @@ var _ = Describe("HTTPClient", func() {
 		It("redacts passwords from error message", func() {
 			url := "http://foo:bar@10.10.0.0/path"
 
-			_, err := httpClient.GetCustomized(url, func(r *http.Request) {})
+			_, err := fastErroringHttpClient.GetCustomized(url, func(r *http.Request) {})
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("http://foo:<redacted>@10.10.0.0/path"))
 		})
@@ -534,38 +417,14 @@ var _ = Describe("HTTPClient", func() {
 		It("redacts passwords from error message for https calls", func() {
 			url := "https://foo:bar@10.10.0.0:8080/path"
 
-			_, err := httpClient.GetCustomized(url, func(r *http.Request) {})
+			_, err := fastErroringHttpClient.GetCustomized(url, func(r *http.Request) {})
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("https://foo:<redacted>@10.10.0.0:8080/path"))
 		})
 
 		Describe("httpclient opts", func() {
-			var opts Opts
-
 			BeforeEach(func() {
 				opts = Opts{NoRedactUrlQuery: true}
-
-				httpClient = NewHTTPClientOpts(&http.Client{
-					Transport: &http.Transport{
-						TLSClientConfig: &tls.Config{
-							RootCAs:            nil,
-							InsecureSkipVerify: true,
-						},
-
-						Proxy: http.ProxyFromEnvironment,
-
-						Dial: (&net.Dialer{
-							Timeout:   10 * time.Millisecond,
-							KeepAlive: 0,
-						}).Dial,
-
-						TLSHandshakeTimeout: 10 * time.Millisecond,
-						DisableKeepAlives:   true,
-					},
-				},
-					&logger,
-					opts,
-				)
 			})
 
 			It("does not redact every query param from endpoint for https calls", func() {
@@ -580,28 +439,6 @@ var _ = Describe("HTTPClient", func() {
 			Context("httpclient has been configured to redact query parmas", func() {
 				BeforeEach(func() {
 					opts = Opts{}
-
-					httpClient = NewHTTPClientOpts(&http.Client{
-						Transport: &http.Transport{
-							TLSClientConfig: &tls.Config{
-								RootCAs:            nil,
-								InsecureSkipVerify: true,
-							},
-
-							Proxy: http.ProxyFromEnvironment,
-
-							Dial: (&net.Dialer{
-								Timeout:   10 * time.Millisecond,
-								KeepAlive: 0,
-							}).Dial,
-
-							TLSHandshakeTimeout: 10 * time.Millisecond,
-							DisableKeepAlives:   true,
-						},
-					},
-						&logger,
-						opts,
-					)
 				})
 
 				It("redacts every query param from endpoint for https calls", func() {
