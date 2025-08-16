@@ -1,7 +1,7 @@
 code.cloudfoundry.org/clock v1.0.0 h1:kFXWQM4bxYvdBw2X8BbBeXwQNgfoWv1vqAk2ZZyBN2o=
 code.cloudfoundry.org/clock v1.0.0/go.mod h1:QD9Lzhd/ux6eNQVUDVRJX/RKTigpewimNYBi7ivZKY8=
-code.cloudfoundry.org/tlsconfig v0.32.0 h1:QL1F0o0V0Q64qn9/RsLu96R9M6yqCuk19+35l3d6+Rg=
-code.cloudfoundry.org/tlsconfig v0.32.0/go.mod h1:0InW25+0caQQIX+rdnhFqs9Jyt4IG0/5k4l0uISvTbA=
+code.cloudfoundry.org/tlsconfig v0.33.0 h1:VJeaUzkzvaWWE4/xjS6+h6Jb5usOoGpASgRkkoKGprY=
+code.cloudfoundry.org/tlsconfig v0.33.0/go.mod h1:0EEV0judSNaFAEVOmHWqz7d5JsrpaYQpE7iy8yZ3HG0=
 filippo.io/edwards25519 v1.1.0 h1:FNf4tywRC1HmFuKW5xopWpigGjJKiJSV0Cqo0cJWDaA=
 filippo.io/edwards25519 v1.1.0/go.mod h1:BxyFTGdWcka3PhytdK4V28tE5sGfRvvvRV7EaN4VDT4=
 github.com/bmatcuk/doublestar v1.3.4 h1:gPypJ5xD31uhX6Tf54sDPUOBXTqKH4c9aPY66CyQrS0=
@@ -88,8 +88,8 @@ github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf
 github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 h1:mujcChM89zOHwgZBBNr5WZ77mBXP1yR+gLThGCYZgAg=
 github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00/go.mod h1:eyZnKCc955uh98WQvzOm0dgAeLnf2O0Rz0LPoC5ze+0=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
-go.step.sm/crypto v0.68.0 h1:PqiEolMb+MGJkamRzmbiEp6lWqbfGESCS5yehwNJ1Tk=
-go.step.sm/crypto v0.68.0/go.mod h1:YzEeTFSsXOJg7BV4uckv3lW5/OS+3E20clU136od/sU=
+go.step.sm/crypto v0.69.0 h1:ELMNQjAGsnwpOeRfX/1phJdWm8Y6RIxAXnDzYlU9AOk=
+go.step.sm/crypto v0.69.0/go.mod h1:mZ0mP4Q4wdoDy+fdEo6cOo0qzDDf7KgkvSIleTLv1+w=
 go.uber.org/automaxprocs v1.6.0 h1:O3y2/QNTOdbF+e/dpXNNW7Rx2hZ4sTIPyybbxyNqTUs=
 go.uber.org/automaxprocs v1.6.0/go.mod h1:ifeIMSnPZuznNm6jmdzmU3/bfk01Fe2fotchwEFJ8r8=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
