@@ -53,7 +53,7 @@ var _ = Describe("tarballCompressor", func() {
 
 			defer os.Remove(symlinkPath)
 
-			tgzName, err := compressor.CompressFilesInDir(testAssetsFixtureDir)
+			tgzName, err := compressor.CompressFilesInDir(testAssetsFixtureDir, CompressorOptions{})
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(tgzName)
 
@@ -94,6 +94,30 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(content).To(ContainSubstring("this is other app stdout"))
 		})
+
+		It("uses NoCompression option to create uncompressed tarball", func() {
+			cmdRunner := fakesys.NewFakeCmdRunner()
+			compressor := NewTarballCompressor(cmdRunner, fs)
+
+			tgzName, err := compressor.CompressFilesInDir(testAssetsFixtureDir, CompressorOptions{NoCompression: true})
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(tgzName)
+
+			Expect(1).To(Equal(len(cmdRunner.RunCommands)))
+			Expect(cmdRunner.RunCommands[0]).ToNot(ContainElement("-z"))
+		})
+
+		It("uses compression by default when NoCompression is false", func() {
+			cmdRunner := fakesys.NewFakeCmdRunner()
+			compressor := NewTarballCompressor(cmdRunner, fs)
+
+			tgzName, err := compressor.CompressFilesInDir(testAssetsFixtureDir, CompressorOptions{NoCompression: false})
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(tgzName)
+
+			Expect(1).To(Equal(len(cmdRunner.RunCommands)))
+			Expect(cmdRunner.RunCommands[0]).To(ContainElement("-z"))
+		})
 	})
 
 	Describe("CompressSpecificFilesInDir", func() {
@@ -104,7 +128,7 @@ var _ = Describe("tarballCompressor", func() {
 				"some_directory",
 				"app.stderr.log",
 			}
-			tgzName, err := compressor.CompressSpecificFilesInDir(srcDir, files)
+			tgzName, err := compressor.CompressSpecificFilesInDir(srcDir, files, CompressorOptions{})
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(tgzName)
 
