@@ -206,7 +206,7 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(cmdRunner.RunCommands[0]).To(Equal(
 				[]string{
 					"tar", "--no-same-owner",
-					"-xzf", tarballPath,
+					"-xf", tarballPath,
 					"-C", dstDir,
 				},
 			))
@@ -228,7 +228,7 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(cmdRunner.RunCommands[0]).To(Equal(
 				[]string{
 					"tar", "--same-owner",
-					"-xzf", tarballPath,
+					"-xf", tarballPath,
 					"-C", dstDir,
 				},
 			))
@@ -246,7 +246,7 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(cmdRunner.RunCommands[0]).To(Equal(
 				[]string{
 					"tar", "--no-same-owner",
-					"-xzf", tarballPath,
+					"-xf", tarballPath,
 					"-C", dstDir,
 					"some/path/in/archive",
 				},
@@ -265,7 +265,7 @@ var _ = Describe("tarballCompressor", func() {
 			Expect(cmdRunner.RunCommands[0]).To(Equal(
 				[]string{
 					"tar", "--no-same-owner",
-					"-xzf", tarballPath,
+					"-xf", tarballPath,
 					"-C", dstDir,
 					"--strip-components=3",
 				},

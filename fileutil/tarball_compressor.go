@@ -64,7 +64,7 @@ func (c tarballCompressor) DecompressFileToDir(tarballPath string, dir string, o
 	if err != nil {
 		return bosherr.WrapError(err, "Resolving tarball path")
 	}
-	args := []string{sameOwnerOption, "-xzf", resolvedTarballPath, "-C", dir}
+	args := []string{sameOwnerOption, "-xf", resolvedTarballPath, "-C", dir}
 	if options.StripComponents != 0 {
 		args = append(args, fmt.Sprintf("--strip-components=%d", options.StripComponents))
 	}
