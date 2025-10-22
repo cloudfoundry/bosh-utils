@@ -273,6 +273,124 @@ var _ = Describe("tarballCompressor", func() {
 		})
 	})
 
+	Describe("IsNonCompressedTarball", func() {
+		It("returns true for non-compressed tarball files", func() {
+			cmdRunner := fakesys.NewFakeCmdRunner()
+			compressor := NewTarballCompressor(cmdRunner, fs)
+
+			// Mock the file command output for a non-compressed tarball
+			cmdRunner.AddCmdResult("file /test/file.tar", fakesys.FakeCmdResult{
+				Stdout:     "/test/file.tar: POSIX tar archive\n",
+				Stderr:     "",
+				ExitStatus: 0,
+			})
+
+			result, err := compressor.IsNonCompressedTarball("/test/file.tar")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).To(BeTrue())
+
+			Expect(1).To(Equal(len(cmdRunner.RunCommands)))
+			Expect(cmdRunner.RunCommands[0]).To(Equal([]string{"file", "/test/file.tar"}))
+		})
+
+		It("returns false for compressed tarball files", func() {
+			cmdRunner := fakesys.NewFakeCmdRunner()
+			compressor := NewTarballCompressor(cmdRunner, fs)
+
+			// Mock the file command output for a compressed tarball
+			cmdRunner.AddCmdResult("file /test/file.tgz", fakesys.FakeCmdResult{
+				Stdout:     "/test/file.tgz: gzip compressed data, from Unix, original size modulo 2^32 1024\n",
+				Stderr:     "",
+				ExitStatus: 0,
+			})
+
+			result, err := compressor.IsNonCompressedTarball("/test/file.tgz")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).To(BeFalse())
+
+			Expect(1).To(Equal(len(cmdRunner.RunCommands)))
+			Expect(cmdRunner.RunCommands[0]).To(Equal([]string{"file", "/test/file.tgz"}))
+		})
+
+		It("returns false for non-tarball files", func() {
+			cmdRunner := fakesys.NewFakeCmdRunner()
+			compressor := NewTarballCompressor(cmdRunner, fs)
+
+			// Mock the file command output for a regular text file
+			cmdRunner.AddCmdResult("file /test/file.txt", fakesys.FakeCmdResult{
+				Stdout:     "/test/file.txt: ASCII text\n",
+				Stderr:     "",
+				ExitStatus: 0,
+			})
+
+			result, err := compressor.IsNonCompressedTarball("/test/file.txt")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).To(BeFalse())
+
+			Expect(1).To(Equal(len(cmdRunner.RunCommands)))
+			Expect(cmdRunner.RunCommands[0]).To(Equal([]string{"file", "/test/file.txt"}))
+		})
+
+		It("returns error when file command fails", func() {
+			cmdRunner := fakesys.NewFakeCmdRunner()
+			compressor := NewTarballCompressor(cmdRunner, fs)
+
+			// Mock the file command to return an error
+			cmdRunner.AddCmdResult("file /test/nonexistent.tar", fakesys.FakeCmdResult{
+				Stdout:     "",
+				Stderr:     "file: cannot open `/test/nonexistent.tar' (No such file or directory)\n",
+				ExitStatus: 1,
+			})
+
+			result, err := compressor.IsNonCompressedTarball("/test/nonexistent.tar")
+			Expect(err).To(HaveOccurred())
+			Expect(result).To(BeFalse())
+
+			Expect(1).To(Equal(len(cmdRunner.RunCommands)))
+			Expect(cmdRunner.RunCommands[0]).To(Equal([]string{"file", "/test/nonexistent.tar"}))
+		})
+
+		It("returns error when file command execution fails", func() {
+			cmdRunner := fakesys.NewFakeCmdRunner()
+			compressor := NewTarballCompressor(cmdRunner, fs)
+
+			// Mock the file command to return an execution error
+			cmdRunner.AddCmdResult("file /test/file.tar", fakesys.FakeCmdResult{
+				Stdout:     "",
+				Stderr:     "",
+				ExitStatus: 0,
+				Error:      errors.New("command execution failed"),
+			})
+
+			result, err := compressor.IsNonCompressedTarball("/test/file.tar")
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("command execution failed"))
+			Expect(result).To(BeFalse())
+
+			Expect(1).To(Equal(len(cmdRunner.RunCommands)))
+			Expect(cmdRunner.RunCommands[0]).To(Equal([]string{"file", "/test/file.tar"}))
+		})
+
+		It("handles file command output with extra whitespace", func() {
+			cmdRunner := fakesys.NewFakeCmdRunner()
+			compressor := NewTarballCompressor(cmdRunner, fs)
+
+			// Mock the file command output with extra whitespace
+			cmdRunner.AddCmdResult("file /test/file.tar", fakesys.FakeCmdResult{
+				Stdout:     "  /test/file.tar: POSIX tar archive  \n",
+				Stderr:     "",
+				ExitStatus: 0,
+			})
+
+			result, err := compressor.IsNonCompressedTarball("/test/file.tar")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).To(BeTrue())
+
+			Expect(1).To(Equal(len(cmdRunner.RunCommands)))
+			Expect(cmdRunner.RunCommands[0]).To(Equal([]string{"file", "/test/file.tar"}))
+		})
+	})
+
 	Describe("CleanUp", func() {
 		It("removes tarball path", func() {
 			fs := fakesys.NewFakeFileSystem()

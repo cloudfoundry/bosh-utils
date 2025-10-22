@@ -15,6 +15,8 @@ type Compressor interface {
 
 	DecompressFileToDir(path string, dir string, options CompressorOptions) (err error)
 
+	IsNonCompressedTarball(path string) (bool, error)
+
 	// CleanUp cleans up compressed file after it was used
 	CleanUp(path string) error
 }

@@ -65,6 +65,10 @@ func (fc *FakeCompressor) DecompressFileToDir(tarballPath string, dir string, op
 	return fc.DecompressFileToDirErr
 }
 
+func (fc *FakeCompressor) IsNonCompressedTarball(path string) (bool, error) {
+	return false, nil
+}
+
 func (fc *FakeCompressor) CleanUp(tarballPath string) error {
 	fc.CleanUpTarballPath = tarballPath
 	return fc.CleanUpErr

@@ -3,6 +3,7 @@ package fileutil
 import (
 	"fmt"
 	"runtime"
+	"strings"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshsys "github.com/cloudfoundry/bosh-utils/system"
@@ -78,6 +79,16 @@ func (c tarballCompressor) DecompressFileToDir(tarballPath string, dir string, o
 	}
 
 	return nil
+}
+
+func (c tarballCompressor) IsNonCompressedTarball(path string) (bool, error) {
+	stdout, _, exitStatus, err := c.cmdRunner.RunCommand("file", path)
+	if err != nil || exitStatus != 0 {
+		return false, err
+	}
+
+	fileOutputStr := strings.TrimSpace(stdout)
+	return strings.Contains(fileOutputStr, "POSIX tar archive"), nil
 }
 
 func (c tarballCompressor) CleanUp(tarballPath string) error {
