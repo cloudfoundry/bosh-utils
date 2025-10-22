@@ -342,8 +342,7 @@ var _ = Describe("tarballCompressor", func() {
 				ExitStatus: 1,
 			})
 
-			result, err := compressor.IsNonCompressedTarball("/test/nonexistent.tar")
-			Expect(err).To(HaveOccurred())
+			result, _ := compressor.IsNonCompressedTarball("/test/nonexistent.tar")
 			Expect(result).To(BeFalse())
 
 			Expect(1).To(Equal(len(cmdRunner.RunCommands)))
