@@ -26,6 +26,9 @@ type FakeCompressor struct {
 
 	CleanUpTarballPath string
 	CleanUpErr         error
+
+	IsNonCompressedResult bool
+	IsNonCompressedErr    error
 }
 
 func NewFakeCompressor() *FakeCompressor {
@@ -66,7 +69,7 @@ func (fc *FakeCompressor) DecompressFileToDir(tarballPath string, dir string, op
 }
 
 func (fc *FakeCompressor) IsNonCompressedTarball(path string) (bool, error) {
-	return false, nil
+	return fc.IsNonCompressedResult, fc.IsNonCompressedErr
 }
 
 func (fc *FakeCompressor) CleanUp(tarballPath string) error {
