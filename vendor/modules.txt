@@ -17,7 +17,7 @@ github.com/charlievieth/fs
 # github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851
 ## explicit; go 1.21.0
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.157
+# github.com/cloudfoundry/socks5-proxy v0.2.158
 ## explicit; go 1.23.0
 github.com/cloudfoundry/socks5-proxy
 # github.com/davecgh/go-spew v1.1.1
@@ -57,7 +57,7 @@ github.com/maxbrunsfeld/counterfeiter/v6/generator
 github.com/nu7hatch/gouuid
 # github.com/onsi/ginkgo v1.16.5
 ## explicit; go 1.16
-# github.com/onsi/ginkgo/v2 v2.26.0
+# github.com/onsi/ginkgo/v2 v2.27.1
 ## explicit; go 1.23.0
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
