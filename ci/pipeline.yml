@@ -22,6 +22,7 @@ jobs:
     serial: true
     plan:
       - in_parallel:
+        - get: golang-release-image
         - get: weekly
           trigger: true
         - get: bosh-utils
@@ -29,10 +30,15 @@ jobs:
         - get: bosh-utils-image
       - task: bump-deps
         file: golang-release/ci/tasks/shared/bump-deps.yml
+        tags: [windows-nimbus]
+        image: golang-release-image
         input_mapping:
           input_repo: bosh-utils
         output_mapping:
           output_repo: bumped-bosh-utils
+        params:
+          GOPROXY: ((repository_mirrors.goproxy))
+          GOSUMDB: ((repository_mirrors.gosumdb))
       - in_parallel:
         - task: test-unit
           input_mapping:
@@ -43,8 +49,7 @@ jobs:
           input_mapping:
             bosh-utils: bumped-bosh-utils
           file: bosh-utils/ci/tasks/test-unit-windows.yml
-          tags:
-            - windows-nimbus
+          tags: [windows-nimbus]
       - put: bosh-utils
         inputs: detect
         params:
@@ -59,7 +64,8 @@ jobs:
         - get: bosh-utils-registry-image
           trigger: true
         - get: version-semver
-          params: {bump: patch}
+          params:
+            bump: patch
         - get: bosh-utils-image
       - in_parallel:
         - task: test-unit
@@ -67,8 +73,7 @@ jobs:
           file: bosh-utils/ci/tasks/test-unit.yml
         - task: test-unit-windows
           file: bosh-utils/ci/tasks/test-unit-windows.yml
-          tags:
-            - windows-nimbus
+          tags: [windows-nimbus]
       - put: bosh-utils-commit-status
         inputs: detect
         params:
@@ -82,7 +87,8 @@ jobs:
           tag: version-semver/version
       - put: version-semver
         inputs: detect
-        params: { file: version-semver/version }
+        params:
+          file: version-semver/version
 
   - name: publish-multidigest-binary
     serial: true
@@ -97,13 +103,15 @@ jobs:
         passed: [test-unit]
       - task: build-multidigest-binary-linux
         file: bosh-utils/ci/tasks/build-multidigest-binary.yml
-        output_mapping: { out: compiled-linux }
+        output_mapping:
+          out: compiled-linux
         params:
           GOOS: linux
           GOARCH: amd64
       - put: release-bucket-linux
         inputs: detect
-        params: {file: compiled-linux/verify-multidigest-*-linux-amd64}
+        params:
+          file: compiled-linux/verify-multidigest-*-linux-amd64
 
   - name: build-bosh-utils-image
     serial: true
@@ -165,6 +173,12 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry/bosh-package-golang-release.git
+  - name: golang-release-image
+    type: registry-image
+    source:
+      repository: bosh/golang-release
+      username: ((docker.username))
+      password: ((docker.password))
 
   - name: release-bucket-linux
     type: gcs
