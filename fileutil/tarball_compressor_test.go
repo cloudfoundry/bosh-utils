@@ -273,6 +273,26 @@ var _ = Describe("tarballCompressor", func() {
 		})
 	})
 
+	Describe("IsNonCompressedTarball", func() {
+		It("returns false for compressed tarball", func() {
+			tgzName, err := compressor.CompressFilesInDir(testAssetsFixtureDir, CompressorOptions{NoCompression: false})
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(tgzName)
+
+			result := compressor.IsNonCompressedTarball(tgzName)
+			Expect(result).To(BeFalse())
+		})
+
+		It("returns true for uncompressed tarball", func() {
+			tgzName, err := compressor.CompressFilesInDir(testAssetsFixtureDir, CompressorOptions{NoCompression: true})
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(tgzName)
+
+			result := compressor.IsNonCompressedTarball(tgzName)
+			Expect(result).To(BeTrue())
+		})
+	})
+
 	Describe("CleanUp", func() {
 		It("removes tarball path", func() {
 			fs := fakesys.NewFakeFileSystem()
