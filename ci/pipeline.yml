@@ -118,7 +118,7 @@ jobs:
     plan:
       - get: bosh-utils-dockerfiles
         trigger: true
-      - get: bosh-golang-release-image
+      - get: golang-release-image
         trigger: true
       - put: bosh-utils-image
         inputs: detect
@@ -176,9 +176,7 @@ resources:
   - name: golang-release-image
     type: registry-image
     source:
-      repository: bosh/golang-release
-      username: ((docker.username))
-      password: ((docker.password))
+      repository: ghcr.io/cloudfoundry/bosh/golang-release
 
   - name: release-bucket-linux
     type: gcs
@@ -209,13 +207,6 @@ resources:
     type: registry-image
     source:
       repository: bosh/utils
-      username: ((docker.username))
-      password: ((docker.password))
-
-  - name: bosh-golang-release-image
-    type: registry-image
-    source:
-      repository: bosh/golang-release
       username: ((docker.username))
       password: ((docker.password))
 
