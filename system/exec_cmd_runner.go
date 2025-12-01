@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
+	"github.com/hekmon/processpriority"
 )
 
 type execCmdRunner struct {
@@ -22,6 +23,32 @@ func (r execCmdRunner) RunComplexCommand(cmd Command) (string, string, int, erro
 	err := process.Start()
 	if err != nil {
 		return "", "", -1, err
+	}
+
+	if cmd.RunNicer == true {
+		parentName := os.Args[0]
+		parentPid := os.Getpid()
+		parentPrio, rawParentPrio, err := processpriority.Get(parentPid)
+
+		if err == nil {
+			r.logger.Debug(parentName, "Current process priority is %s (%d)", parentPrio, rawParentPrio)
+
+			processPrio := rawParentPrio - 5
+			// Clamp priority to be max 19 (idle)
+			if processPrio < -19 {
+				processPrio = -19
+			}
+
+			processPid := process.cmd.Process.Pid
+
+			r.logger.Debug(parentName, "Setting new process priority to %d", processPrio)
+			err := processpriority.SetRAW(processPid, processPrio)
+			if err != nil {
+				r.logger.Debug(cmd.Name, "Error setting priority %d on the command %s (%d): %s", processPrio, cmd.Name, processPid, err)
+			}
+		} else {
+			r.logger.Debug(parentName, "Error getting priority of the current process (%d): %s", parentPid, err)
+		}
 	}
 
 	result := <-process.Wait()
