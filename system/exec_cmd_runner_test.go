@@ -1,6 +1,7 @@
 package system_test
 
 import (
+	"io/ioutil"
 	"fmt"
 	"os"
 	"runtime"
@@ -13,6 +14,8 @@ import (
 	"github.com/cloudfoundry/bosh-utils/logger/loggerfakes"
 	. "github.com/cloudfoundry/bosh-utils/system"
 	fakesys "github.com/cloudfoundry/bosh-utils/system/fakes"
+
+	"github.com/hekmon/processpriority"
 )
 
 const ErrExitCode = 14
@@ -179,6 +182,35 @@ var _ = Describe("execCmdRunner", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(envVars).To(HaveKeyWithValue("ABC", "XYZ"))
 				Expect(envVars).To(HaveKeyWithValue("abc", "xyz"))
+			})
+
+			It("runs a command nicer than itself", func() {
+				// Write script that echos the its nice value
+				script := "#!/bin/bash\nnice\n"
+				tmpFile, err := ioutil.TempFile("", "tmp-script-*.sh")
+				Expect(err).ToNot(HaveOccurred())
+				defer os.Remove(tmpFile.Name())
+				_, err = tmpFile.WriteString(script)
+				Expect(err).ToNot(HaveOccurred())
+				err = tmpFile.Close()
+				Expect(err).ToNot(HaveOccurred())
+				err = os.Chmod(tmpFile.Name(), 0700)
+				Expect(err).ToNot(HaveOccurred())
+
+				parentPid := os.Getpid()
+				_, rawParentPrio, err := processpriority.Get(parentPid)
+				Expect(err).ToNot(HaveOccurred())
+				expectedOutput := fmt.Sprintf("%d\n", rawParentPrio + 5)
+
+				// Run script with RunNicer
+				cmd := Command{
+					Name:  tmpFile.Name(),
+					RunNicer: true,
+				}
+				stdout, _, _, err := runner.RunComplexCommand(cmd)
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(stdout).To(Equal(expectedOutput))
 			})
 		})
 
