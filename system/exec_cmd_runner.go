@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"runtime"
 
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/hekmon/processpriority"
@@ -17,6 +18,35 @@ func NewExecCmdRunner(logger boshlog.Logger) CmdRunner {
 	return execCmdRunner{logger}
 }
 
+func (r execCmdRunner) LowerProcessPriority(processPid int) (error) {
+	parentName := os.Args[0]
+	parentPid := os.Getpid()
+
+	parentPrio, rawParentPrio, err := processpriority.Get(parentPid)
+	if err != nil {
+		r.logger.Debug(parentName, "Error getting priority of the current process (%d): %s", parentPid, err)
+		return err
+	}
+	r.logger.Debug(parentName, "Current process priority is %s (%d)", parentPrio, rawParentPrio)
+
+	if runtime.GOOS == "windows" {
+		r.logger.Debug(parentName, "Setting new child process priority to IDLE")
+		err = processpriority.Set(processPid, processpriority.Idle)
+	} else {
+		processPrio := rawParentPrio + 5
+		if processPrio > 19 {
+			processPrio = 19
+		}
+		r.logger.Debug(parentName, "Setting new child process priority to %d", processPrio)
+		err = processpriority.SetRAW(processPid, processPrio)
+	}
+
+	if err != nil {
+		r.logger.Error(parentName, "Error setting priority on the command: %s", err)
+	}
+	return err
+}
+
 func (r execCmdRunner) RunComplexCommand(cmd Command) (string, string, int, error) {
 	process := NewExecProcess(r.buildComplexCommand(cmd), cmd.KeepAttached, cmd.Quiet, r.logger)
 
@@ -25,29 +55,9 @@ func (r execCmdRunner) RunComplexCommand(cmd Command) (string, string, int, erro
 		return "", "", -1, err
 	}
 
-	if cmd.RunNicer == true {
-		parentName := os.Args[0]
-		parentPid := os.Getpid()
-		parentPrio, rawParentPrio, err := processpriority.Get(parentPid)
-
-		if err == nil {
-			r.logger.Debug(parentName, "Current process priority is %s (%d)", parentPrio, rawParentPrio)
-
-			processPrio := rawParentPrio - 5
-			// Clamp priority to be max 19 (idle)
-			if processPrio < -19 {
-				processPrio = -19
-			}
-
-			processPid := process.cmd.Process.Pid
-
-			r.logger.Debug(parentName, "Setting new process priority to %d", processPrio)
-			err := processpriority.SetRAW(processPid, processPrio)
-			if err != nil {
-				r.logger.Debug(cmd.Name, "Error setting priority %d on the command %s (%d): %s", processPrio, cmd.Name, processPid, err)
-			}
-		} else {
-			r.logger.Debug(parentName, "Error getting priority of the current process (%d): %s", parentPid, err)
+	if cmd.RunNicer {
+		if err := r.LowerProcessPriority(process.cmd.Process.Pid); err != nil {
+			r.logger.Error(cmd.Name, "Error setting process priority on %s", cmd.Name)
 		}
 	}
 
