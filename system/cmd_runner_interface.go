@@ -18,7 +18,7 @@ type Command struct {
 	// Don't echo stdout/stderr
 	Quiet bool
 
-	// Run command with lower priority than the parent process
+	// Run command with a priority lower than the parent process
 	RunNicer bool
 
 	Stdin io.Reader
