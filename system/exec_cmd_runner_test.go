@@ -279,6 +279,31 @@ var _ = Describe("execCmdRunner", func() {
 				Expect(envVars).ToNot(HaveKey("_bar"))
 				Expect(envVars).To(HaveKeyWithValue("_BAR", "alpha=first"))
 			})
+
+			It("runs a command nicer than itself", func() {
+				// Write script that echos the its nice value
+				script := "$proc = Get-Process -Id $PID\nWrite-Output $proc.PriorityClass"
+
+				tmpFile, err := ioutil.TempFile("", "tmp-script-*.ps1")
+				Expect(err).ToNot(HaveOccurred())
+				defer os.Remove(tmpFile.Name())
+				_, err = tmpFile.WriteString(script)
+				Expect(err).ToNot(HaveOccurred())
+				err = tmpFile.Close()
+				Expect(err).ToNot(HaveOccurred())
+				err = os.Chmod(tmpFile.Name(), 0700)
+				Expect(err).ToNot(HaveOccurred())
+
+				// Run script with RunNicer
+				cmd := Command{
+					Name:  tmpFile.Name(),
+					RunNicer: true,
+				}
+				stdout, _, _, err := runner.RunComplexCommand(cmd)
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(stdout).To(Equal("Idle"))
+			})
 		})
 
 		It("run complex command with stdin", func() {
