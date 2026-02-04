@@ -1,4 +1,7 @@
 ---
+vars:
+  - &worker_tag_windows windows-nimbus
+
 groups:
 - name: test-and-release
   jobs:
@@ -30,7 +33,6 @@ jobs:
         - get: bosh-utils-image
       - task: bump-deps
         file: golang-release/ci/tasks/shared/bump-deps.yml
-        tags: [windows-nimbus]
         image: golang-release-image
         input_mapping:
           input_repo: bosh-utils
@@ -49,7 +51,7 @@ jobs:
           input_mapping:
             bosh-utils: bumped-bosh-utils
           file: bosh-utils/ci/tasks/test-unit-windows.yml
-          tags: [windows-nimbus]
+          tags: [*worker_tag_windows]
       - put: bosh-utils
         inputs: detect
         params:
@@ -73,7 +75,7 @@ jobs:
           file: bosh-utils/ci/tasks/test-unit.yml
         - task: test-unit-windows
           file: bosh-utils/ci/tasks/test-unit-windows.yml
-          tags: [windows-nimbus]
+          tags: [*worker_tag_windows]
       - put: bosh-utils-commit-status
         inputs: detect
         params:
