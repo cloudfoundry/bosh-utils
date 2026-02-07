@@ -7,7 +7,7 @@ require (
 	code.cloudfoundry.org/tlsconfig v0.44.0
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/charlievieth/fs v0.0.3
-	github.com/cloudfoundry/socks5-proxy v0.2.166
+	github.com/cloudfoundry/socks5-proxy v0.2.167
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/jpillora/backoff v1.0.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.12.1
@@ -27,7 +27,7 @@ require (
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20260115054156-294ebfa9ad83 // indirect
+	github.com/google/pprof v0.0.0-20260202012954-cb029daf43ef // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/tedsuo/ifrit v0.0.0-20191009134036-9a97d0632f00 // indirect
