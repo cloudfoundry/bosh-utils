@@ -17,8 +17,8 @@ github.com/charlievieth/fs
 # github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851
 ## explicit; go 1.21.0
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.167
-## explicit; go 1.24.0
+# github.com/cloudfoundry/socks5-proxy v0.2.168
+## explicit; go 1.25.0
 github.com/cloudfoundry/socks5-proxy
 # github.com/davecgh/go-spew v1.1.1
 ## explicit
