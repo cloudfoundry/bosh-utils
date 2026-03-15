@@ -1,7 +1,21 @@
 # https://golangci-lint.run/usage/configuration/
-run:
-  timeout: 5m # 1m default times out on github-action runners
-
-output:
-  # Sort results by: filepath, line and column.
-  sort-results: true
+version: "2"
+linters:
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
