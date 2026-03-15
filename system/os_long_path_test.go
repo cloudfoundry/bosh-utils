@@ -8,8 +8,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/charlievieth/fs"
-
 	. "github.com/cloudfoundry/bosh-utils/system"
 )
 
@@ -32,13 +30,13 @@ var _ = Describe("Long Paths", func() {
 
 	// TODO: make sure we can cleanup before running tests
 	It("the fs package can cleanup long paths and dirs", func() {
-		f, err := fs.Create(LongPath)
+		f, err := os.Create(LongPath)
 		Expect(err).To(Succeed())
 		Expect(f.Close()).To(Succeed())
-		Expect(fs.Remove(LongPath)).To(Succeed())
+		Expect(os.Remove(LongPath)).To(Succeed())
 
-		Expect(fs.MkdirAll(LongDir, 0755)).To(Succeed())
-		Expect(fs.RemoveAll(LongDir)).To(Succeed())
+		Expect(os.MkdirAll(LongDir, 0755)).To(Succeed())
+		Expect(os.RemoveAll(LongDir)).To(Succeed())
 	})
 
 	It("can create and delete a directory with a long path", func() {

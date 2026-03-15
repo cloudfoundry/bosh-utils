@@ -8,8 +8,6 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	fsWrapper "github.com/charlievieth/fs"
 )
 
 var _ = Describe("Windows Specific tests", func() {
@@ -54,7 +52,7 @@ var _ = Describe("Windows Specific tests", func() {
 		osFs := createOsFs()
 
 		longPath := randLongPath(GinkgoT().TempDir())
-		err := fsWrapper.MkdirAll(longPath, 0755)
+		err := os.MkdirAll(longPath, 0755)
 		Expect(err).ToNot(HaveOccurred())
 
 		dstFile, err := os.CreateTemp(`\\?\`+longPath, "")
