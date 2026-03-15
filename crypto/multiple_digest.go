@@ -104,7 +104,7 @@ func (m MultipleDigest) VerifyFilePath(filePath string, fs boshsys.FileSystem) e
 
 func (m MultipleDigest) validate() error {
 	if len(m.digests) == 0 {
-		return errors.New("Expected to find at least one digest")
+		return errors.New("Expected to find at least one digest") //nolint:staticcheck
 	}
 
 	algosUsed := map[string]struct{}{}
@@ -192,7 +192,7 @@ func (m MultipleDigest) parseMultipleDigestString(multipleDigest string) (Multip
 	}
 
 	if len(digests) == 0 {
-		return MultipleDigest{}, errors.New("No digest algorithm found. Supported algorithms: sha1, sha256, sha512")
+		return MultipleDigest{}, errors.New("No digest algorithm found. Supported algorithms: sha1, sha256, sha512") //nolint:staticcheck
 	}
 
 	return MultipleDigest{digests: digests}, nil
@@ -213,7 +213,7 @@ func (MultipleDigest) parseDigestString(digest string) (Digest, error) {
 
 	for _, piece := range pieces {
 		if !isStringAlphanumeric(piece) {
-			return nil, errors.New("Unable to parse digest string. Digest and algorithm key can only contain alpha-numeric characters.")
+			return nil, errors.New("Unable to parse digest string. Digest and algorithm key can only contain alpha-numeric characters.") //nolint:staticcheck
 		}
 	}
 

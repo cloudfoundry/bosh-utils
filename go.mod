@@ -6,7 +6,6 @@ require (
 	code.cloudfoundry.org/clock v1.0.0
 	code.cloudfoundry.org/tlsconfig v0.47.0
 	github.com/bmatcuk/doublestar v1.3.4
-	github.com/charlievieth/fs v0.0.3
 	github.com/cloudfoundry/socks5-proxy v0.2.170
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/jpillora/backoff v1.0.0

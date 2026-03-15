@@ -53,7 +53,7 @@ func (c tarballCompressor) CompressSpecificFilesInDir(dir string, files []string
 		args = append([]string{"--no-mac-metadata"}, args...)
 	}
 
-	for _, file := range files { //nolint:gosimple
+	for _, file := range files { //nolint:staticcheck
 		args = append(args, file)
 	}
 
