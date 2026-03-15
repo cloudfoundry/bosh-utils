@@ -1,4 +1,5 @@
-//+build !windows
+//go:build !windows
+// +build !windows
 
 package system
 
@@ -23,7 +24,7 @@ func (fs *osFileSystem) homeDir(username string) (string, error) {
 
 func (fs *osFileSystem) chown(path, owner string) error {
 	if owner == "" {
-		return errors.New("Failed to lookup user ''")
+		return errors.New("Failed to lookup user ''") //nolint:staticcheck
 	}
 
 	var group string
