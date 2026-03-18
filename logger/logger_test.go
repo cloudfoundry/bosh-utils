@@ -135,11 +135,11 @@ var _ = Describe("Levelify", func() {
 	It("errors on unknown input", func() {
 		_, err := Levelify("unknown")
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(Equal("Unknown LogLevel string 'unknown', expected one of [DEBUG, INFO, WARN, ERROR, NONE]"))
+		Expect(err.Error()).To(Equal("unknown LogLevel string 'unknown', expected one of [DEBUG, INFO, WARN, ERROR, NONE]"))
 
 		_, err = Levelify("")
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(Equal("Unknown LogLevel string '', expected one of [DEBUG, INFO, WARN, ERROR, NONE]"))
+		Expect(err.Error()).To(Equal("unknown LogLevel string '', expected one of [DEBUG, INFO, WARN, ERROR, NONE]"))
 	})
 })
 

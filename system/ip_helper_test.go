@@ -12,13 +12,13 @@ var _ = Describe("CalculateNetworkAndBroadcast", func() {
 		It("returns error if bad ip address", func() {
 			_, _, _, err := CalculateNetworkAndBroadcast("192.168.195", "255.255.255.0")
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal("Invalid IP '192.168.195'"))
+			Expect(err.Error()).To(Equal("invalid IP '192.168.195'"))
 		})
 
 		It("returns error if bad netmask", func() {
 			_, _, _, err := CalculateNetworkAndBroadcast("192.168.195.0", "255.255.255")
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal("Invalid netmask '255.255.255'"))
+			Expect(err.Error()).To(Equal("invalid netmask '255.255.255'"))
 		})
 	})
 

@@ -371,7 +371,7 @@ func (fs *osFileSystem) listDirContents(dirPath string) ([]os.FileInfo, error) {
 func (fs *osFileSystem) TempFile(prefix string) (file File, err error) {
 	fs.logger.Debug(fs.logTag, "Creating temp file with prefix %s", prefix)
 	if fs.tempRoot == "" && fs.requiresTempRoot {
-		return nil, errors.New("Set a temp directory root with ChangeTempRoot before making temp files") //nolint:staticcheck
+		return nil, errors.New("set a temp directory root with ChangeTempRoot before making temp files")
 	}
 	return os.CreateTemp(fs.tempRoot, prefix)
 }
@@ -379,7 +379,7 @@ func (fs *osFileSystem) TempFile(prefix string) (file File, err error) {
 func (fs *osFileSystem) TempDir(prefix string) (path string, err error) {
 	fs.logger.Debug(fs.logTag, "Creating temp dir with prefix %s", prefix)
 	if fs.tempRoot == "" && fs.requiresTempRoot {
-		return "", errors.New("Set a temp directory root with ChangeTempRoot before making temp directories") //nolint:staticcheck
+		return "", errors.New("set a temp directory root with ChangeTempRoot before making temp directories")
 	}
 	return os.MkdirTemp(fs.tempRoot, prefix)
 }

@@ -182,7 +182,7 @@ var _ = Describe("Logger", func() {
 			tick := time.NewTicker(WriteInterval / 10)
 			defer tick.Stop()
 			go func() {
-				for _ = range tick.C { //nolint:staticcheck
+				for range tick.C {
 					logger.Debug("NEW", "new")
 				}
 			}()

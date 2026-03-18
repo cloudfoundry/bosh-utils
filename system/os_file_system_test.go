@@ -262,7 +262,8 @@ var _ = Describe("OS FileSystem", func() {
 
 			file.Close()                  //nolint:errcheck
 			file, err = os.Open(testPath) //nolint:ineffassign,staticcheck
-			defer file.Close()            //nolint:staticcheck
+			Expect(err).ToNot(HaveOccurred())
+			defer file.Close()
 
 			written, err = osFs.ConvergeFileContents(testPath, []byte("second write"))
 			Expect(err).ToNot(HaveOccurred())

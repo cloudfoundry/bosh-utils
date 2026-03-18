@@ -135,7 +135,7 @@ var _ = Describe("digestImpl", func() {
 
 			err := digest.VerifyFilePath(file.Name(), fileSystem)
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal(fmt.Sprintf("Calculating digest of '%s': nope", file.Name())))
+			Expect(err.Error()).To(Equal(fmt.Sprintf("calculating digest of '%s': nope", file.Name())))
 		})
 	})
 
