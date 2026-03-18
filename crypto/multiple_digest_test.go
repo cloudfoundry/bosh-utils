@@ -49,24 +49,24 @@ var _ = Describe("MultipleDigest", func() {
 		It("returns error if unmarshalling fails", func() {
 			_, err := ParseMultipleDigest("")
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal("No digest algorithm found. Supported algorithms: sha1, sha256, sha512"))
+			Expect(err.Error()).To(Equal("no digest algorithm found. Supported algorithms: sha1, sha256, sha512"))
 		})
 		It("returns error if digest contains non-alphanumeric characters", func() {
 			_, err := ParseMultipleDigest("sha1:!")
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal("Unable to parse digest string. Digest and algorithm key can only contain alpha-numeric characters."))
+			Expect(err.Error()).To(Equal("unable to parse digest string. Digest and algorithm key can only contain alpha-numeric characters"))
 		})
 
 		It("returns error if algorithm key contains non-alphanumeric characters", func() {
 			_, err := ParseMultipleDigest("d!m!tr3:abc")
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal("Unable to parse digest string. Digest and algorithm key can only contain alpha-numeric characters."))
+			Expect(err.Error()).To(Equal("unable to parse digest string. Digest and algorithm key can only contain alpha-numeric characters"))
 		})
 
 		It("returns error if algorithm key is empty", func() {
 			_, err := ParseMultipleDigest(":")
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal("Unable to parse digest string. Digest and algorithm key can only contain alpha-numeric characters."))
+			Expect(err.Error()).To(Equal("unable to parse digest string. Digest and algorithm key can only contain alpha-numeric characters"))
 		})
 	})
 
@@ -97,7 +97,7 @@ var _ = Describe("MultipleDigest", func() {
 
 			err := digest.VerifyFilePath(file.Name(), fileSystem)
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal(fmt.Sprintf("Calculating digest of '%s': nope", file.Name())))
+			Expect(err.Error()).To(Equal(fmt.Sprintf("calculating digest of '%s': nope", file.Name())))
 		})
 	})
 
@@ -106,7 +106,7 @@ var _ = Describe("MultipleDigest", func() {
 			It("returns error", func() {
 				err := MultipleDigest{}.Verify(strings.NewReader("desired content"))
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(Equal("Expected to find at least one digest"))
+				Expect(err.Error()).To(Equal("expected to find at least one digest"))
 			})
 		})
 
@@ -461,13 +461,13 @@ var _ = Describe("MultipleDigest", func() {
 		It("returns an error if the JSON does not contain any digests", func() {
 			err := json.Unmarshal([]byte(`""`), &digest)
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("No digest algorithm found. Supported algorithms: sha1, sha256, sha512"))
+			Expect(err.Error()).To(ContainSubstring("no digest algorithm found. Supported algorithms: sha1, sha256, sha512"))
 		})
 
 		It("returns an error if the JSON contains only semicolon", func() {
 			err := json.Unmarshal([]byte(`";"`), &digest)
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("No digest algorithm found. Supported algorithms: sha1, sha256, sha512"))
+			Expect(err.Error()).To(ContainSubstring("no digest algorithm found. Supported algorithms: sha1, sha256, sha512"))
 		})
 	})
 })

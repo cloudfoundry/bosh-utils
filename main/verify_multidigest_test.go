@@ -110,7 +110,7 @@ var _ = Describe("VerifyMultidigest", func() {
 				session, err := runVerifyMultidigest("create-multi-digest", "sha1", "potato")
 				Expect(err).NotTo(HaveOccurred())
 				Eventually(session).Should(gexec.Exit(1))
-				Eventually(session.Err).Should(gbytes.Say("Calculating digest of 'potato': open potato:"))
+				Eventually(session.Err).Should(gbytes.Say("calculating digest of 'potato': open potato:"))
 			})
 
 			It("exits 1 when the algorithm is unknown", func() {

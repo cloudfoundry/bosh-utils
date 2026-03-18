@@ -10,7 +10,7 @@ import (
 func main() {
 	sigCh := make(chan os.Signal, 1)
 
-	signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGKILL) //nolint:staticcheck
+	signal.Notify(sigCh, syscall.SIGTERM)
 
 	done := make(chan struct{})
 	var exitStatus int
@@ -21,9 +21,6 @@ func main() {
 		case "SIGTERM":
 			fmt.Println("Received SIGTERM")
 			exitStatus = 13
-		case "SIGKILL":
-			fmt.Println("Received SIGKILL")
-			exitStatus = 27
 		default:
 			fmt.Printf("Received unhandled signal: %s\n", s)
 			exitStatus = 17

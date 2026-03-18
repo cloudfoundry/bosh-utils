@@ -93,7 +93,7 @@ func unixCommand(cmdName string) Command {
 
 func parseEnvFields(envDump string, convertKeysToUpper bool) map[string]string {
 	fields := make(map[string]string)
-	envDump = strings.Replace(envDump, "\r", "", -1) //nolint:staticcheck
+	envDump = strings.ReplaceAll(envDump, "\r", "")
 	for _, line := range strings.Split(envDump, "\n") {
 		// don't split on '=' as '=' is allowed in the value on Windows
 		if n := strings.IndexByte(line, '='); n != -1 {
