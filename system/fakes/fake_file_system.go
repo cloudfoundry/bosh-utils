@@ -220,7 +220,7 @@ func (f *FakeFile) WriteAt(b []byte, offset int64) (int, error) {
 
 func (f *FakeFile) Seek(offset int64, whence int) (int64, error) {
 	if whence != io.SeekStart {
-		return -1, errors.New(`Invalid argument for "whence": only SeekStart is supported`)
+		return -1, errors.New(`Invalid argument for "whence": only SeekStart is supported`) //nolint:staticcheck
 	}
 	f.readIndex = offset
 	return f.readIndex, nil
@@ -347,7 +347,7 @@ func (fs *FakeFileSystem) FindFileStats(path string) (*FakeFileStats, error) {
 	if stats := fs.fileRegistry.Get(path); stats != nil {
 		return stats, nil
 	}
-	return nil, fmt.Errorf("Path does not exist: %s", path)
+	return nil, fmt.Errorf("Path does not exist: %s", path) //nolint:staticcheck
 }
 
 func (fs *FakeFileSystem) OpenFile(path string, flag int, perm os.FileMode) (boshsys.File, error) {
@@ -474,7 +474,7 @@ func (fs *FakeFileSystem) Chown(path, username string) error {
 
 	stats := fs.fileRegistry.Get(path)
 	if stats == nil {
-		return fmt.Errorf("Path does not exist: %s", path)
+		return fmt.Errorf("Path does not exist: %s", path) //nolint:staticcheck
 	}
 
 	parts := strings.Split(username, ":")
@@ -498,7 +498,7 @@ func (fs *FakeFileSystem) Chmod(path string, perm os.FileMode) error {
 
 	stats := fs.fileRegistry.Get(path)
 	if stats == nil {
-		return fmt.Errorf("Path does not exist: %s", path)
+		return fmt.Errorf("Path does not exist: %s", path) //nolint:staticcheck
 	}
 
 	stats.FileMode = perm
@@ -576,13 +576,13 @@ func (fs *FakeFileSystem) ConvergeFileContents(path string, content []byte, opts
 		if stats == nil {
 			return true, nil
 		}
-		return bytes.Compare(stats.Content, content) != 0, nil //nolint:gosimple
+		return bytes.Compare(stats.Content, content) != 0, nil //nolint:staticcheck
 	}
 
 	stats := fs.getOrCreateFile(path)
 	stats.FileType = FakeFileTypeFile
 
-	if bytes.Compare(stats.Content, content) != 0 { //nolint:gosimple
+	if bytes.Compare(stats.Content, content) != 0 { //nolint:staticcheck
 		stats.Content = content
 		return true, nil
 	}
@@ -663,12 +663,12 @@ func (fs *FakeFileSystem) Rename(oldPath, newPath string) error {
 
 	parentDir := gopath.Dir(newPath)
 	if parentDir != "." && fs.fileRegistry.Get(parentDir) == nil {
-		return errors.New("Parent directory does not exist")
+		return errors.New("Parent directory does not exist") //nolint:staticcheck
 	}
 
 	stats := fs.fileRegistry.Get(oldPath)
 	if stats == nil {
-		return errors.New("Old path did not exist")
+		return errors.New("Old path did not exist") //nolint:staticcheck
 	}
 
 	fs.RenameOldPaths = append(fs.RenameOldPaths, oldPath)
@@ -834,7 +834,7 @@ func (fs *FakeFileSystem) TempFile(prefix string) (file boshsys.File, err error)
 	}
 
 	if fs.strictTempRoot && fs.TempRootPath == "" {
-		return nil, errors.New("Temp file was requested without having set a temp root")
+		return nil, errors.New("Temp file was requested without having set a temp root") //nolint:staticcheck
 	}
 
 	if fs.ReturnTempFilesByPrefix != nil {
@@ -867,7 +867,7 @@ func (fs *FakeFileSystem) TempDir(prefix string) (string, error) {
 	}
 
 	if fs.strictTempRoot && fs.TempRootPath == "" {
-		return "", errors.New("Temp file was requested without having set a temp root")
+		return "", errors.New("Temp file was requested without having set a temp root") //nolint:staticcheck
 	}
 
 	var path string
@@ -875,7 +875,7 @@ func (fs *FakeFileSystem) TempDir(prefix string) (string, error) {
 		path = fs.TempDirDir
 	} else if fs.TempDirDirs != nil {
 		if len(fs.TempDirDirs) == 0 {
-			return "", errors.New("Failed to create new temp dir: TempDirDirs is empty")
+			return "", errors.New("Failed to create new temp dir: TempDirDirs is empty") //nolint:staticcheck
 		}
 		path = fs.TempDirDirs[0]
 		fs.TempDirDirs = fs.TempDirDirs[1:]
