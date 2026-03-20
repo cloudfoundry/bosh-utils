@@ -302,7 +302,7 @@ var _ = Describe("execCmdRunner", func() {
 				stdout, _, _, err := runner.RunComplexCommand(cmd)
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(stdout).To(Equal("Idle"))
+				Expect(stdout).To(Equal("Idle\r\n"))
 			})
 		})
 
