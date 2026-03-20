@@ -295,7 +295,8 @@ var _ = Describe("execCmdRunner", func() {
 
 				// Run script with SpawnWithLowerPriority
 				cmd := Command{
-					Name:                   tmpFile.Name(),
+					Name:                   "powershell",
+					Args:                   []string{"-ExecutionPolicy", "Bypass", "-File", tmpFile.Name()},
 					SpawnWithLowerPriority: true,
 				}
 				stdout, _, _, err := runner.RunComplexCommand(cmd)
