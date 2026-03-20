@@ -19,7 +19,7 @@ type Command struct {
 	Quiet bool
 
 	// Run command with a priority lower than the parent process
-	RunNicer bool
+	SpawnWithLowerPriority bool
 
 	Stdin io.Reader
 

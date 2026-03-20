@@ -3,8 +3,8 @@ package system
 import (
 	"os"
 	"os/exec"
-	"strings"
 	"runtime"
+	"strings"
 
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/hekmon/processpriority"
@@ -18,7 +18,7 @@ func NewExecCmdRunner(logger boshlog.Logger) CmdRunner {
 	return execCmdRunner{logger}
 }
 
-func (r execCmdRunner) LowerProcessPriority(processPid int) (error) {
+func (r execCmdRunner) LowerProcessPriority(processPid int) error {
 	parentName := os.Args[0]
 	parentPid := os.Getpid()
 
@@ -55,7 +55,7 @@ func (r execCmdRunner) RunComplexCommand(cmd Command) (string, string, int, erro
 		return "", "", -1, err
 	}
 
-	if cmd.RunNicer {
+	if cmd.SpawnWithLowerPriority {
 		if err := r.LowerProcessPriority(process.cmd.Process.Pid); err != nil {
 			r.logger.Error(cmd.Name, "Error setting process priority on %s", cmd.Name)
 		}

@@ -1,7 +1,6 @@
 package system_test
 
 import (
-	"io/ioutil"
 	"fmt"
 	"os"
 	"runtime"
@@ -187,7 +186,7 @@ var _ = Describe("execCmdRunner", func() {
 			It("runs a command nicer than itself", func() {
 				// Write script that echos the its nice value
 				script := "#!/bin/bash\nnice\n"
-				tmpFile, err := ioutil.TempFile("", "tmp-script-*.sh")
+				tmpFile, err := os.CreateTemp("", "tmp-script-*.sh")
 				Expect(err).ToNot(HaveOccurred())
 				defer os.Remove(tmpFile.Name())
 				_, err = tmpFile.WriteString(script)
@@ -200,12 +199,12 @@ var _ = Describe("execCmdRunner", func() {
 				parentPid := os.Getpid()
 				_, rawParentPrio, err := processpriority.Get(parentPid)
 				Expect(err).ToNot(HaveOccurred())
-				expectedOutput := fmt.Sprintf("%d\n", rawParentPrio + 5)
+				expectedOutput := fmt.Sprintf("%d\n", rawParentPrio+5)
 
-				// Run script with RunNicer
+				// Run script with SpawnWithLowerPriority
 				cmd := Command{
-					Name:  tmpFile.Name(),
-					RunNicer: true,
+					Name:                   tmpFile.Name(),
+					SpawnWithLowerPriority: true,
 				}
 				stdout, _, _, err := runner.RunComplexCommand(cmd)
 
@@ -284,7 +283,7 @@ var _ = Describe("execCmdRunner", func() {
 				// Write script that echos the its nice value
 				script := "$proc = Get-Process -Id $PID\nWrite-Output $proc.PriorityClass"
 
-				tmpFile, err := ioutil.TempFile("", "tmp-script-*.ps1")
+				tmpFile, err := os.CreateTemp("", "tmp-script-*.ps1")
 				Expect(err).ToNot(HaveOccurred())
 				defer os.Remove(tmpFile.Name())
 				_, err = tmpFile.WriteString(script)
@@ -294,10 +293,10 @@ var _ = Describe("execCmdRunner", func() {
 				err = os.Chmod(tmpFile.Name(), 0700)
 				Expect(err).ToNot(HaveOccurred())
 
-				// Run script with RunNicer
+				// Run script with SpawnWithLowerPriority
 				cmd := Command{
-					Name:  tmpFile.Name(),
-					RunNicer: true,
+					Name:                   tmpFile.Name(),
+					SpawnWithLowerPriority: true,
 				}
 				stdout, _, _, err := runner.RunComplexCommand(cmd)
 
