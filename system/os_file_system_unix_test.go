@@ -62,7 +62,7 @@ var _ = Describe("OS FileSystem", func() {
 
 				err := osFs.Chown(testPath, "")
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring("Failed to lookup user ''"))
+				Expect(err.Error()).To(ContainSubstring("failed to lookup user ''"))
 
 			})
 		})
@@ -82,7 +82,7 @@ var _ = Describe("OS FileSystem", func() {
 
 				err := osFs.Chown(testPath, "garbage-foo")
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring("Failed to lookup user 'garbage-foo'"))
+				Expect(err.Error()).To(ContainSubstring("failed to lookup user 'garbage-foo'"))
 			})
 		})
 
@@ -92,7 +92,7 @@ var _ = Describe("OS FileSystem", func() {
 
 				err := osFs.Chown(testPath, "root:not-a-group")
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring("Failed to chown"))
+				Expect(err.Error()).To(ContainSubstring("failed to chown"))
 			})
 		})
 	})
