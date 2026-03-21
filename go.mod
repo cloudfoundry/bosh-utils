@@ -4,9 +4,9 @@ go 1.25.0
 
 require (
 	code.cloudfoundry.org/clock v1.0.0
-	code.cloudfoundry.org/tlsconfig v0.47.0
+	code.cloudfoundry.org/tlsconfig v0.48.0
 	github.com/bmatcuk/doublestar v1.3.4
-	github.com/cloudfoundry/socks5-proxy v0.2.170
+	github.com/cloudfoundry/socks5-proxy v0.2.171
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/jpillora/backoff v1.0.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.12.1
