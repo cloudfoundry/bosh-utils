@@ -30,7 +30,7 @@ jobs:
           trigger: true
         - get: bosh-utils
         - get: golang-release
-        - get: bosh-utils-image
+        - get: bosh-utils-registry-image
       - task: bump-deps
         file: golang-release/ci/tasks/shared/bump-deps.yml
         image: golang-release-image
@@ -47,7 +47,7 @@ jobs:
           input_mapping:
             bosh-utils: bumped-bosh-utils
           file: bosh-utils/ci/tasks/test-unit.yml
-          image: bosh-utils-image
+          image: bosh-utils-registry-image
         - task: test-unit-windows
           input_mapping:
             bosh-utils: bumped-bosh-utils
@@ -69,10 +69,9 @@ jobs:
         - get: version-semver
           params:
             bump: patch
-        - get: bosh-utils-image
       - in_parallel:
         - task: test-unit
-          image: bosh-utils-image
+          image: bosh-utils-registry-image
           file: bosh-utils/ci/tasks/test-unit.yml
         - task: test-unit-windows
           file: bosh-utils/ci/tasks/test-unit-windows.yml
