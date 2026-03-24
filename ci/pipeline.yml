@@ -105,6 +105,7 @@ jobs:
         passed: [test-unit]
       - task: build-multidigest-binary-linux
         file: bosh-utils/ci/tasks/build-multidigest-binary.yml
+        image: bosh-utils-registry-image
         output_mapping:
           out: compiled-linux
         params:

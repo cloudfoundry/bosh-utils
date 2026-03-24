@@ -1,12 +1,6 @@
 ---
 platform: linux
 
-image_resource:
-  type: docker-image
-  source:
-    repository: bosh/utils
-    tag: latest
-
 inputs:
 - name: bosh-utils
   path: gopath/src/github.com/cloudfoundry/bosh-utils
