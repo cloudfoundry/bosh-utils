@@ -17,6 +17,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/net v0.52.0
 	gopkg.in/yaml.v2 v2.4.0
+	github.com/hekmon/processpriority v1.0.0
 )
 
 require (

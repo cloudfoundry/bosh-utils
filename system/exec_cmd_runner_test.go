@@ -13,6 +13,8 @@ import (
 	"github.com/cloudfoundry/bosh-utils/logger/loggerfakes"
 	. "github.com/cloudfoundry/bosh-utils/system"
 	fakesys "github.com/cloudfoundry/bosh-utils/system/fakes"
+
+	"github.com/hekmon/processpriority"
 )
 
 const ErrExitCode = 14
@@ -180,6 +182,35 @@ var _ = Describe("execCmdRunner", func() {
 				Expect(envVars).To(HaveKeyWithValue("ABC", "XYZ"))
 				Expect(envVars).To(HaveKeyWithValue("abc", "xyz"))
 			})
+
+			It("runs a command nicer than itself", func() {
+				// Write script that echos the its nice value
+				script := "#!/bin/bash\nnice\n"
+				tmpFile, err := os.CreateTemp("", "tmp-script-*.sh")
+				Expect(err).ToNot(HaveOccurred())
+				defer os.Remove(tmpFile.Name())
+				_, err = tmpFile.WriteString(script)
+				Expect(err).ToNot(HaveOccurred())
+				err = tmpFile.Close()
+				Expect(err).ToNot(HaveOccurred())
+				err = os.Chmod(tmpFile.Name(), 0700)
+				Expect(err).ToNot(HaveOccurred())
+
+				parentPid := os.Getpid()
+				_, rawParentPrio, err := processpriority.Get(parentPid)
+				Expect(err).ToNot(HaveOccurred())
+				expectedOutput := fmt.Sprintf("%d\n", rawParentPrio+5)
+
+				// Run script with SpawnWithLowerPriority
+				cmd := Command{
+					Name:                   tmpFile.Name(),
+					SpawnWithLowerPriority: true,
+				}
+				stdout, _, _, err := runner.RunComplexCommand(cmd)
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(stdout).To(Equal(expectedOutput))
+			})
 		})
 
 		Context("windows specific behavior", func() {
@@ -246,6 +277,32 @@ var _ = Describe("execCmdRunner", func() {
 				//
 				Expect(envVars).ToNot(HaveKey("_bar"))
 				Expect(envVars).To(HaveKeyWithValue("_BAR", "alpha=first"))
+			})
+
+			It("runs a command nicer than itself", func() {
+				// Write script that echos the its nice value
+				script := "$proc = Get-Process -Id $PID\nWrite-Output $proc.PriorityClass"
+
+				tmpFile, err := os.CreateTemp("", "tmp-script-*.ps1")
+				Expect(err).ToNot(HaveOccurred())
+				defer os.Remove(tmpFile.Name())
+				_, err = tmpFile.WriteString(script)
+				Expect(err).ToNot(HaveOccurred())
+				err = tmpFile.Close()
+				Expect(err).ToNot(HaveOccurred())
+				err = os.Chmod(tmpFile.Name(), 0700)
+				Expect(err).ToNot(HaveOccurred())
+
+				// Run script with SpawnWithLowerPriority
+				cmd := Command{
+					Name:                   "powershell",
+					Args:                   []string{"-ExecutionPolicy", "Bypass", "-File", tmpFile.Name()},
+					SpawnWithLowerPriority: true,
+				}
+				stdout, _, _, err := runner.RunComplexCommand(cmd)
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(stdout).To(Equal("Idle\r\n"))
 			})
 		})
 
