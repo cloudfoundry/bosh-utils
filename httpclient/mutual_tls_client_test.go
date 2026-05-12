@@ -56,7 +56,8 @@ var _ = Describe("NewMutualTLSClient", func() {
 	It("has secure tls defaults", func() {
 		tlsConfigBefore := *tlsConfig //nolint:govet
 
-		tlsconfig.WithInternalServiceDefaults()(tlsConfig)
+		err = tlsconfig.WithInternalServiceDefaults()(tlsConfig)
+		Expect(err).ToNot(HaveOccurred())
 
 		Expect(*tlsConfig).To(Equal(tlsConfigBefore)) //nolint:govet
 	})
