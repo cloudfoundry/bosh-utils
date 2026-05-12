@@ -13,7 +13,6 @@ require (
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/onsi/ginkgo/v2 v2.28.3
 	github.com/onsi/gomega v1.40.0
-	github.com/pivotal-cf/paraphernalia v0.0.0-20180203224945-a64ae2051c20
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/net v0.53.0
 	gopkg.in/yaml.v2 v2.4.0

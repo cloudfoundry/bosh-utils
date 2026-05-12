@@ -7,10 +7,10 @@ import (
 	"os"
 	"time"
 
+	"code.cloudfoundry.org/tlsconfig"
 	"github.com/cloudfoundry/bosh-utils/httpclient"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-cf/paraphernalia/secure/tlsconfig"
 )
 
 var _ = Describe("NewMutualTLSClient", func() {
@@ -40,7 +40,8 @@ var _ = Describe("NewMutualTLSClient", func() {
 	})
 
 	JustBeforeEach(func() {
-		client = httpclient.NewMutualTLSClient(identity, caCertPool, serverName)
+		client, err = httpclient.NewMutualTLSClient(identity, caCertPool, serverName)
+		Expect(err).ToNot(HaveOccurred())
 		tlsConfig = client.Transport.(*http.Transport).TLSClientConfig
 	})
 
@@ -55,7 +56,8 @@ var _ = Describe("NewMutualTLSClient", func() {
 	It("has secure tls defaults", func() {
 		tlsConfigBefore := *tlsConfig //nolint:govet
 
-		tlsconfig.WithInternalServiceDefaults()(tlsConfig)
+		err = tlsconfig.WithInternalServiceDefaults()(tlsConfig)
+		Expect(err).ToNot(HaveOccurred())
 
 		Expect(*tlsConfig).To(Equal(tlsConfigBefore)) //nolint:govet
 	})
