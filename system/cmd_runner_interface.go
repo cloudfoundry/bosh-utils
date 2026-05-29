@@ -18,7 +18,10 @@ type Command struct {
 	// Don't echo stdout/stderr
 	Quiet bool
 
-	// Run command with a priority lower than the parent process
+	// Run command with a lower scheduling priority than the parent process.
+	// On Unix: nice value is parent + 5, clamped at 19.
+	// On Windows: priority class is set to BelowNormal.
+	// If the parent is already at the minimum priority, the child will run at the same level.
 	SpawnWithLowerPriority bool
 
 	Stdin io.Reader
