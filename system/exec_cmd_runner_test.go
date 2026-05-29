@@ -184,8 +184,9 @@ var _ = Describe("execCmdRunner", func() {
 			})
 
 			It("runs a command nicer than itself", func() {
-				// Write script that echos the its nice value
-				script := "#!/bin/bash\nnice\n"
+				// Write script that echos its nice value
+				// Sleep briefly to ensure parent has time to set priority
+				script := "#!/bin/bash\nsleep 0.1\nnice\n"
 				tmpFile, err := os.CreateTemp("", "tmp-script-*.sh")
 				Expect(err).ToNot(HaveOccurred())
 				defer os.Remove(tmpFile.Name())
@@ -284,8 +285,9 @@ var _ = Describe("execCmdRunner", func() {
 			})
 
 			It("runs a command nicer than itself", func() {
-				// Write script that echos the its nice value
-				script := "$proc = Get-Process -Id $PID\nWrite-Output $proc.PriorityClass"
+				// Write script that echos its priority class
+				// Sleep briefly to ensure parent has time to set priority
+				script := "Start-Sleep -Milliseconds 100\n$proc = Get-Process -Id $PID\nWrite-Output $proc.PriorityClass"
 
 				tmpFile, err := os.CreateTemp("", "tmp-script-*.ps1")
 				Expect(err).ToNot(HaveOccurred())
