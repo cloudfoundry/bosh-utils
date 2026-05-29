@@ -30,8 +30,8 @@ func (r execCmdRunner) LowerProcessPriority(processPid int) error {
 	r.logger.Debug(parentName, "Current process priority is %s (%d)", parentPrio, rawParentPrio)
 
 	if runtime.GOOS == "windows" {
-		r.logger.Debug(parentName, "Setting new child process priority to IDLE")
-		err = processpriority.Set(processPid, processpriority.Idle)
+		r.logger.Debug(parentName, "Setting new child process priority to BelowNormal")
+		err = processpriority.Set(processPid, processpriority.BelowNormal)
 	} else {
 		processPrio := rawParentPrio + 5
 		if processPrio > 19 {
