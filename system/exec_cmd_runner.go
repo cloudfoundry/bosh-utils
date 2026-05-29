@@ -71,6 +71,10 @@ func (r execCmdRunner) RunComplexCommandAsync(cmd Command) (Process, error) {
 		return nil, err
 	}
 
+	if cmd.SpawnWithLowerPriority {
+		r.lowerProcessPriority(cmd.Name, process.cmd.Process.Pid) //nolint:errcheck
+	}
+
 	return process, nil
 }
 
