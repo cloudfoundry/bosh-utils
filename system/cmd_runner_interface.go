@@ -18,9 +18,6 @@ type Command struct {
 	// Don't echo stdout/stderr
 	Quiet bool
 
-	// Run command with a priority lower than the parent process
-	SpawnWithLowerPriority bool
-
 	Stdin io.Reader
 
 	// Full stdout and stderr will be captured to memory
