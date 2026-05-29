@@ -199,7 +199,11 @@ var _ = Describe("execCmdRunner", func() {
 				parentPid := os.Getpid()
 				_, rawParentPrio, err := processpriority.Get(parentPid)
 				Expect(err).ToNot(HaveOccurred())
-				expectedOutput := fmt.Sprintf("%d\n", rawParentPrio+5)
+				childPrio := rawParentPrio + 5
+				if childPrio > 19 {
+					childPrio = 19
+				}
+				expectedOutput := fmt.Sprintf("%d\n", childPrio)
 
 				// Run script with SpawnWithLowerPriority
 				cmd := Command{
