@@ -23,25 +23,25 @@ func (r execCmdRunner) lowerProcessPriority(logTag string, processPid int) error
 
 	parentPrio, rawParentPrio, err := processpriority.Get(parentPid)
 	if err != nil {
-		r.logger.Debug(logTag, "Error getting priority of the current process (%d): %s", parentPid, err)
+		r.logger.Error(logTag, "Error getting priority of the current process (pid %d): %s", parentPid, err)
 		return err
 	}
 	r.logger.Debug(logTag, "Current process priority is %s (%d)", parentPrio, rawParentPrio)
 
 	if runtime.GOOS == "windows" {
-		r.logger.Debug(logTag, "Setting new child process priority to BelowNormal")
+		r.logger.Debug(logTag, "Setting child process (pid %d) priority to BelowNormal", processPid)
 		err = processpriority.Set(processPid, processpriority.BelowNormal)
 	} else {
 		processPrio := rawParentPrio + 5
 		if processPrio > 19 {
 			processPrio = 19
 		}
-		r.logger.Debug(logTag, "Setting new child process priority to %d", processPrio)
+		r.logger.Debug(logTag, "Setting child process (pid %d) priority to %d", processPid, processPrio)
 		err = processpriority.SetRAW(processPid, processPrio)
 	}
 
 	if err != nil {
-		r.logger.Error(logTag, "Error setting priority on the command: %s", err)
+		r.logger.Error(logTag, "Error setting priority on child process (pid %d): %s", processPid, err)
 	}
 	return err
 }
