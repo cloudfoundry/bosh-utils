@@ -18,7 +18,7 @@ func NewExecCmdRunner(logger boshlog.Logger) CmdRunner {
 	return execCmdRunner{logger}
 }
 
-func (r execCmdRunner) LowerProcessPriority(logTag string, processPid int) error {
+func (r execCmdRunner) lowerProcessPriority(logTag string, processPid int) error {
 	parentPid := os.Getpid()
 
 	parentPrio, rawParentPrio, err := processpriority.Get(parentPid)
@@ -55,9 +55,7 @@ func (r execCmdRunner) RunComplexCommand(cmd Command) (string, string, int, erro
 	}
 
 	if cmd.SpawnWithLowerPriority {
-		if err := r.LowerProcessPriority(cmd.Name, process.cmd.Process.Pid); err != nil {
-			r.logger.Error(cmd.Name, "Error setting process priority on %s", cmd.Name)
-		}
+		r.lowerProcessPriority(cmd.Name, process.cmd.Process.Pid) //nolint:errcheck
 	}
 
 	result := <-process.Wait()
