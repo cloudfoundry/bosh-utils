@@ -3,7 +3,9 @@ package system_test
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -180,6 +182,66 @@ var _ = Describe("execCmdRunner", func() {
 				Expect(envVars).To(HaveKeyWithValue("ABC", "XYZ"))
 				Expect(envVars).To(HaveKeyWithValue("abc", "xyz"))
 			})
+
+			It("runs a command nicer than itself", func() {
+				// Write script that echos its nice value
+				// Sleep briefly to ensure parent has time to set priority
+				script := "#!/bin/bash\nsleep 0.1\nnice\n"
+				tmpFile, err := os.CreateTemp("", "tmp-script-*.sh")
+				Expect(err).ToNot(HaveOccurred())
+				defer os.Remove(tmpFile.Name())
+				_, err = tmpFile.WriteString(script)
+				Expect(err).ToNot(HaveOccurred())
+				err = tmpFile.Close()
+				Expect(err).ToNot(HaveOccurred())
+
+				niceOut, err := exec.Command("nice").Output()
+				Expect(err).ToNot(HaveOccurred())
+				parentNice, err := strconv.Atoi(strings.TrimSpace(string(niceOut)))
+				Expect(err).ToNot(HaveOccurred())
+				expectedOutput := fmt.Sprintf("%d\n", min(parentNice+5, 19))
+
+				// Run script with SpawnWithLowerPriority
+				cmd := Command{
+					Name:                   "bash",
+					Args:                   []string{tmpFile.Name()},
+					SpawnWithLowerPriority: true,
+				}
+				stdout, _, _, err := runner.RunComplexCommand(cmd)
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(stdout).To(Equal(expectedOutput))
+			})
+
+			It("runs an async command nicer than itself", func() {
+				// Write script that echos its nice value
+				script := "#!/bin/bash\nsleep 0.1\nnice\n"
+				tmpFile, err := os.CreateTemp("", "tmp-script-*.sh")
+				Expect(err).ToNot(HaveOccurred())
+				defer os.Remove(tmpFile.Name())
+				_, err = tmpFile.WriteString(script)
+				Expect(err).ToNot(HaveOccurred())
+				err = tmpFile.Close()
+				Expect(err).ToNot(HaveOccurred())
+
+				niceOut, err := exec.Command("nice").Output()
+				Expect(err).ToNot(HaveOccurred())
+				parentNice, err := strconv.Atoi(strings.TrimSpace(string(niceOut)))
+				Expect(err).ToNot(HaveOccurred())
+				expectedOutput := fmt.Sprintf("%d\n", min(parentNice+5, 19))
+
+				cmd := Command{
+					Name:                   "bash",
+					Args:                   []string{tmpFile.Name()},
+					SpawnWithLowerPriority: true,
+				}
+				process, err := runner.RunComplexCommandAsync(cmd)
+				Expect(err).ToNot(HaveOccurred())
+
+				result := <-process.Wait()
+				Expect(result.Error).ToNot(HaveOccurred())
+				Expect(result.Stdout).To(Equal(expectedOutput))
+			})
 		})
 
 		Context("windows specific behavior", func() {
@@ -246,6 +308,59 @@ var _ = Describe("execCmdRunner", func() {
 				//
 				Expect(envVars).ToNot(HaveKey("_bar"))
 				Expect(envVars).To(HaveKeyWithValue("_BAR", "alpha=first"))
+			})
+
+			It("runs a command nicer than itself", func() {
+				// Write script that echos its priority class
+				// Sleep briefly to ensure parent has time to set priority
+				script := "Start-Sleep -Milliseconds 100\n$proc = Get-Process -Id $PID\nWrite-Output $proc.PriorityClass"
+
+				tmpFile, err := os.CreateTemp("", "tmp-script-*.ps1")
+				Expect(err).ToNot(HaveOccurred())
+				defer os.Remove(tmpFile.Name())
+				_, err = tmpFile.WriteString(script)
+				Expect(err).ToNot(HaveOccurred())
+				err = tmpFile.Close()
+				Expect(err).ToNot(HaveOccurred())
+				err = os.Chmod(tmpFile.Name(), 0700)
+				Expect(err).ToNot(HaveOccurred())
+
+				// Run script with SpawnWithLowerPriority
+				cmd := Command{
+					Name:                   "powershell",
+					Args:                   []string{"-ExecutionPolicy", "Bypass", "-File", tmpFile.Name()},
+					SpawnWithLowerPriority: true,
+				}
+				stdout, _, _, err := runner.RunComplexCommand(cmd)
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(stdout).To(Equal("BelowNormal\r\n"))
+			})
+
+			It("runs an async command nicer than itself", func() {
+				script := "Start-Sleep -Milliseconds 100\n$proc = Get-Process -Id $PID\nWrite-Output $proc.PriorityClass"
+
+				tmpFile, err := os.CreateTemp("", "tmp-script-*.ps1")
+				Expect(err).ToNot(HaveOccurred())
+				defer os.Remove(tmpFile.Name())
+				_, err = tmpFile.WriteString(script)
+				Expect(err).ToNot(HaveOccurred())
+				err = tmpFile.Close()
+				Expect(err).ToNot(HaveOccurred())
+				err = os.Chmod(tmpFile.Name(), 0700)
+				Expect(err).ToNot(HaveOccurred())
+
+				cmd := Command{
+					Name:                   "powershell",
+					Args:                   []string{"-ExecutionPolicy", "Bypass", "-File", tmpFile.Name()},
+					SpawnWithLowerPriority: true,
+				}
+				process, err := runner.RunComplexCommandAsync(cmd)
+				Expect(err).ToNot(HaveOccurred())
+
+				result := <-process.Wait()
+				Expect(result.Error).ToNot(HaveOccurred())
+				Expect(result.Stdout).To(Equal("BelowNormal\r\n"))
 			})
 		})
 
