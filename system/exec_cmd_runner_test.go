@@ -194,8 +194,6 @@ var _ = Describe("execCmdRunner", func() {
 				Expect(err).ToNot(HaveOccurred())
 				err = tmpFile.Close()
 				Expect(err).ToNot(HaveOccurred())
-				err = os.Chmod(tmpFile.Name(), 0700)
-				Expect(err).ToNot(HaveOccurred())
 
 				niceOut, err := exec.Command("nice").Output()
 				Expect(err).ToNot(HaveOccurred())
@@ -205,7 +203,8 @@ var _ = Describe("execCmdRunner", func() {
 
 				// Run script with SpawnWithLowerPriority
 				cmd := Command{
-					Name:                   tmpFile.Name(),
+					Name:                   "bash",
+					Args:                   []string{tmpFile.Name()},
 					SpawnWithLowerPriority: true,
 				}
 				stdout, _, _, err := runner.RunComplexCommand(cmd)
@@ -224,8 +223,6 @@ var _ = Describe("execCmdRunner", func() {
 				Expect(err).ToNot(HaveOccurred())
 				err = tmpFile.Close()
 				Expect(err).ToNot(HaveOccurred())
-				err = os.Chmod(tmpFile.Name(), 0700)
-				Expect(err).ToNot(HaveOccurred())
 
 				niceOut, err := exec.Command("nice").Output()
 				Expect(err).ToNot(HaveOccurred())
@@ -234,7 +231,8 @@ var _ = Describe("execCmdRunner", func() {
 				expectedOutput := fmt.Sprintf("%d\n", min(parentNice+5, 19))
 
 				cmd := Command{
-					Name:                   tmpFile.Name(),
+					Name:                   "bash",
+					Args:                   []string{tmpFile.Name()},
 					SpawnWithLowerPriority: true,
 				}
 				process, err := runner.RunComplexCommandAsync(cmd)
