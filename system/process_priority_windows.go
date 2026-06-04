@@ -16,14 +16,11 @@ const (
 	// Windows process priority classes.
 	// https://learn.microsoft.com/en-us/windows/win32/procthread/scheduling-priorities
 	winPriorityBelowNormal = 0x4000 // BELOW_NORMAL_PRIORITY_CLASS
-
-	// PROCESS_ALL_ACCESS for opening a process handle.
-	processAllAccess = windows.STANDARD_RIGHTS_REQUIRED | windows.SYNCHRONIZE | 0xffff
 )
 
 // getProcessPriority returns the priority class of the process with the given pid.
 func getProcessPriority(pid int) (int, error) {
-	handle, err := windows.OpenProcess(processAllAccess, false, uint32(pid))
+	handle, err := windows.OpenProcess(windows.PROCESS_QUERY_INFORMATION, false, uint32(pid))
 	if err != nil {
 		return 0, fmt.Errorf("failed to open process: %w", err)
 	}
@@ -38,7 +35,7 @@ func getProcessPriority(pid int) (int, error) {
 
 // setProcessPriority sets the priority class of the process with the given pid.
 func setProcessPriority(pid int, priority int) error {
-	handle, err := windows.OpenProcess(processAllAccess, false, uint32(pid))
+	handle, err := windows.OpenProcess(windows.PROCESS_SET_INFORMATION, false, uint32(pid))
 	if err != nil {
 		return fmt.Errorf("failed to open process: %w", err)
 	}
