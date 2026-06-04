@@ -3,11 +3,9 @@ package system
 import (
 	"os"
 	"os/exec"
-	"runtime"
 	"strings"
 
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
-	"github.com/hekmon/processpriority"
 )
 
 type execCmdRunner struct {
@@ -16,34 +14,6 @@ type execCmdRunner struct {
 
 func NewExecCmdRunner(logger boshlog.Logger) CmdRunner {
 	return execCmdRunner{logger}
-}
-
-func (r execCmdRunner) lowerProcessPriority(logTag string, processPid int) error {
-	parentPid := os.Getpid()
-
-	parentPrio, rawParentPrio, err := processpriority.Get(parentPid)
-	if err != nil {
-		r.logger.Error(logTag, "Error getting priority of the current process (pid %d): %s", parentPid, err)
-		return err
-	}
-	r.logger.Debug(logTag, "Current process priority is %s (%d)", parentPrio, rawParentPrio)
-
-	if runtime.GOOS == "windows" {
-		r.logger.Debug(logTag, "Setting child process (pid %d) priority to BelowNormal", processPid)
-		err = processpriority.Set(processPid, processpriority.BelowNormal)
-	} else {
-		processPrio := rawParentPrio + 5
-		if processPrio > 19 {
-			processPrio = 19
-		}
-		r.logger.Debug(logTag, "Setting child process (pid %d) priority to %d", processPid, processPrio)
-		err = processpriority.SetRAW(processPid, processPrio)
-	}
-
-	if err != nil {
-		r.logger.Error(logTag, "Error setting priority on child process (pid %d): %s", processPid, err)
-	}
-	return err
 }
 
 func (r execCmdRunner) RunComplexCommand(cmd Command) (string, string, int, error) {

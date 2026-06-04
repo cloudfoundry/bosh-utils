@@ -3,7 +3,9 @@ package system_test
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -13,8 +15,6 @@ import (
 	"github.com/cloudfoundry/bosh-utils/logger/loggerfakes"
 	. "github.com/cloudfoundry/bosh-utils/system"
 	fakesys "github.com/cloudfoundry/bosh-utils/system/fakes"
-
-	"github.com/hekmon/processpriority"
 )
 
 const ErrExitCode = 14
@@ -197,14 +197,11 @@ var _ = Describe("execCmdRunner", func() {
 				err = os.Chmod(tmpFile.Name(), 0700)
 				Expect(err).ToNot(HaveOccurred())
 
-				parentPid := os.Getpid()
-				_, rawParentPrio, err := processpriority.Get(parentPid)
+				niceOut, err := exec.Command("nice").Output()
 				Expect(err).ToNot(HaveOccurred())
-				childPrio := rawParentPrio + 5
-				if childPrio > 19 {
-					childPrio = 19
-				}
-				expectedOutput := fmt.Sprintf("%d\n", childPrio)
+				parentNice, err := strconv.Atoi(strings.TrimSpace(string(niceOut)))
+				Expect(err).ToNot(HaveOccurred())
+				expectedOutput := fmt.Sprintf("%d\n", min(parentNice+5, 19))
 
 				// Run script with SpawnWithLowerPriority
 				cmd := Command{
@@ -230,14 +227,11 @@ var _ = Describe("execCmdRunner", func() {
 				err = os.Chmod(tmpFile.Name(), 0700)
 				Expect(err).ToNot(HaveOccurred())
 
-				parentPid := os.Getpid()
-				_, rawParentPrio, err := processpriority.Get(parentPid)
+				niceOut, err := exec.Command("nice").Output()
 				Expect(err).ToNot(HaveOccurred())
-				childPrio := rawParentPrio + 5
-				if childPrio > 19 {
-					childPrio = 19
-				}
-				expectedOutput := fmt.Sprintf("%d\n", childPrio)
+				parentNice, err := strconv.Atoi(strings.TrimSpace(string(niceOut)))
+				Expect(err).ToNot(HaveOccurred())
+				expectedOutput := fmt.Sprintf("%d\n", min(parentNice+5, 19))
 
 				cmd := Command{
 					Name:                   tmpFile.Name(),
