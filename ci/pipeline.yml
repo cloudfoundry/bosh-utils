@@ -123,12 +123,26 @@ jobs:
         trigger: true
       - get: golang-release-image
         trigger: true
+      - task: build-image
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: concourse/oci-build-task
+          inputs:
+            - name: bosh-utils-dockerfiles
+          outputs:
+            - name: image
+          params:
+            CONTEXT: bosh-utils-dockerfiles/ci/docker
+          run:
+            path: build
       - put: bosh-utils-image
-        inputs: detect
+        no_get: true
         params:
-          build: "bosh-utils-dockerfiles/ci/docker"
-        get_params:
-          skip_download: true
+          image: image/image.tar
 
 resources:
   - name: weekly
@@ -200,9 +214,10 @@ resources:
       initial_version: '0.0.500'
 
   - name: bosh-utils-image
-    type: docker-image
+    type: registry-image
     source:
       repository: bosh/utils
+      tag: latest
       username: ((docker.username))
       password: ((docker.password))
 
@@ -210,6 +225,7 @@ resources:
     type: registry-image
     source:
       repository: bosh/utils
+      tag: latest
       username: ((docker.username))
       password: ((docker.password))
 
