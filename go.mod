@@ -6,12 +6,12 @@ require (
 	code.cloudfoundry.org/clock v1.0.0
 	code.cloudfoundry.org/tlsconfig v0.53.0
 	github.com/bmatcuk/doublestar v1.3.4
-	github.com/cloudfoundry/socks5-proxy v0.2.178
+	github.com/cloudfoundry/socks5-proxy v0.2.179
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/jpillora/backoff v1.0.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.12.2
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
-	github.com/onsi/ginkgo/v2 v2.30.0
+	github.com/onsi/ginkgo/v2 v2.31.0
 	github.com/onsi/gomega v1.40.0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/net v0.56.0
