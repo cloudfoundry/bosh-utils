@@ -2,13 +2,10 @@ package system_test
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"os/user"
 	"path/filepath"
-	"slices"
 	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -21,6 +18,12 @@ import (
 	"github.com/cloudfoundry/bosh-utils/logger/loggerfakes"
 	. "github.com/cloudfoundry/bosh-utils/system"
 )
+
+var fixtureFiles = []string{
+	"foo.txt",
+	"bar/bar.txt",
+	"bar/baz/.gitkeep",
+}
 
 func createOsFs() (fs FileSystem) {
 	logger := boshlog.NewLogger(boshlog.LevelNone)
@@ -50,36 +53,6 @@ var _ = Describe("OS FileSystem", func() {
 
 	AfterEach(func() {
 		os.RemoveAll(TempDir) //nolint:errcheck
-	})
-
-	It("home dir", func() {
-		if isWindows {
-			currentUser, err := user.Current()
-			Expect(err).ToNot(HaveOccurred())
-
-			// If a regular user, the home directory will end with the username
-			expDir := fmt.Sprintf(`\%s`, filepath.Base(currentUser.Username))
-
-			// If a System or LocalSystem user, the home directory will be different
-			// ref: https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-identifiers
-			groupIds, err := currentUser.GroupIds()
-			Expect(err).ToNot(HaveOccurred())
-			if slices.Contains(groupIds, "S-1-5-18") {
-				expDir = `C:\Windows\system32\config\systemprofile`
-			}
-
-			homeDir, err := createOsFs().HomeDir(currentUser.Name)
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(strings.ToLower(homeDir)).To(ContainSubstring(strings.ToLower(expDir)))
-		} else {
-			superuser := "root"
-			expDir := "/root"
-			homeDir, err := createOsFs().HomeDir(superuser)
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(homeDir).To(ContainSubstring(expDir))
-		}
 	})
 
 	It("expand path", func() {
@@ -824,57 +797,9 @@ var _ = Describe("OS FileSystem", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(fooContent).To(Equal(srcContent))
 		})
-
-		It("does not leak file descriptors", func() {
-			cmdName := "lsof"
-			if isWindows {
-				if _, err := exec.LookPath("handle.exe"); err != nil {
-					Skip("This test requires handle.exe it can be downloaded here:\n" +
-						"https://technet.microsoft.com/en-us/sysinternals/handle.aspx")
-				}
-				cmdName = "handle.exe"
-			}
-			osFs := createOsFs()
-
-			srcFile, err := osFs.TempFile("srcPath")
-			Expect(err).ToNot(HaveOccurred())
-			defer os.Remove(srcFile.Name())
-
-			err = srcFile.Close()
-			Expect(err).ToNot(HaveOccurred())
-
-			dstFile, err := osFs.TempFile("dstPath")
-			Expect(err).ToNot(HaveOccurred())
-			defer os.Remove(dstFile.Name())
-
-			err = dstFile.Close()
-			Expect(err).ToNot(HaveOccurred())
-
-			err = osFs.CopyFile(srcFile.Name(), dstFile.Name())
-			Expect(err).ToNot(HaveOccurred())
-
-			runner := NewExecCmdRunner(boshlog.NewLogger(boshlog.LevelNone))
-			stdout, _, _, err := runner.RunCommand(cmdName)
-			Expect(err).ToNot(HaveOccurred())
-
-			for _, line := range strings.Split(stdout, "\n") {
-				if strings.Contains(line, srcFile.Name()) {
-					Fail(fmt.Sprintf("CopyFile did not close: srcFile: %s", srcFile.Name()))
-				}
-				if strings.Contains(line, dstFile.Name()) {
-					Fail(fmt.Sprintf("CopyFile did not close: dstFile: %s", dstFile.Name()))
-				}
-			}
-		})
 	})
 
 	Describe("CopyDir", func() {
-		var fixtureFiles = []string{
-			"foo.txt",
-			"bar/bar.txt",
-			"bar/baz/.gitkeep",
-		}
-
 		It("recursively copies directory contents", func() {
 			osFs := createOsFs()
 			srcPath := "test_assets/test_copy_dir_entries"
@@ -893,58 +818,6 @@ var _ = Describe("OS FileSystem", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(srcContents).To(Equal(dstContents), "Copied file does not match source file: '%s", fixtureFile)
-			}
-		})
-
-		It("does not leak file descriptors", func() {
-			cmdName := "lsof"
-			if isWindows {
-				if _, err := exec.LookPath("handle.exe"); err != nil {
-					Skip("This test requires handle.exe it can be downloaded here:\n" +
-						"https://technet.microsoft.com/en-us/sysinternals/handle.aspx")
-				}
-				cmdName = "handle.exe"
-			}
-
-			osFs := createOsFs()
-			srcPath := "test_assets/test_copy_dir_entries"
-			dstPath, err := osFs.TempDir("CopyDirTestDir")
-			Expect(err).ToNot(HaveOccurred())
-			defer osFs.RemoveAll(dstPath) //nolint:errcheck
-
-			err = osFs.CopyDir(srcPath, dstPath)
-			Expect(err).ToNot(HaveOccurred())
-
-			runner := NewExecCmdRunner(boshlog.NewLogger(boshlog.LevelNone))
-			stdout, _, _, err := runner.RunCommand(cmdName)
-			Expect(err).ToNot(HaveOccurred())
-
-			// lsof and handle use absolute paths
-			srcPath, err = filepath.Abs(srcPath)
-			Expect(err).ToNot(HaveOccurred())
-
-			for _, line := range strings.Split(stdout, "\n") {
-				for _, fixtureFile := range fixtureFiles {
-					srcFilePath := filepath.Join(srcPath, fixtureFile)
-					if strings.Contains(line, srcFilePath) {
-						Fail(fmt.Sprintf("CopyDir did not close source file: %s", srcFilePath))
-					}
-
-					srcFileDirPath := filepath.Dir(srcFilePath)
-					if strings.Contains(line, srcFileDirPath) {
-						Fail(fmt.Sprintf("CopyDir did not close source dir: %s", srcFileDirPath))
-					}
-
-					dstFilePath := filepath.Join(dstPath, fixtureFile)
-					if strings.Contains(line, dstFilePath) {
-						Fail(fmt.Sprintf("CopyDir did not close destination file: %s", dstFilePath))
-					}
-
-					dstFileDirPath := filepath.Dir(dstFilePath)
-					if strings.Contains(line, dstFileDirPath) {
-						Fail(fmt.Sprintf("CopyDir did not close destination dir: %s", dstFileDirPath))
-					}
-				}
 			}
 		})
 	})

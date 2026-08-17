@@ -19,6 +19,6 @@ jobs:
     - name: Unit Tests (Windows)
       if: runner.os == 'Windows'
       run: ./bin/test-unit.ps1
-    - name: Unit Tests (Linux)
-      if: runner.os == 'Linux'
+    - name: Unit Tests (Linux/macOS)
+      if: runner.os != 'Windows'
       run: ./bin/test-unit

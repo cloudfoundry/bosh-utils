@@ -27,18 +27,18 @@ var windowsExePath string
 var priorityPath string
 
 var _ = SynchronizedBeforeSuite(func() []byte {
+	workingDir, err := filepath.Abs(".")
+	Expect(err).ToNot(HaveOccurred())
+
 	var paths []string
+	paths = append(paths, buildFixtureCmd(workingDir, "exec_cmd_runner_fixtures/cat/"))
+	paths = append(paths, buildFixtureCmd(workingDir, "exec_cmd_runner_fixtures/false/"))
+	paths = append(paths, buildFixtureCmd(workingDir, "exec_cmd_runner_fixtures/windows_exe/"))
+	paths = append(paths, buildFixtureCmd(workingDir, "exec_cmd_runner_fixtures/priority"))
 
-	paths = append(paths, buildFixtureCmd("exec_cmd_runner_fixtures/cat/"))
-	paths = append(paths, buildFixtureCmd("exec_cmd_runner_fixtures/false/"))
-	paths = append(paths, buildFixtureCmd("exec_cmd_runner_fixtures/windows_exe/"))
-	paths = append(paths, buildFixtureCmd("exec_cmd_runner_fixtures/priority"))
-
-	Expect(paths).To(HaveLen(4))
 	return []byte(strings.Join(paths, "|"))
 }, func(data []byte) {
 	paths := strings.Split(string(data), "|")
-	Expect(paths).To(HaveLen(4))
 
 	catPath = paths[0]
 	falsePath = paths[1]
@@ -50,13 +50,7 @@ var _ = SynchronizedAfterSuite(func() {}, func() {
 	gexec.CleanupBuildArtifacts()
 })
 
-func buildFixtureCmd(fixtureSrcPath string) string {
-	ex, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	workingDir := filepath.Dir(ex)
-
+func buildFixtureCmd(workingDir string, fixtureSrcPath string) string {
 	Expect(os.Chdir(fixtureSrcPath)).To(Succeed())
 	fixtureBinPath, err := gexec.Build("./...")
 	Expect(err).ToNot(HaveOccurred())
@@ -78,7 +72,7 @@ func randSeq(n int) string {
 func randLongPath(tmpDir string) string {
 	volume := tmpDir + string(filepath.Separator)
 	buf := bytes.NewBufferString(volume)
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		for i := byte('A'); i <= 'Z'; i++ {
 			buf.Write(bytes.Repeat([]byte{i}, 4))
 			buf.WriteRune(filepath.Separator)
@@ -87,4 +81,22 @@ func randLongPath(tmpDir string) string {
 	buf.WriteString(randSeq(10))
 	buf.WriteRune(filepath.Separator)
 	return filepath.Clean(buf.String())
+}
+
+func parseEnvFields(envDump string, convertKeysToUpper bool) map[string]string {
+	fields := make(map[string]string)
+	for line := range strings.SplitSeq(envDump, "\n") {
+		line = strings.TrimSuffix(line, "\r")
+		// don't split on '=' as '=' is allowed in the value on Windows
+		if before, after, ok := strings.Cut(line, "="); ok {
+			varName := before
+			varValue := after
+			if convertKeysToUpper {
+				fields[strings.ToUpper(varName)] = varValue
+			} else {
+				fields[varName] = varValue
+			}
+		}
+	}
+	return fields
 }

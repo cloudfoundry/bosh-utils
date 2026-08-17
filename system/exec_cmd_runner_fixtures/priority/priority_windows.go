@@ -30,6 +30,25 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Prints the raw Windows priority class integer
-	fmt.Printf("%d\n", priorityClass)
+	var priorityClassName string
+	switch priorityClass {
+	case windows.NORMAL_PRIORITY_CLASS:
+		priorityClassName = "NORMAL_PRIORITY_CLASS"
+	case windows.IDLE_PRIORITY_CLASS:
+		priorityClassName = "IDLE_PRIORITY_CLASS"
+	case windows.HIGH_PRIORITY_CLASS:
+		priorityClassName = "HIGH_PRIORITY_CLASS"
+	case windows.REALTIME_PRIORITY_CLASS:
+		priorityClassName = "REALTIME_PRIORITY_CLASS"
+	case windows.BELOW_NORMAL_PRIORITY_CLASS:
+		priorityClassName = "BELOW_NORMAL_PRIORITY_CLASS"
+	case windows.ABOVE_NORMAL_PRIORITY_CLASS:
+		priorityClassName = "ABOVE_NORMAL_PRIORITY_CLASS"
+	default:
+		// Fallback for any unknown values
+		priorityClassName = fmt.Sprintf("UNKNOWN_PRIORITY_CLASS (%d)", priorityClass)
+	}
+
+	// Prints the Windows priority class name
+	fmt.Printf("%s\r\n", priorityClassName)
 }
