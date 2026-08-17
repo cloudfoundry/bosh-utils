@@ -1,26 +1,12 @@
-//go:build !windows
+package system
 
 // Inspired by github.com/hekmon/processpriority (MIT, Copyright 2024 Edouard Hur).
 // Reimplemented inline to avoid the external dependency.
-
-package system
 
 import (
 	"os"
 	"syscall"
 )
-
-// getProcessPriority returns the nice value of the process with the given pid.
-func getProcessPriority(pid int) (int, error) {
-	// syscall.Getpriority returns the "kernel nice" (20 - nice), so we convert.
-	// See https://linux.die.net/man/2/getpriority
-	knice, err := syscall.Getpriority(syscall.PRIO_PROCESS, pid)
-	if err != nil {
-		return 0, err
-	}
-	nice := (knice - 20) * -1
-	return nice, nil
-}
 
 // setProcessPriority sets the nice value of the process with the given pid.
 func setProcessPriority(pid int, nice int) error {

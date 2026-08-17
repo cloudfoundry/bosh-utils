@@ -3,6 +3,7 @@ package system_test
 import (
 	"bytes"
 	"math/rand"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -23,36 +24,46 @@ func TestSystem(t *testing.T) {
 var catPath string
 var falsePath string
 var windowsExePath string
+var priorityPath string
 
 var _ = SynchronizedBeforeSuite(func() []byte {
 	var paths []string
 
-	catBin, err := gexec.Build("exec_cmd_runner_fixtures/cat/cat.go")
-	Expect(err).ToNot(HaveOccurred())
-	paths = append(paths, catBin)
+	paths = append(paths, buildFixtureCmd("exec_cmd_runner_fixtures/cat/"))
+	paths = append(paths, buildFixtureCmd("exec_cmd_runner_fixtures/false/"))
+	paths = append(paths, buildFixtureCmd("exec_cmd_runner_fixtures/windows_exe/"))
+	paths = append(paths, buildFixtureCmd("exec_cmd_runner_fixtures/priority"))
 
-	falseBin, err := gexec.Build("exec_cmd_runner_fixtures/false/false.go")
-	Expect(err).ToNot(HaveOccurred())
-	paths = append(paths, falseBin)
-
-	windowsExeBin, err := gexec.Build("exec_cmd_runner_fixtures/windows_exe/windows_exe.go")
-	Expect(err).ToNot(HaveOccurred())
-	paths = append(paths, windowsExeBin)
-
-	Expect(paths).To(HaveLen(3))
+	Expect(paths).To(HaveLen(4))
 	return []byte(strings.Join(paths, "|"))
 }, func(data []byte) {
 	paths := strings.Split(string(data), "|")
-	Expect(paths).To(HaveLen(3))
+	Expect(paths).To(HaveLen(4))
 
 	catPath = paths[0]
 	falsePath = paths[1]
 	windowsExePath = paths[2]
+	priorityPath = paths[3]
 })
 
 var _ = SynchronizedAfterSuite(func() {}, func() {
 	gexec.CleanupBuildArtifacts()
 })
+
+func buildFixtureCmd(fixtureSrcPath string) string {
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	workingDir := filepath.Dir(ex)
+
+	Expect(os.Chdir(fixtureSrcPath)).To(Succeed())
+	fixtureBinPath, err := gexec.Build("./...")
+	Expect(err).ToNot(HaveOccurred())
+	Expect(os.Chdir(workingDir)).To(Succeed())
+
+	return fixtureBinPath
+}
 
 func randSeq(n int) string {
 	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

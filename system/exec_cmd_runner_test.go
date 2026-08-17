@@ -3,10 +3,9 @@ package system_test
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"runtime"
-	"strconv"
 	"strings"
+	"syscall"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -111,6 +110,13 @@ func parseEnvFields(envDump string, convertKeysToUpper bool) map[string]string {
 	return fields
 }
 
+func normalizeNiceLevel(kernelNice int) int {
+	if runtime.GOOS == "linux" {
+		return (kernelNice - 20) * -1
+	}
+	return kernelNice
+}
+
 var _ = Describe("execCmdRunner", func() {
 	var (
 		runner CmdRunner
@@ -184,62 +190,31 @@ var _ = Describe("execCmdRunner", func() {
 			})
 
 			It("runs a command nicer than itself", func() {
-				// Write script that echos its nice value
-				// Sleep briefly to ensure parent has time to set priority
-				script := "#!/bin/bash\nsleep 0.1\nnice\n"
-				tmpFile, err := os.CreateTemp("", "tmp-script-*.sh")
-				Expect(err).ToNot(HaveOccurred())
-				defer os.Remove(tmpFile.Name())
-				_, err = tmpFile.WriteString(script)
-				Expect(err).ToNot(HaveOccurred())
-				err = tmpFile.Close()
+				// Calculate what we expect the priority to be
+				parentPid := os.Getpid()
+				parentKnice, err := syscall.Getpriority(syscall.PRIO_PROCESS, parentPid)
 				Expect(err).ToNot(HaveOccurred())
 
-				niceOut, err := exec.Command("nice").Output()
+				stdout, _, _, err := runner.RunComplexCommand(Command{Name: priorityPath, SpawnWithLowerPriority: true})
 				Expect(err).ToNot(HaveOccurred())
-				parentNice, err := strconv.Atoi(strings.TrimSpace(string(niceOut)))
-				Expect(err).ToNot(HaveOccurred())
+
+				parentNice := normalizeNiceLevel(parentKnice)
 				expectedOutput := fmt.Sprintf("%d\n", min(parentNice+5, 19))
-
-				// Run script with SpawnWithLowerPriority
-				cmd := Command{
-					Name:                   "bash",
-					Args:                   []string{tmpFile.Name()},
-					SpawnWithLowerPriority: true,
-				}
-				stdout, _, _, err := runner.RunComplexCommand(cmd)
-
-				Expect(err).ToNot(HaveOccurred())
 				Expect(stdout).To(Equal(expectedOutput))
 			})
 
 			It("runs an async command nicer than itself", func() {
-				// Write script that echos its nice value
-				script := "#!/bin/bash\nsleep 0.1\nnice\n"
-				tmpFile, err := os.CreateTemp("", "tmp-script-*.sh")
-				Expect(err).ToNot(HaveOccurred())
-				defer os.Remove(tmpFile.Name())
-				_, err = tmpFile.WriteString(script)
-				Expect(err).ToNot(HaveOccurred())
-				err = tmpFile.Close()
+				parentPid := os.Getpid()
+				parentKnice, err := syscall.Getpriority(syscall.PRIO_PROCESS, parentPid)
 				Expect(err).ToNot(HaveOccurred())
 
-				niceOut, err := exec.Command("nice").Output()
+				process, err := runner.RunComplexCommandAsync(Command{Name: priorityPath, SpawnWithLowerPriority: true})
 				Expect(err).ToNot(HaveOccurred())
-				parentNice, err := strconv.Atoi(strings.TrimSpace(string(niceOut)))
-				Expect(err).ToNot(HaveOccurred())
-				expectedOutput := fmt.Sprintf("%d\n", min(parentNice+5, 19))
-
-				cmd := Command{
-					Name:                   "bash",
-					Args:                   []string{tmpFile.Name()},
-					SpawnWithLowerPriority: true,
-				}
-				process, err := runner.RunComplexCommandAsync(cmd)
-				Expect(err).ToNot(HaveOccurred())
-
 				result := <-process.Wait()
 				Expect(result.Error).ToNot(HaveOccurred())
+
+				parentNice := normalizeNiceLevel(parentKnice)
+				expectedOutput := fmt.Sprintf("%d\n", min(parentNice+5, 19))
 				Expect(result.Stdout).To(Equal(expectedOutput))
 			})
 		})
