@@ -5,6 +5,8 @@ on:
     branches:
       - master
 
+permissions: {}
+
 jobs:
   check-branch:
     runs-on: ubuntu-latest
