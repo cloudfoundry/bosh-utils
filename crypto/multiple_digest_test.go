@@ -81,7 +81,7 @@ var _ = Describe("MultipleDigest", func() {
 			file.Write([]byte("fake-contents")) //nolint:errcheck
 		})
 
-		It("can read a file and verify its content aginst the digest", func() {
+		It("can read a file and verify its content against the digest", func() {
 			logger := boshlog.NewLogger(boshlog.LevelNone)
 			fileSystem := boshsys.NewOsFileSystem(logger)
 			sha1Digest := NewDigest(DigestAlgorithmSHA1, "978ad524a02039f261773fe93d94973ae7de6470")
@@ -219,20 +219,20 @@ var _ = Describe("MultipleDigest", func() {
 
 	Describe("String", func() {
 		It("returns the concatenated digest string", func() {
-			digest1 := NewDigest(DigestAlgorithmSHA1, "sha1digestval")
-			digest2 := NewDigest(DigestAlgorithmSHA256, "sha256digestval")
+			digest1 := NewDigest(DigestAlgorithmSHA1, "sha1digestVal")
+			digest2 := NewDigest(DigestAlgorithmSHA256, "sha256digestVal")
 			digest := MustNewMultipleDigest(digest1, digest2)
 
 			fullString := digest.String()
-			Expect(fullString).To(Equal("sha1digestval;sha256:sha256digestval"))
+			Expect(fullString).To(Equal("sha1digestVal;sha256:sha256digestVal"))
 		})
 	})
 
 	Describe("DigestFor", func() {
 		Context("when the algorithm matches one of the digests in the multi", func() {
 			It("returns the digest matching the algorithm", func() {
-				digest1 := NewDigest(DigestAlgorithmSHA1, "sha1digestval")
-				digest2 := NewDigest(DigestAlgorithmSHA256, "sha256digestval")
+				digest1 := NewDigest(DigestAlgorithmSHA1, "sha1digestVal")
+				digest2 := NewDigest(DigestAlgorithmSHA256, "sha256digestVal")
 				digests := MustNewMultipleDigest(digest1, digest2)
 
 				digest, err := digests.DigestFor(DigestAlgorithmSHA1)
@@ -247,8 +247,8 @@ var _ = Describe("MultipleDigest", func() {
 
 		Context("when the algorithm specified does not match any contained digests", func() {
 			It("returns an error", func() {
-				digest1 := NewDigest(DigestAlgorithmSHA1, "sha1digestval")
-				digest2 := NewDigest(DigestAlgorithmSHA256, "sha256digestval")
+				digest1 := NewDigest(DigestAlgorithmSHA1, "sha1digestVal")
+				digest2 := NewDigest(DigestAlgorithmSHA256, "sha256digestVal")
 				digests := MustNewMultipleDigest(digest1, digest2)
 
 				_, err := digests.DigestFor(DigestAlgorithmSHA512)
@@ -294,7 +294,7 @@ var _ = Describe("MultipleDigest", func() {
 		})
 
 		It("returns an error when the file cannot be opened", func() {
-			algos := []Algorithm{}
+			var algos []Algorithm
 			fs := fakesys.NewFakeFileSystem()
 			fs.OpenFileErr = errors.New("nope nope")
 
@@ -305,7 +305,7 @@ var _ = Describe("MultipleDigest", func() {
 		})
 
 		It("returns an error if no algorithms are supplied", func() {
-			algos := []Algorithm{}
+			var algos []Algorithm
 			_, err := NewMultipleDigestFromPath("file-path", fakesys.NewFakeFileSystem(), algos)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("must provide at least one algorithm"))
@@ -351,7 +351,7 @@ var _ = Describe("MultipleDigest", func() {
 		})
 
 		It("returns and error if no algorithms are supplied", func() {
-			algos := []Algorithm{}
+			var algos []Algorithm
 			_, err := NewMultipleDigest(readSeeker, algos)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("must provide at least one algorithm"))
@@ -360,38 +360,38 @@ var _ = Describe("MultipleDigest", func() {
 
 	Describe("MarshalJSON", func() {
 		It("returns semicolon separated strings", func() {
-			digest1 := NewDigest(DigestAlgorithmSHA1, "sha1digestval")
-			digest2 := NewDigest(DigestAlgorithmSHA256, "sha256digestval")
+			digest1 := NewDigest(DigestAlgorithmSHA1, "sha1digestVal")
+			digest2 := NewDigest(DigestAlgorithmSHA256, "sha256digestVal")
 			digest := MustNewMultipleDigest(digest1, digest2)
 
 			bytes, err := json.Marshal(digest)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(string(bytes)).To(Equal(`"sha1digestval;sha256:sha256digestval"`))
+			Expect(string(bytes)).To(Equal(`"sha1digestVal;sha256:sha256digestVal"`))
 		})
 
 		It("does not include sha1 prefix", func() {
-			bytes, err := json.Marshal(MustNewMultipleDigest(NewDigest(DigestAlgorithmSHA1, "digestval")))
+			bytes, err := json.Marshal(MustNewMultipleDigest(NewDigest(DigestAlgorithmSHA1, "digestVal")))
 			Expect(err).ToNot(HaveOccurred())
-			Expect(string(bytes)).To(Equal(`"digestval"`))
+			Expect(string(bytes)).To(Equal(`"digestVal"`))
 		})
 
 		It("includes non-sha1 algo prefixes", func() {
-			bytes, err := json.Marshal(MustNewMultipleDigest(NewDigest(DigestAlgorithmSHA256, "digestval")))
+			bytes, err := json.Marshal(MustNewMultipleDigest(NewDigest(DigestAlgorithmSHA256, "digestVal")))
 			Expect(err).ToNot(HaveOccurred())
-			Expect(string(bytes)).To(Equal(`"sha256:digestval"`))
+			Expect(string(bytes)).To(Equal(`"sha256:digestVal"`))
 		})
 
 		It("maintains order of digests", func() {
-			digest1 := NewDigest(DigestAlgorithmSHA1, "digestval")
-			digest2 := NewDigest(DigestAlgorithmSHA256, "digestval256")
+			digest1 := NewDigest(DigestAlgorithmSHA1, "digestVal")
+			digest2 := NewDigest(DigestAlgorithmSHA256, "digestVal256")
 
 			bytes, err := MustNewMultipleDigest(digest1, digest2).MarshalJSON()
 			Expect(err).ToNot(HaveOccurred())
-			Expect(string(bytes)).To(Equal(`"digestval;sha256:digestval256"`))
+			Expect(string(bytes)).To(Equal(`"digestVal;sha256:digestVal256"`))
 
 			bytes, err = MustNewMultipleDigest(digest2, digest1).MarshalJSON()
 			Expect(err).ToNot(HaveOccurred())
-			Expect(string(bytes)).To(Equal(`"sha256:digestval256;digestval"`))
+			Expect(string(bytes)).To(Equal(`"sha256:digestVal256;digestVal"`))
 		})
 
 		It("retains unknown algos", func() {

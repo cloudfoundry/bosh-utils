@@ -7,9 +7,9 @@ import (
 	"testing"
 )
 
-func TestRetrystrategy(t *testing.T) {
+func TestRetryStrategy(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Retrystrategy Suite")
+	RunSpecs(t, "RetryStrategy Suite")
 }
 
 type simpleRetryable struct {

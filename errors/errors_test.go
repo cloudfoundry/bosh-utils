@@ -1,6 +1,8 @@
 package errors_test
 
 import (
+	"errors"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -12,8 +14,8 @@ type testShortError struct {
 	shortMsg string
 }
 
-func (e testShortError) Error() string       { return e.fullMsg }
-func (e *testShortError) ShortError() string { return e.shortMsg }
+func (e testShortError) Error() string      { return e.fullMsg }
+func (e testShortError) ShortError() string { return e.shortMsg }
 
 var _ = Describe("Error", func() {
 	It("constructs an error", func() {
@@ -43,7 +45,8 @@ var _ = Describe("WrapError", func() {
 		err := WrapError(cause, "fake-message")
 		Expect(err).To(MatchError("fake-message: fake-cause-message"))
 
-		typedErr := err.(ShortenableError)
+		var typedErr ShortenableError
+		Expect(errors.As(err, &typedErr)).To(BeTrue())
 		Expect(typedErr.ShortError()).To(Equal("fake-message: fake-cause-message"))
 	})
 })
@@ -55,7 +58,8 @@ var _ = Describe("WrapErrorf", func() {
 		err := WrapErrorf(cause, "fake-message: %s", "fake-details")
 		Expect(err).To(MatchError("fake-message: fake-details: fake-cause-message"))
 
-		typedErr := err.(ShortenableError)
+		var typedErr ShortenableError
+		Expect(errors.As(err, &typedErr)).To(BeTrue())
 		Expect(typedErr.ShortError()).To(Equal("fake-message: fake-details: fake-cause-message"))
 	})
 })
@@ -68,7 +72,8 @@ var _ = Describe("WrapComplexError", func() {
 		err := WrapComplexError(cause, delegate)
 		Expect(err).To(MatchError("fake-message: fake-cause-message"))
 
-		typedErr := err.(ShortenableError)
+		var typedErr ShortenableError
+		Expect(errors.As(err, &typedErr)).To(BeTrue())
 		Expect(typedErr.ShortError()).To(Equal("fake-message: fake-cause-message"))
 	})
 
@@ -85,7 +90,8 @@ var _ = Describe("WrapComplexError", func() {
 		Expect(err).To(MatchError(
 			"fake-delegate-delegate: fake-delegate-cause: fake-cause-delegate: fake-cause-cause"))
 
-		typedErr := err.(ShortenableError)
+		var typedErr ShortenableError
+		Expect(errors.As(err, &typedErr)).To(BeTrue())
 		Expect(typedErr.ShortError()).To(Equal(
 			"fake-delegate-delegate: fake-delegate-cause: fake-cause-delegate: fake-cause-cause"))
 	})
@@ -97,7 +103,8 @@ var _ = Describe("WrapComplexError", func() {
 		err := WrapComplexError(cause, delegate)
 		Expect(err).To(MatchError("delegate-full: cause-full"))
 
-		typedErr := err.(ShortenableError)
+		var typedErr ShortenableError
+		Expect(errors.As(err, &typedErr)).To(BeTrue())
 		Expect(typedErr.ShortError()).To(Equal("delegate-short1: cause-short1"))
 	})
 
@@ -106,7 +113,8 @@ var _ = Describe("WrapComplexError", func() {
 		err := WrapComplexError(nil, delegate)
 		Expect(err).To(MatchError("delegate-full: <nil cause>"))
 
-		shortErr := err.(ShortenableError)
+		var shortErr ShortenableError
+		Expect(errors.As(err, &shortErr)).To(BeTrue())
 		Expect(shortErr.ShortError()).To(Equal("delegate-short1: <nil cause>"))
 	})
 })

@@ -147,16 +147,11 @@ var _ = Describe("retryableBlobstore", func() {
 
 		Context("when inner blobstore succeed exactly at maximum number of create tries", func() {
 			It("returns blobID and fingerprint without an error", func() {
-
 				tries := 0
-				expectedDigest := boshcrypto.MustParseMultipleDigest("someshasum")
+				expectedDigest := boshcrypto.MustParseMultipleDigest("someShaSum")
 				createBlobIDs := []string{"", "", "fake-last-blob-id"}
 
-				createDigests := []boshcrypto.MultipleDigest{
-					boshcrypto.MultipleDigest{},
-					boshcrypto.MultipleDigest{},
-					expectedDigest,
-				}
+				createDigests := []boshcrypto.MultipleDigest{{}, {}, expectedDigest}
 				createErrs := []error{
 					errors.New("fake-create-err-1"),
 					errors.New("fake-create-err-2"),

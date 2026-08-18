@@ -28,12 +28,12 @@ var _ = Describe("externalBlobstore", func() {
 		runner = fakesys.NewFakeCmdRunner()
 		uuidGen = &fakeuuid.FakeGenerator{}
 		configPath = filepath.Join("/etc/", "blobstore-fake-provider.json")
-		blobstore = NewExternalBlobstore("fake-provider", map[string]interface{}{}, fs, runner, uuidGen, configPath)
+		blobstore = NewExternalBlobstore("fake-provider", map[string]any{}, fs, runner, uuidGen, configPath)
 	})
 
 	Describe("Validate", func() {
 		It("external validate writes config file", func() {
-			options := map[string]interface{}{"fake-key": "fake-value"}
+			options := map[string]any{"fake-key": "fake-value"}
 
 			blobstore := NewExternalBlobstore("fake-provider", options, fs, runner, uuidGen, configPath)
 
@@ -50,7 +50,7 @@ var _ = Describe("externalBlobstore", func() {
 		})
 
 		It("external validate errors when command not in path", func() {
-			options := map[string]interface{}{}
+			options := map[string]any{}
 
 			blobstore := NewExternalBlobstore("fake-provider", options, fs, runner, uuidGen, configPath)
 

@@ -23,7 +23,7 @@ var _ = Describe("localBlobstore", func() {
 	BeforeEach(func() {
 		fs = fakesys.NewFakeFileSystem()
 		uuidGen = &fakeuuid.FakeGenerator{}
-		options := map[string]interface{}{"blobstore_path": fakeBlobstorePath}
+		options := map[string]any{"blobstore_path": fakeBlobstorePath}
 		blobstore = NewLocalBlobstore(fs, uuidGen, options)
 	})
 
@@ -34,7 +34,7 @@ var _ = Describe("localBlobstore", func() {
 		})
 
 		It("returns error when missing blobstore path", func() {
-			options := map[string]interface{}{}
+			options := map[string]any{}
 			blobstore = NewLocalBlobstore(fs, uuidGen, options)
 
 			err := blobstore.Validate()
@@ -43,7 +43,7 @@ var _ = Describe("localBlobstore", func() {
 		})
 
 		It("returns error when blobstore path is not a string", func() {
-			options := map[string]interface{}{"blobstore_path": 443}
+			options := map[string]any{"blobstore_path": 443}
 			blobstore = NewLocalBlobstore(fs, uuidGen, options)
 
 			err := blobstore.Validate()

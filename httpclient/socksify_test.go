@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Socksify", func() {
+var _ = Describe("Socks-ify", func() {
 	var (
 		proxyDialer *FakeProxyDialer
 		origDial    net.Dialer
@@ -33,9 +33,9 @@ var _ = Describe("Socksify", func() {
 	Context("When BOSH_ALL_PROXY is set", func() {
 		Context("When BOSH_ALL_PROXY is prefixed with ssh+", func() {
 			BeforeEach(func() {
-				proxyDialer.DialerCall.Returns.DialFunc = proxy.DialFunc(func(x, y string) (net.Conn, error) {
+				proxyDialer.DialerCall.Returns.DialFunc = func(x, y string) (net.Conn, error) {
 					return nil, errors.New("proxy dialer")
-				})
+				}
 				tempDir, err := os.MkdirTemp("", "")
 				Expect(err).NotTo(HaveOccurred())
 				privateKeyPath := filepath.Join(tempDir, "test.key")
@@ -90,13 +90,13 @@ var _ = Describe("Socksify", func() {
 
 			It("Can be concurrently (run ginkgo with -race flag)", func() {
 				errs := make(chan error)
-				for i := 0; i < 20; i++ {
+				for range 20 {
 					go func() {
 						_, err := dialFunc(ctx, "", "")
 						errs <- err
 					}()
 				}
-				for i := 0; i < 20; i++ {
+				for range 20 {
 					err := <-errs
 					Expect(err).To(MatchError("proxy dialer"))
 				}

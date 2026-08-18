@@ -15,15 +15,18 @@ var _ = Describe("execProcess", func() {
 	Describe("Wait", func() {
 		var err error
 		var logger *loggerfakes.FakeLogger
+		var quietLogging bool
 
 		BeforeEach(func() {
 			logger = &loggerfakes.FakeLogger{}
 		})
 
 		Context("When quiet logging is enabled", func() {
-			It("only excludes logging stdout and stderr contents", func() {
-				quietLogging := true
+			BeforeEach(func() {
+				quietLogging = true
+			})
 
+			It("only excludes logging stdout and stderr contents", func() {
 				command := exec.Command(catPath, "--stdout", "someStdout", "--stderr", "someStderr")
 				process := NewExecProcess(command, false, quietLogging, logger)
 				err = process.Start()
@@ -46,9 +49,11 @@ var _ = Describe("execProcess", func() {
 		})
 
 		Context("when quiet logging is not enabled", func() {
-			It("logs the contents of stderr and stdout", func() {
-				quietLogging := false
+			BeforeEach(func() {
+				quietLogging = false
+			})
 
+			It("logs the contents of stderr and stdout", func() {
 				command := exec.Command(catPath, "--stdout", "someStdout", "--stderr", "someStderr")
 				process := NewExecProcess(command, false, quietLogging, logger)
 				err = process.Start()

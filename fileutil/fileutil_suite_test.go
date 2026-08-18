@@ -13,14 +13,14 @@ import (
 
 func TestFileutil(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Fileutil Suite")
+	RunSpecs(t, "FileUtil Suite")
 }
 
 var testAssetsDir string
 var testAssetsFixtureDir string
 
-func localCopyFSForGo122(dir string, fsys fs.FS) error {
-	return fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
+func localCopyFSForGo122(dir string, goFs fs.FS) error {
+	return fs.WalkDir(goFs, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -34,7 +34,7 @@ func localCopyFSForGo122(dir string, fsys fs.FS) error {
 			return &os.PathError{Op: "CopyFS", Path: path, Err: os.ErrInvalid}
 		}
 
-		r, err := fsys.Open(path)
+		r, err := goFs.Open(path)
 		if err != nil {
 			return err
 		}

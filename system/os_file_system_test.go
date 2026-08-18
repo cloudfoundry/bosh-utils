@@ -94,7 +94,7 @@ var _ = Describe("OS FileSystem", func() {
 				filepath.Join(testPath, "foo/bam/bang"),
 				filepath.Join(testPath, "foo/baz"),
 			}
-			actualFiles := []string{}
+			var actualFiles []string
 			err = osFs.Walk(filepath.Join(testPath, "foo"), func(path string, _ os.FileInfo, err error) error {
 				if err != nil {
 					return err
@@ -289,7 +289,7 @@ var _ = Describe("OS FileSystem", func() {
 			Expect(readFile(file)).To(Equal("initial write"))
 
 			// same length content
-			written, err = osFs.ConvergeFileContents(testPath, []byte("initial wNOTe"), ConvergeFileContentsOpts{DryRun: true})
+			written, err = osFs.ConvergeFileContents(testPath, []byte("initial WRONG"), ConvergeFileContentsOpts{DryRun: true})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(written).To(BeTrue())
 
@@ -629,7 +629,7 @@ var _ = Describe("OS FileSystem", func() {
 		actualFilePath, err := osFs.ReadAndFollowLink(symlinkPath)
 		Expect(err).ToNot(HaveOccurred())
 
-		// on Mac OS /var -> private/var
+		// on macOS /var -> private/var
 		absPath, err := filepath.EvalSymlinks(targetPath)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(actualFilePath).To(MatchPath(absPath))
@@ -769,7 +769,7 @@ var _ = Describe("OS FileSystem", func() {
 				osFs = NewOsFileSystemWithStrictTempRoot(boshlog.NewLogger(boshlog.LevelNone))
 			})
 
-			It("should eror", func() {
+			It("should error", func() {
 				_, err := osFs.TempFile("some-prefix")
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("ChangeTempRoot"))

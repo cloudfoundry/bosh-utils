@@ -23,8 +23,8 @@ var _ = Describe("UnlimitedRetryStrategy", func() {
 
 	Describe("Try", func() {
 		It("stops retrying when it receives a non-retryable error", func() {
-			output := []attemptOutput{}
-			for i := 0; i < 6; i++ {
+			var output []attemptOutput
+			for i := range 6 {
 				output = append(output, attemptOutput{
 					ShouldRetry: true,
 					AttemptErr:  fmt.Errorf("error-%d", i),
@@ -44,8 +44,8 @@ var _ = Describe("UnlimitedRetryStrategy", func() {
 		})
 
 		It("stops retrying when it stops receiving errors", func() {
-			output := []attemptOutput{}
-			for i := 0; i < 6; i++ {
+			var output []attemptOutput
+			for i := range 6 {
 				output = append(output, attemptOutput{
 					ShouldRetry: true,
 					AttemptErr:  fmt.Errorf("error-%d", i),
