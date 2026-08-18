@@ -103,7 +103,7 @@ var _ = Describe("NewFileLogger", func() {
 		Expect(contents).To(Equal(""))
 	})
 
-	It("errors if the file cannot be openned for writing", func() {
+	It("errors if the file cannot be opened for writing", func() {
 		fs.OpenFileErr = errors.New("fake-fs-error")
 
 		_, _, err := New(boshlog.LevelNone, logFile.Name(), DefaultLogFileMode, fs)

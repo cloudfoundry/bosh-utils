@@ -121,7 +121,7 @@ var _ = Describe("digestImpl", func() {
 			digest = NewDigest(DigestAlgorithmSHA1, "978ad524a02039f261773fe93d94973ae7de6470")
 		})
 
-		It("can read a file and verify its content aginst the digest", func() {
+		It("can read a file and verify its content against the digest", func() {
 			logger := boshlog.NewLogger(boshlog.LevelNone)
 			fileSystem := boshsys.NewOsFileSystem(logger)
 
@@ -153,7 +153,7 @@ var _ = Describe("digestImpl", func() {
 				Expect(digest.String()).To(Equal("sha256:value"))
 			})
 
-			It("includes algorithmonly once", func() {
+			It("includes algorithm only once", func() {
 				digest := NewDigest(DigestAlgorithmSHA256, "sha256:value")
 				Expect(digest.String()).To(Equal("sha256:value"))
 			})

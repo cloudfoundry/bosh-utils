@@ -48,10 +48,10 @@ var _ = Describe("VerifyMultidigest", func() {
 
 		Context("when passing incorrect args", func() {
 			It("exits 1 when digest does not match", func() {
-				session, err := runVerifyMultidigest("verify-multi-digest", filePath, "incorrectdigest")
+				session, err := runVerifyMultidigest("verify-multi-digest", filePath, "incorrectDigest")
 				Expect(err).ToNot(HaveOccurred())
 				Eventually(session).Should(gexec.Exit(1))
-				Eventually(session.Err).Should(gbytes.Say("Expected stream to have digest 'incorrectdigest' but was 'c4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6'"))
+				Eventually(session.Err).Should(gbytes.Say("Expected stream to have digest 'incorrectDigest' but was 'c4f246e2d6f84ee61a699d68a4bd1a2e43ec40f6'"))
 			})
 
 			It("exits 1 when file does not exist", func() {
@@ -115,10 +115,10 @@ var _ = Describe("VerifyMultidigest", func() {
 			})
 
 			It("exits 1 when the algorithm is unknown", func() {
-				session, err := runVerifyMultidigest("create-multi-digest", "potoato", filePath)
+				session, err := runVerifyMultidigest("create-multi-digest", "potato", filePath)
 				Expect(err).NotTo(HaveOccurred())
 				Eventually(session).Should(gexec.Exit(1))
-				Eventually(session.Err).Should(gbytes.Say("unknown algorithm 'potoato'"))
+				Eventually(session.Err).Should(gbytes.Say("unknown algorithm 'potato'"))
 			})
 		})
 	})

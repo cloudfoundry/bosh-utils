@@ -37,7 +37,7 @@ func testConcurrentPrefix(newLogger func(lv LogLevel, out io.Writer) Logger) {
 			tag := strings.Repeat(s, tagLen)
 			msg := strings.Repeat(s, msgLen) + "\n"
 			<-start
-			for i := 0; i < 1000; i++ {
+			for range 1000 {
 				logger.Debug(tag, msg)
 				logger.Error(tag, msg)
 			}
@@ -47,8 +47,8 @@ func testConcurrentPrefix(newLogger func(lv LogLevel, out io.Writer) Logger) {
 	wg.Wait()
 
 	testOutput := func(context, output string) {
-		lines := strings.Split(output, "\n")
-		for _, line := range lines {
+		lines := strings.SplitSeq(output, "\n")
+		for line := range lines {
 			if len(line) < msgLen+tagLen {
 				continue
 			}
@@ -83,7 +83,7 @@ var _ = Describe("AsString", func() {
 		Expect(level).To(Equal("ERROR"))
 	})
 
-	It("returns debug as defult on unknown input", func() {
+	It("returns debug as default on unknown input", func() {
 		level := AsString(LogLevel(2983472))
 		Expect(level).To(Equal("DEBUG"))
 	})
@@ -357,7 +357,7 @@ var _ = Describe("Logger", func() {
 		start := make(chan struct{})
 		go func() {
 			close(start)
-			for i := 0; i < 10; i++ {
+			for range 10 {
 				logger.Error("TAG", "%#v", slow)
 			}
 		}()

@@ -35,7 +35,7 @@ var _ = Describe("Pool", func() {
 		Expect(err).ToNot(HaveOccurred())
 		close(resultsChan)
 
-		results := []int{}
+		var results []int
 		for result := range resultsChan {
 			results = append(results, result)
 		}

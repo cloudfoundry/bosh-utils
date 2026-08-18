@@ -28,13 +28,13 @@ var _ = Describe("Provider", func() {
 
 	Describe("Get", func() {
 		It("get dummy", func() {
-			blobstore, err := provider.Get(BlobstoreTypeDummy, map[string]interface{}{})
+			blobstore, err := provider.Get(BlobstoreTypeDummy, map[string]any{})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(blobstore).ToNot(BeNil())
 		})
 
 		It("get external when external command in path", func() {
-			options := map[string]interface{}{"key": "value"}
+			options := map[string]any{"key": "value"}
 			runner.CommandExistsValue = true
 
 			externalBlobstore := NewExternalBlobstore(
@@ -62,7 +62,7 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("get external errs when external command not in path", func() {
-			options := map[string]interface{}{"key": "value"}
+			options := map[string]any{"key": "value"}
 			runner.CommandExistsValue = false
 
 			_, err := provider.Get("fake-external-type", options)

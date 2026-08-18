@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -30,8 +31,9 @@ func main() {
 
 	_, err := flags.Parse(&o)
 
-	if typedErr, ok := err.(*flags.Error); ok {
-		if typedErr.Type == flags.ErrHelp {
+	var typedErr *flags.Error
+	if errors.As(err, &typedErr) {
+		if errors.Is(typedErr.Type, flags.ErrHelp) {
 			err = nil
 		}
 	}
@@ -56,6 +58,7 @@ func (m MultiDigestCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+	defer file.Close()
 	return multipleDigest.Verify(file)
 }
 

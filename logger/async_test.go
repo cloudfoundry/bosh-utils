@@ -127,18 +127,15 @@ var _ = Describe("Logger", func() {
 		})
 
 		It("flush doesn't block writes", func() {
-			const (
-				MessageCount  = 10
-				WriteInterval = 10 * time.Millisecond
-				FlushInterval = 10 * WriteInterval
-			)
+			const messageCount = 10
+			const writeInterval = 10 * time.Millisecond
 
-			out := &intervalWriter{dur: WriteInterval}
+			out := &intervalWriter{dur: writeInterval}
 			asyncWriterLogger := logger.NewAsyncWriterLogger(logger.LevelDebug, out)
 
 			// add some messages to the queue
 			out.Lock()
-			for range MessageCount {
+			for range messageCount {
 				asyncWriterLogger.Debug("NEW", "message")
 			}
 			out.Unlock()
@@ -147,7 +144,7 @@ var _ = Describe("Logger", func() {
 
 			ch := make(chan struct{}, 1)
 			go func() {
-				for range MessageCount {
+				for range messageCount {
 					asyncWriterLogger.Debug("NEW", "message")
 				}
 				ch <- struct{}{}

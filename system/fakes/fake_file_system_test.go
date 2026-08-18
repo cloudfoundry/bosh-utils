@@ -109,19 +109,19 @@ var _ = Describe("FakeFileSystem", func() {
 
 	Describe("RemoveAll", func() {
 		It("removes the specified file", func() {
-			fs.WriteFileString("foobar", "asdfghjk")     //nolint:errcheck
-			fs.WriteFileString("foobarbaz", "qwertyuio") //nolint:errcheck
+			fs.WriteFileString("foobar", "asdfghjk")       //nolint:errcheck
+			fs.WriteFileString("foo-bar-baz", "qwertyuio") //nolint:errcheck
 
 			err := fs.RemoveAll("foobar")
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(fs.FileExists("foobar")).To(BeFalse())
-			Expect(fs.FileExists("foobarbaz")).To(BeTrue())
+			Expect(fs.FileExists("foo-bar-baz")).To(BeTrue())
 
-			err = fs.RemoveAll("foobarbaz")
+			err = fs.RemoveAll("foo-bar-baz")
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(fs.FileExists("foobarbaz")).To(BeFalse())
+			Expect(fs.FileExists("foo-bar-baz")).To(BeFalse())
 		})
 
 		It("works with windows drives", func() {
@@ -133,9 +133,9 @@ var _ = Describe("FakeFileSystem", func() {
 		})
 
 		It("removes the specified dir and the files under it", func() {
-			err := fs.MkdirAll("foobarbaz", os.ModePerm)
+			err := fs.MkdirAll("foo-bar-baz", os.ModePerm)
 			Expect(err).ToNot(HaveOccurred())
-			err = fs.WriteFileString("foobarbaz/stuff.txt", "asdfghjk")
+			err = fs.WriteFileString("foo-bar-baz/stuff.txt", "asdfghjk")
 			Expect(err).ToNot(HaveOccurred())
 			err = fs.MkdirAll("foobar", os.ModePerm)
 			Expect(err).ToNot(HaveOccurred())
@@ -147,26 +147,26 @@ var _ = Describe("FakeFileSystem", func() {
 
 			Expect(fs.FileExists("foobar")).To(BeFalse())
 			Expect(fs.FileExists("foobar/stuff.txt")).To(BeFalse())
-			Expect(fs.FileExists("foobarbaz")).To(BeTrue())
-			Expect(fs.FileExists("foobarbaz/stuff.txt")).To(BeTrue())
+			Expect(fs.FileExists("foo-bar-baz")).To(BeTrue())
+			Expect(fs.FileExists("foo-bar-baz/stuff.txt")).To(BeTrue())
 
-			err = fs.RemoveAll("foobarbaz")
+			err = fs.RemoveAll("foo-bar-baz")
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(fs.FileExists("foobarbaz")).To(BeFalse())
-			Expect(fs.FileExists("foobarbaz/stuff.txt")).To(BeFalse())
+			Expect(fs.FileExists("foo-bar-baz")).To(BeFalse())
+			Expect(fs.FileExists("foo-bar-baz/stuff.txt")).To(BeFalse())
 		})
 
 		It("removes the specified symlink (but not the file it links to)", func() {
-			err := fs.WriteFileString("foobarbaz", "asdfghjk")
+			err := fs.WriteFileString("foo-bar-baz", "asdfghjk")
 			Expect(err).ToNot(HaveOccurred())
-			err = fs.Symlink("foobarbaz", "foobar")
-			Expect(err).ToNot(HaveOccurred())
-
-			err = fs.RemoveAll("foobarbaz")
+			err = fs.Symlink("foo-bar-baz", "foobar")
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(fs.FileExists("foobarbaz")).To(BeFalse())
+			err = fs.RemoveAll("foo-bar-baz")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(fs.FileExists("foo-bar-baz")).To(BeFalse())
 			Expect(fs.FileExists("foobar")).To(BeTrue())
 
 			err = fs.RemoveAll("foobar")
@@ -275,13 +275,13 @@ var _ = Describe("FakeFileSystem", func() {
 		It("should allow glob to be replaced with a custom callback", func() {
 			fs.GlobStub = func(pattern string) ([]string, error) {
 				fs.GlobStub = nil
-				return []string{}, errors.New("Oh noes!")
+				return []string{}, errors.New("oh noes")
 			}
 			fs.SetGlob("glob/pattern", []string{"matchingFile1", "matchingFile2"})
 
 			matches, err := fs.Glob("glob/pattern")
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal("Oh noes!"))
+			Expect(err.Error()).To(Equal("oh noes"))
 			Expect(matches).To(BeEmpty())
 
 			matches, err = fs.Glob("glob/pattern")
@@ -292,19 +292,19 @@ var _ = Describe("FakeFileSystem", func() {
 
 	Describe("Rename", func() {
 		It("renames", func() {
-			file, err := fs.OpenFile("foobarbaz", 1, 0600)
+			file, err := fs.OpenFile("foo-bar-baz", 1, 0600)
 			Expect(err).ToNot(HaveOccurred())
 			_, err = file.Write([]byte("asdf"))
 			Expect(err).ToNot(HaveOccurred())
 			err = file.Close()
 			Expect(err).ToNot(HaveOccurred())
 
-			err = fs.Chown("foobarbaz", "root:vcap")
+			err = fs.Chown("foo-bar-baz", "root:vcap")
 			Expect(err).ToNot(HaveOccurred())
 
-			oldStat := fs.GetFileTestStat("foobarbaz")
+			oldStat := fs.GetFileTestStat("foo-bar-baz")
 
-			err = fs.Rename("foobarbaz", "foobar")
+			err = fs.Rename("foo-bar-baz", "foobar")
 			Expect(err).ToNot(HaveOccurred())
 
 			newStat := fs.GetFileTestStat("foobar")
@@ -317,16 +317,16 @@ var _ = Describe("FakeFileSystem", func() {
 		})
 
 		It("renames the contents of subdirectories", func() {
-			err := fs.MkdirAll("originaldir", 0700)
+			err := fs.MkdirAll("original-dir", 0700)
 			Expect(err).ToNot(HaveOccurred())
 
-			err = fs.WriteFileString("originaldir/file.txt", "contents!")
+			err = fs.WriteFileString("original-dir/file.txt", "contents!")
 			Expect(err).ToNot(HaveOccurred())
 
-			err = fs.Rename("originaldir", "newdir")
+			err = fs.Rename("original-dir", "new-dir")
 			Expect(err).ToNot(HaveOccurred())
 
-			contents, err := fs.ReadFileString("newdir/file.txt")
+			contents, err := fs.ReadFileString("new-dir/file.txt")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(contents).To(Equal("contents!"))
 		})
@@ -334,7 +334,7 @@ var _ = Describe("FakeFileSystem", func() {
 
 	Describe("Symlink", func() {
 		It("creates", func() {
-			err := fs.Symlink("foobarbaz", "foobar")
+			err := fs.Symlink("foo-bar-baz", "foobar")
 			Expect(err).ToNot(HaveOccurred())
 
 			stat, err := fs.Lstat("foobar")
@@ -347,26 +347,26 @@ var _ = Describe("FakeFileSystem", func() {
 	Describe("ReadAndFollowLink", func() {
 		Context("when the target exists", func() {
 			It("returns the target", func() {
-				err := fs.WriteFileString("foobarbaz", "asdfghjk")
+				err := fs.WriteFileString("foo-bar-baz", "asdfghjk")
 				Expect(err).ToNot(HaveOccurred())
-				err = fs.Symlink("foobarbaz", "foobar")
+				err = fs.Symlink("foo-bar-baz", "foobar")
 				Expect(err).ToNot(HaveOccurred())
 
 				targetPath, err := fs.ReadAndFollowLink("foobar")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(targetPath).To(Equal("foobarbaz"))
+				Expect(targetPath).To(Equal("foo-bar-baz"))
 			})
 
 			Context("using absolute directory paths", func() {
 				It("returns the absolute path of target", func() {
-					err := fs.WriteFileString("/tmp/foobarbaz", "asdfghjk")
+					err := fs.WriteFileString("/tmp/foo-bar-baz", "asdfghjk")
 					Expect(err).ToNot(HaveOccurred())
-					err = fs.Symlink("/tmp/foobarbaz", "/tmp/foobar")
+					err = fs.Symlink("/tmp/foo-bar-baz", "/tmp/foobar")
 					Expect(err).ToNot(HaveOccurred())
 
 					targetPath, err := fs.ReadAndFollowLink("/tmp/foobar")
 					Expect(err).ToNot(HaveOccurred())
-					absFilepath, err := filepath.Abs("/tmp/foobarbaz")
+					absFilepath, err := filepath.Abs("/tmp/foo-bar-baz")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(targetPath).To(Equal(absFilepath))
 				})
@@ -375,17 +375,17 @@ var _ = Describe("FakeFileSystem", func() {
 
 		Context("when the target is located in a parent directory", func() {
 			It("returns the target", func() {
-				err := fs.WriteFileString(filepath.FromSlash("/foobarbaz"), "asdfghjk")
+				err := fs.WriteFileString(filepath.FromSlash("/foo-bar-baz"), "asdfghjk")
 				Expect(err).ToNot(HaveOccurred())
 
-				err = fs.Symlink(filepath.FromSlash("/a/b/../../foobarbaz"), "foobar")
+				err = fs.Symlink(filepath.FromSlash("/a/b/../../foo-bar-baz"), "foobar")
 				Expect(err).ToNot(HaveOccurred())
 
 				targetPath, err := fs.ReadAndFollowLink("foobar")
 				Expect(err).ToNot(HaveOccurred())
 				absTarget, err := filepath.Abs(targetPath)
 				Expect(err).ToNot(HaveOccurred())
-				absExpected, err := filepath.Abs(filepath.FromSlash("/foobarbaz"))
+				absExpected, err := filepath.Abs(filepath.FromSlash("/foo-bar-baz"))
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(absTarget).To(Equal(absExpected))
@@ -404,18 +404,18 @@ var _ = Describe("FakeFileSystem", func() {
 
 		Context("when there are intermediate symlinks", func() {
 			It("returns the target", func() {
-				err := fs.WriteFileString("foobarbaz", "asdfghjk")
+				err := fs.WriteFileString("foo-bar-baz", "asdfghjk")
 				Expect(err).ToNot(HaveOccurred())
 
-				err = fs.Symlink("foobarbaz", "foobarbazmid")
+				err = fs.Symlink("foo-bar-baz", "foo-bar-bazmid")
 				Expect(err).ToNot(HaveOccurred())
 
-				err = fs.Symlink("foobarbazmid", "foobar")
+				err = fs.Symlink("foo-bar-bazmid", "foobar")
 				Expect(err).ToNot(HaveOccurred())
 
 				targetPath, err := fs.ReadAndFollowLink("foobar")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(targetPath).To(Equal("foobarbaz"))
+				Expect(targetPath).To(Equal("foo-bar-baz"))
 			})
 		})
 	})
@@ -423,7 +423,7 @@ var _ = Describe("FakeFileSystem", func() {
 	Describe("Readlink", func() {
 		Context("when the given 'link' is a regular file", func() {
 			It("returns an error", func() {
-				err := fs.WriteFileString("foobar", "notalink")
+				err := fs.WriteFileString("foobar", "not-a-link")
 				Expect(err).ToNot(HaveOccurred())
 
 				_, err = fs.Readlink("foobar")
@@ -464,14 +464,14 @@ var _ = Describe("FakeFileSystem", func() {
 
 			Context("using absolute directory paths", func() {
 				It("returns the absolute path of target", func() {
-					err := fs.WriteFileString("/tmp/foobarbaz", "asdfghjk")
+					err := fs.WriteFileString("/tmp/foo-bar-baz", "asdfghjk")
 					Expect(err).ToNot(HaveOccurred())
-					err = fs.Symlink("/tmp/foobarbaz", "/tmp/foobar")
+					err = fs.Symlink("/tmp/foo-bar-baz", "/tmp/foobar")
 					Expect(err).ToNot(HaveOccurred())
 
 					targetPath, err := fs.Readlink("/tmp/foobar")
 					Expect(err).ToNot(HaveOccurred())
-					absFilepath, err := filepath.Abs("/tmp/foobarbaz")
+					absFilepath, err := filepath.Abs("/tmp/foo-bar-baz")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(targetPath).To(Equal(absFilepath))
 
@@ -590,7 +590,7 @@ var _ = Describe("FakeFileSystem", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			expectedFiles := []string{"foo", "foo/bam", "foo/bam/bang", "foo/bar", "foo/baz"}
-			actualFiles := []string{}
+			var actualFiles []string
 			// foo/bar/.. makes it necessary to handle path expansion, which should be handled gracefully by the fake filesystem as well.
 			err = fs.Walk("foo/bar/..", func(path string, _ os.FileInfo, err error) error {
 				if err != nil {
@@ -623,7 +623,7 @@ var _ = Describe("FakeFileSystem", func() {
 
 	Describe("Stat", func() {
 		It("errors when symlink targets do not exist", func() {
-			err := fs.Symlink("foobarbaz", "foobar")
+			err := fs.Symlink("foo-bar-baz", "foobar")
 			Expect(err).ToNot(HaveOccurred())
 
 			_, err = fs.Stat("foobar")
@@ -631,10 +631,10 @@ var _ = Describe("FakeFileSystem", func() {
 		})
 
 		It("follows symlink target to show its stats", func() {
-			err := fs.WriteFileString("foobarbaz", "asdfghjk")
+			err := fs.WriteFileString("foo-bar-baz", "asdfghjk")
 			Expect(err).ToNot(HaveOccurred())
 
-			err = fs.Symlink("foobarbaz", "foobar")
+			err = fs.Symlink("foo-bar-baz", "foobar")
 			Expect(err).ToNot(HaveOccurred())
 
 			_, err = fs.Stat("foobar")
@@ -656,10 +656,10 @@ var _ = Describe("FakeFileSystem", func() {
 		})
 
 		It("records the invocation", func() {
-			err := fs.WriteFileString("somepath", "some file contents")
+			err := fs.WriteFileString("some-path", "some file contents")
 			Expect(err).ToNot(HaveOccurred())
 
-			_, err = fs.Stat("somepath")
+			_, err = fs.Stat("some-path")
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(fs.StatCallCount).To(Equal(1))
@@ -668,11 +668,11 @@ var _ = Describe("FakeFileSystem", func() {
 
 	Describe("StatWithOpts", func() {
 		It("records the invocation", func() {
-			err := fs.WriteFileString("somepath", "some file contents")
+			err := fs.WriteFileString("some-path", "some file contents")
 			Expect(err).ToNot(HaveOccurred())
 			statOpts := boshsys.StatOpts{Quiet: true}
 
-			_, err = fs.StatWithOpts("somepath", statOpts)
+			_, err = fs.StatWithOpts("some-path", statOpts)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(fs.StatWithOptsCallCount).To(Equal(1))
@@ -681,7 +681,7 @@ var _ = Describe("FakeFileSystem", func() {
 
 	Describe("Lstat", func() {
 		It("returns symlink info to a target that does not exist", func() {
-			err := fs.Symlink("foobarbaz", "foobar")
+			err := fs.Symlink("foo-bar-baz", "foobar")
 			Expect(err).ToNot(HaveOccurred())
 
 			_, err = fs.Lstat("foobar")
@@ -689,10 +689,10 @@ var _ = Describe("FakeFileSystem", func() {
 		})
 
 		It("returns symlink info to a target that exists", func() {
-			err := fs.WriteFileString("foobarbaz", "asdfghjk")
+			err := fs.WriteFileString("foo-bar-baz", "asdfghjk")
 			Expect(err).ToNot(HaveOccurred())
 
-			err = fs.Symlink("foobarbaz", "foobar")
+			err = fs.Symlink("foo-bar-baz", "foobar")
 			Expect(err).ToNot(HaveOccurred())
 
 			_, err = fs.Lstat("foobar")

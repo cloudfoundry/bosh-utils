@@ -52,7 +52,7 @@ var _ = Describe("RetryClients", func() {
 				Expect(readString(resp.Body)).To(Equal("fake-response-body"))
 			})
 
-			It("attemps once if request is successful", func() {
+			It("attempts once if request is successful", func() {
 				server.AppendHandlers(ghttp.CombineHandlers(
 					ghttp.VerifyRequest("GET", "/"),
 					ghttp.RespondWith(http.StatusOK, "fake-response-body"),
@@ -127,8 +127,7 @@ var _ = Describe("RetryClients", func() {
 				http.StatusInternalServerError,
 			}
 			for _, code := range directorErrorCodes {
-				code := code
-				It(fmt.Sprintf("attemps once if request is %d", code), func() {
+				It(fmt.Sprintf("attempts once if request is %d", code), func() {
 					server.AppendHandlers(ghttp.CombineHandlers(
 						ghttp.VerifyRequest("GET", "/"),
 						ghttp.RespondWith(code, "fake-response-body"),
@@ -169,7 +168,6 @@ var _ = Describe("RetryClients", func() {
 			}
 
 			for code := range redirectCodes {
-				code := code
 				It(fmt.Sprintf("follows redirects if response is %d", code), func() {
 					server.AppendHandlers(ghttp.CombineHandlers(
 						ghttp.VerifyRequest("GET", "/"),
@@ -192,13 +190,12 @@ var _ = Describe("RetryClients", func() {
 
 			Context("underlying connection errors should not be influenced by request method", func() {
 				for _, method := range []string{"GET", "HEAD", "POST", "DELETE"} {
-					method := method
 					It(fmt.Sprintf("retries for maxAttempts with a %s request", method), func() {
-						server.RouteToHandler(method, "/", http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+						server.RouteToHandler(method, "/", func(w http.ResponseWriter, _ *http.Request) {
 							hijacker, _, err := w.(http.Hijacker).Hijack()
 							Expect(err).NotTo(HaveOccurred())
 							hijacker.Close()
-						}))
+						})
 
 						req, err := http.NewRequest(method, server.URL(), nil)
 						Expect(err).NotTo(HaveOccurred())
@@ -220,9 +217,7 @@ var _ = Describe("RetryClients", func() {
 				http.StatusBadGateway,
 			}
 			for _, code := range timeoutCodes {
-				code := code
 				for _, method := range []string{"GET", "HEAD"} {
-					method := method
 					Context(fmt.Sprintf("timeout http status code '%d' with %s request", code, method), func() {
 						It("retries for maxAttempts", func() {
 							server.RouteToHandler(method, "/", ghttp.RespondWith(code, "fake-response-body"))
@@ -241,7 +236,6 @@ var _ = Describe("RetryClients", func() {
 				}
 
 				for _, method := range []string{"POST", "DELETE"} {
-					method := method
 					Context(fmt.Sprintf("timeout http status code '%d' with %s request", code, method), func() {
 						It("does not retry", func() {
 							server.AppendHandlers(ghttp.CombineHandlers(

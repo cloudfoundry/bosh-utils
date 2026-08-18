@@ -1,5 +1,4 @@
 //go:build !windows
-// +build !windows
 
 package system_test
 
@@ -36,7 +35,7 @@ var _ = Describe("execProcess", func() {
 
 			// Cannot check for PID existence directly because
 			// PID could have been recycled by the OS; make sure it's not the same process
-			for _, line := range strings.Split(strings.TrimSpace(string(output)), "\n") {
+			for line := range strings.SplitSeq(strings.TrimSpace(string(output)), "\n") {
 				if strings.Contains(line, buildDir) {
 					return true, line
 				}
@@ -80,8 +79,6 @@ var _ = Describe("execProcess", func() {
 
 		//for _, keepAttached := range []bool{true, false} {
 		for _, keepAttached := range []bool{false} {
-			keepAttached := keepAttached
-
 			Describe(fmt.Sprintf("running with process attached=%t", keepAttached), func() {
 				Context("when parent and child terminate after receiving SIGTERM", func() {
 					It("sends term signal to the whole group and returns with exit status that parent exited", func() {
@@ -152,7 +149,7 @@ var _ = Describe("execProcess", func() {
 						Expect(err).ToNot(HaveOccurred())
 
 						// Wait for script to exit
-						for i := 0; i < 20; i++ {
+						for i := range 20 {
 							if exists, _ := hasProcessesFromBuildDir(); !exists {
 								break
 							}

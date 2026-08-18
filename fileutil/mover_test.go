@@ -92,7 +92,7 @@ var _ = Describe("Mover", func() {
 
 	Context("when Rename fails for any other reason", func() {
 		BeforeEach(func() {
-			fs.RenameError = errors.New("what's my name again?")
+			fs.RenameError = errors.New("what's my name again")
 		})
 
 		It("returns error", func() {

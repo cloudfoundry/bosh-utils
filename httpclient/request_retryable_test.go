@@ -105,7 +105,7 @@ var _ = Describe("RequestRetryable", func() {
 			})
 
 			BeforeEach(func() {
-				seekableReaderCloser = NewSeekableReadClose([]byte("hello from seekable"))
+				seekableReaderCloser = newSeekableReadClose([]byte("hello from seekable"))
 				request.Body = seekableReaderCloser
 				request.GetBody = nil
 
@@ -141,7 +141,7 @@ var _ = Describe("RequestRetryable", func() {
 
 			Context("when checking if the request is retryable returns an error", func() {
 				BeforeEach(func() {
-					seekableReaderCloser = NewSeekableReadClose([]byte("hello from seekable"))
+					seekableReaderCloser = newSeekableReadClose([]byte("hello from seekable"))
 					request.Body = seekableReaderCloser
 
 					server.AppendHandlers(ghttp.VerifyRequest("GET", "/"))
@@ -300,7 +300,7 @@ type seekableReadClose struct {
 	readCloserMutex sync.Mutex
 }
 
-func NewSeekableReadClose(content []byte) *seekableReadClose {
+func newSeekableReadClose(content []byte) *seekableReadClose {
 	return &seekableReadClose{
 		Seeked:     false,
 		content:    content,
@@ -308,7 +308,7 @@ func NewSeekableReadClose(content []byte) *seekableReadClose {
 	}
 }
 
-func (s *seekableReadClose) Seek(offset int64, whence int) (ret int64, err error) {
+func (s *seekableReadClose) Seek(_ int64, _ int) (ret int64, err error) {
 	s.readCloserMutex.Lock()
 	defer s.readCloserMutex.Unlock()
 
@@ -326,7 +326,7 @@ func (s *seekableReadClose) Read(p []byte) (n int, err error) {
 
 func (s *seekableReadClose) Close() error {
 	if s.closed {
-		return errors.New("Can not close twice")
+		return errors.New("can not close twice")
 	}
 
 	s.closed = true

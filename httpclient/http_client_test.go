@@ -164,7 +164,7 @@ var _ = Describe("HTTPClient", func() {
 				Expect(args[0]).To(ContainSubstring("refresh_token=abc"))
 			})
 
-			Context("httpclient has been configured to redact query parmas", func() {
+			Context("httpclient has been configured to redact query params", func() {
 				BeforeEach(func() {
 					opts = Opts{}
 				})
@@ -222,7 +222,7 @@ var _ = Describe("HTTPClient", func() {
 				Expect(args[0]).To(ContainSubstring("refresh_token=abc"))
 			})
 
-			Context("httpclient has been configured to redact query parmas", func() {
+			Context("httpclient has been configured to redact query params", func() {
 				BeforeEach(func() {
 					opts = Opts{}
 				})
@@ -331,7 +331,7 @@ var _ = Describe("HTTPClient", func() {
 				Expect(args[0]).To(ContainSubstring("refresh_token=abc"))
 			})
 
-			Context("httpclient has been configured to redact query parmas", func() {
+			Context("httpclient has been configured to redact query params", func() {
 				BeforeEach(func() {
 					opts = Opts{}
 				})
@@ -436,7 +436,7 @@ var _ = Describe("HTTPClient", func() {
 				Expect(args[0]).To(ContainSubstring("refresh_token=abc"))
 			})
 
-			Context("httpclient has been configured to redact query parmas", func() {
+			Context("httpclient has been configured to redact query params", func() {
 				BeforeEach(func() {
 					opts = Opts{}
 				})

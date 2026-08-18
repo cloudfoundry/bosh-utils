@@ -1,5 +1,4 @@
 //go:build !windows
-// +build !windows
 
 package system_test
 
@@ -164,7 +163,7 @@ var _ = Describe("OS FileSystem", func() {
 			srcPath, err = filepath.Abs(srcPath)
 			Expect(err).ToNot(HaveOccurred())
 
-			for _, line := range strings.Split(stdout, "\n") {
+			for line := range strings.SplitSeq(stdout, "\n") {
 				for _, fixtureFile := range fixtureFiles {
 					srcFilePath := filepath.Join(srcPath, fixtureFile)
 					if strings.Contains(line, srcFilePath) {
