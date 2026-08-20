@@ -1,12 +1,13 @@
+//go:build !windows
+
 package system_test
 
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"runtime"
-	"strconv"
 	"strings"
+	"syscall"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -18,47 +19,6 @@ import (
 )
 
 const ErrExitCode = 14
-
-func osSpecificCommand(cmdName string) Command {
-	if isWindows {
-		return windowsCommand(cmdName)
-	}
-	return unixCommand(cmdName)
-}
-
-func windowsCommand(cmdName string) Command {
-	return map[string]Command{
-		"pwd": {
-			Name:       "powershell",
-			Args:       []string{"echo $PWD"},
-			WorkingDir: `C:\windows\temp`,
-		},
-		"stderr": {
-			Name: "powershell",
-			Args: []string{"[Console]::Error.WriteLine('error-output')"},
-		},
-		"exit": {
-			Name: "powershell",
-			Args: []string{fmt.Sprintf("exit %d", ErrExitCode)},
-		},
-		"ls": {
-			Name:       "powershell",
-			Args:       []string{"dir"},
-			WorkingDir: ".",
-		},
-		"env": {
-			Name: "cmd.exe",
-			Args: []string{"/C", "SET"},
-			Env: map[string]string{
-				"FOO": "BAR",
-			},
-		},
-		"echo": {
-			Name: "powershell",
-			Args: []string{"Write-Host", "Hello World!"},
-		},
-	}[cmdName]
-}
 
 func unixCommand(cmdName string) Command {
 	return map[string]Command{
@@ -93,22 +53,11 @@ func unixCommand(cmdName string) Command {
 	}[cmdName]
 }
 
-func parseEnvFields(envDump string, convertKeysToUpper bool) map[string]string {
-	fields := make(map[string]string)
-	envDump = strings.ReplaceAll(envDump, "\r", "")
-	for _, line := range strings.Split(envDump, "\n") {
-		// don't split on '=' as '=' is allowed in the value on Windows
-		if n := strings.IndexByte(line, '='); n != -1 {
-			key := line[:n]   // key
-			val := line[n+1:] // key
-			if convertKeysToUpper {
-				fields[strings.ToUpper(key)] = val
-			} else {
-				fields[key] = val
-			}
-		}
+func normalizeNiceLevel(kernelNice int) int {
+	if runtime.GOOS == "linux" {
+		return (kernelNice - 20) * -1
 	}
-	return fields
+	return kernelNice
 }
 
 var _ = Describe("execCmdRunner", func() {
@@ -122,7 +71,7 @@ var _ = Describe("execCmdRunner", func() {
 
 	Describe("RunComplexCommand", func() {
 		It("run complex command with working directory", func() {
-			cmd := osSpecificCommand("ls")
+			cmd := unixCommand("ls")
 			stdout, stderr, status, err := runner.RunComplexCommand(cmd)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(stdout).To(ContainSubstring("exec_cmd_runner_fixtures"))
@@ -131,7 +80,7 @@ var _ = Describe("execCmdRunner", func() {
 		})
 
 		It("run complex command with env", func() {
-			cmd := osSpecificCommand("env")
+			cmd := unixCommand("env")
 			stdout, stderr, status, err := runner.RunComplexCommand(cmd)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -145,7 +94,7 @@ var _ = Describe("execCmdRunner", func() {
 		It("uses the env vars specified in the Command", func() {
 			GinkgoT().Setenv("_FOO", "BAR")
 
-			cmd := osSpecificCommand("env")
+			cmd := unixCommand("env")
 			cmd.Env = map[string]string{
 				"_FOO": "BAZZZ",
 			}
@@ -157,16 +106,10 @@ var _ = Describe("execCmdRunner", func() {
 		})
 
 		Context("unix specific behavior", func() {
-			BeforeEach(func() {
-				if isWindows {
-					Skip("unix only test")
-				}
-			})
-
 			It("performs a case-sensitive comparison of env vars when on *Nix", func() {
 				GinkgoT().Setenv("_FOO", "BAR")
 
-				cmd := osSpecificCommand("env")
+				cmd := unixCommand("env")
 				cmd.Env = map[string]string{
 					"_foo": "BAZZZ",
 					"ABC":  "XYZ",
@@ -184,183 +127,32 @@ var _ = Describe("execCmdRunner", func() {
 			})
 
 			It("runs a command nicer than itself", func() {
-				// Write script that echos its nice value
-				// Sleep briefly to ensure parent has time to set priority
-				script := "#!/bin/bash\nsleep 0.1\nnice\n"
-				tmpFile, err := os.CreateTemp("", "tmp-script-*.sh")
-				Expect(err).ToNot(HaveOccurred())
-				defer os.Remove(tmpFile.Name())
-				_, err = tmpFile.WriteString(script)
-				Expect(err).ToNot(HaveOccurred())
-				err = tmpFile.Close()
+				// Calculate what we expect the priority to be
+				parentPid := os.Getpid()
+				parentKnice, err := syscall.Getpriority(syscall.PRIO_PROCESS, parentPid)
 				Expect(err).ToNot(HaveOccurred())
 
-				niceOut, err := exec.Command("nice").Output()
+				stdout, _, _, err := runner.RunComplexCommand(Command{Name: priorityPath, SpawnWithLowerPriority: true})
 				Expect(err).ToNot(HaveOccurred())
-				parentNice, err := strconv.Atoi(strings.TrimSpace(string(niceOut)))
-				Expect(err).ToNot(HaveOccurred())
+
+				parentNice := normalizeNiceLevel(parentKnice)
 				expectedOutput := fmt.Sprintf("%d\n", min(parentNice+5, 19))
-
-				// Run script with SpawnWithLowerPriority
-				cmd := Command{
-					Name:                   "bash",
-					Args:                   []string{tmpFile.Name()},
-					SpawnWithLowerPriority: true,
-				}
-				stdout, _, _, err := runner.RunComplexCommand(cmd)
-
-				Expect(err).ToNot(HaveOccurred())
 				Expect(stdout).To(Equal(expectedOutput))
 			})
 
 			It("runs an async command nicer than itself", func() {
-				// Write script that echos its nice value
-				script := "#!/bin/bash\nsleep 0.1\nnice\n"
-				tmpFile, err := os.CreateTemp("", "tmp-script-*.sh")
-				Expect(err).ToNot(HaveOccurred())
-				defer os.Remove(tmpFile.Name())
-				_, err = tmpFile.WriteString(script)
-				Expect(err).ToNot(HaveOccurred())
-				err = tmpFile.Close()
+				parentPid := os.Getpid()
+				parentKnice, err := syscall.Getpriority(syscall.PRIO_PROCESS, parentPid)
 				Expect(err).ToNot(HaveOccurred())
 
-				niceOut, err := exec.Command("nice").Output()
+				process, err := runner.RunComplexCommandAsync(Command{Name: priorityPath, SpawnWithLowerPriority: true})
 				Expect(err).ToNot(HaveOccurred())
-				parentNice, err := strconv.Atoi(strings.TrimSpace(string(niceOut)))
-				Expect(err).ToNot(HaveOccurred())
+				result := <-process.Wait()
+				Expect(result.Error).ToNot(HaveOccurred())
+
+				parentNice := normalizeNiceLevel(parentKnice)
 				expectedOutput := fmt.Sprintf("%d\n", min(parentNice+5, 19))
-
-				cmd := Command{
-					Name:                   "bash",
-					Args:                   []string{tmpFile.Name()},
-					SpawnWithLowerPriority: true,
-				}
-				process, err := runner.RunComplexCommandAsync(cmd)
-				Expect(err).ToNot(HaveOccurred())
-
-				result := <-process.Wait()
-				Expect(result.Error).ToNot(HaveOccurred())
 				Expect(result.Stdout).To(Equal(expectedOutput))
-			})
-		})
-
-		Context("windows specific behavior", func() {
-			BeforeEach(func() {
-				if !isWindows {
-					Skip("Windows only test")
-				}
-			})
-
-			setupWindowsEnvTest := func(cmdVars map[string]string) (map[string]string, error) {
-				os.Setenv("_FOO", "BAR") //nolint:errcheck
-				defer os.Unsetenv("_FOO")
-
-				cmd := osSpecificCommand("env")
-				cmd.Env = cmdVars
-				stdout, _, _, err := runner.RunComplexCommand(cmd)
-				if err != nil {
-					return nil, err
-				}
-
-				// don't upper case key names we want to assert that the lower case
-				// duplicates provided in Command.Env are used.  also, Windows does
-				// not care about key case.
-				envVars := parseEnvFields(stdout, false)
-				return envVars, nil
-			}
-
-			It("uses the env vars specified in the Command", func() {
-				envVars, err := setupWindowsEnvTest(map[string]string{
-					"_FOO": "BAZZZ",
-				})
-				Expect(err).ToNot(HaveOccurred())
-				Expect(envVars).To(HaveKeyWithValue("_FOO", "BAZZZ"))
-			})
-
-			It("env var comparison is case-insensitive on Windows", func() {
-				envVars, err := setupWindowsEnvTest(map[string]string{
-					"_foo": "BAZZZ",
-				})
-				Expect(err).ToNot(HaveOccurred())
-				Expect(envVars).ToNot(HaveKey("_FOO"))
-				Expect(envVars).To(HaveKeyWithValue("_foo", "BAZZZ"))
-			})
-
-			It("deterministically handles duplicate env vars on Windows", func() {
-				envVars, err := setupWindowsEnvTest(map[string]string{
-					"_foo": "BAZZZ",
-					"_bar": "alpha=second",
-					"_BAR": "alpha=first",
-				})
-				Expect(err).ToNot(HaveOccurred())
-
-				// vars in Command.Env replace System vars with the same name,
-				// compared case-insensitively. Therefore, the lower case '_foo'
-				// replaces the upper case '_FOO'.
-				//
-				Expect(envVars).ToNot(HaveKey("_FOO"))
-				Expect(envVars).To(HaveKeyWithValue("_foo", "BAZZZ"))
-
-				// Duplicate env vars in Command.Env are de-duped before being
-				// merged with the System env vars.  Since the Command.Env is
-				// a map we sort the keys alphabetically before de-duping so
-				// that the result is deterministic.
-				//
-				Expect(envVars).ToNot(HaveKey("_bar"))
-				Expect(envVars).To(HaveKeyWithValue("_BAR", "alpha=first"))
-			})
-
-			It("runs a command nicer than itself", func() {
-				// Write script that echos its priority class
-				// Sleep briefly to ensure parent has time to set priority
-				script := "Start-Sleep -Milliseconds 100\n$proc = Get-Process -Id $PID\nWrite-Output $proc.PriorityClass"
-
-				tmpFile, err := os.CreateTemp("", "tmp-script-*.ps1")
-				Expect(err).ToNot(HaveOccurred())
-				defer os.Remove(tmpFile.Name())
-				_, err = tmpFile.WriteString(script)
-				Expect(err).ToNot(HaveOccurred())
-				err = tmpFile.Close()
-				Expect(err).ToNot(HaveOccurred())
-				err = os.Chmod(tmpFile.Name(), 0700)
-				Expect(err).ToNot(HaveOccurred())
-
-				// Run script with SpawnWithLowerPriority
-				cmd := Command{
-					Name:                   "powershell",
-					Args:                   []string{"-ExecutionPolicy", "Bypass", "-File", tmpFile.Name()},
-					SpawnWithLowerPriority: true,
-				}
-				stdout, _, _, err := runner.RunComplexCommand(cmd)
-
-				Expect(err).ToNot(HaveOccurred())
-				Expect(stdout).To(Equal("BelowNormal\r\n"))
-			})
-
-			It("runs an async command nicer than itself", func() {
-				script := "Start-Sleep -Milliseconds 100\n$proc = Get-Process -Id $PID\nWrite-Output $proc.PriorityClass"
-
-				tmpFile, err := os.CreateTemp("", "tmp-script-*.ps1")
-				Expect(err).ToNot(HaveOccurred())
-				defer os.Remove(tmpFile.Name())
-				_, err = tmpFile.WriteString(script)
-				Expect(err).ToNot(HaveOccurred())
-				err = tmpFile.Close()
-				Expect(err).ToNot(HaveOccurred())
-				err = os.Chmod(tmpFile.Name(), 0700)
-				Expect(err).ToNot(HaveOccurred())
-
-				cmd := Command{
-					Name:                   "powershell",
-					Args:                   []string{"-ExecutionPolicy", "Bypass", "-File", tmpFile.Name()},
-					SpawnWithLowerPriority: true,
-				}
-				process, err := runner.RunComplexCommandAsync(cmd)
-				Expect(err).ToNot(HaveOccurred())
-
-				result := <-process.Wait()
-				Expect(result.Error).ToNot(HaveOccurred())
-				Expect(result.Stdout).To(Equal("BelowNormal\r\n"))
 			})
 		})
 
@@ -413,7 +205,7 @@ var _ = Describe("execCmdRunner", func() {
 
 	Describe("RunComplexCommandAsync", func() {
 		It("populates stdout and stderr", func() {
-			cmd := osSpecificCommand("ls")
+			cmd := unixCommand("ls")
 			process, err := runner.RunComplexCommandAsync(cmd)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -437,7 +229,7 @@ var _ = Describe("execCmdRunner", func() {
 		})
 
 		It("returns error and sets status to exit status of command if it exits with non-0 status", func() {
-			cmd := osSpecificCommand("exit")
+			cmd := unixCommand("exit")
 			process, err := runner.RunComplexCommandAsync(cmd)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -447,7 +239,7 @@ var _ = Describe("execCmdRunner", func() {
 		})
 
 		It("allows setting custom env variable in addition to inheriting process env variables", func() {
-			cmd := osSpecificCommand("env")
+			cmd := unixCommand("env")
 
 			process, err := runner.RunComplexCommandAsync(cmd)
 			Expect(err).ToNot(HaveOccurred())
@@ -459,7 +251,7 @@ var _ = Describe("execCmdRunner", func() {
 		})
 
 		It("changes working dir", func() {
-			cmd := osSpecificCommand("pwd")
+			cmd := unixCommand("pwd")
 			process, err := runner.RunComplexCommandAsync(cmd)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -471,7 +263,7 @@ var _ = Describe("execCmdRunner", func() {
 
 	Describe("RunCommand", func() {
 		It("run command", func() {
-			cmd := osSpecificCommand("echo")
+			cmd := unixCommand("echo")
 			stdout, stderr, status, err := runner.RunCommand(cmd.Name, cmd.Args...)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(stdout).To(Equal("Hello World!\n"))
@@ -480,7 +272,7 @@ var _ = Describe("execCmdRunner", func() {
 		})
 
 		It("run command with error output", func() {
-			cmd := osSpecificCommand("stderr")
+			cmd := unixCommand("stderr")
 			stdout, stderr, status, err := runner.RunCommand(cmd.Name, cmd.Args...)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(stdout).To(BeEmpty())
@@ -489,7 +281,7 @@ var _ = Describe("execCmdRunner", func() {
 		})
 
 		It("run command with non-0 exit status", func() {
-			cmd := osSpecificCommand("exit")
+			cmd := unixCommand("exit")
 			stdout, stderr, status, err := runner.RunCommand(cmd.Name, cmd.Args...)
 			Expect(err).To(HaveOccurred())
 			Expect(stdout).To(BeEmpty())
@@ -518,9 +310,7 @@ var _ = Describe("execCmdRunner", func() {
 			stdout, stderr, status, err := runner.RunCommand("something that does not exist")
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(Or(ContainSubstring("not found"), ContainSubstring("ObjectNotFound")))
-			if runtime.GOOS != "windows" {
-				Expect(stderr).To(BeEmpty())
-			}
+			Expect(stderr).To(BeEmpty())
 			Expect(stdout).To(BeEmpty())
 			Expect(status).ToNot(Equal(0))
 		})
@@ -541,7 +331,7 @@ var _ = Describe("execCmdRunner", func() {
 			logger := &loggerfakes.FakeLogger{}
 			runner = NewExecCmdRunner(logger)
 
-			cmd := osSpecificCommand("echo")
+			cmd := unixCommand("echo")
 			stdout, stderr, status, err := runner.RunCommandQuietly(cmd.Name, cmd.Args...)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(logger.DebugCallCount()).To(Equal(2))
@@ -553,13 +343,7 @@ var _ = Describe("execCmdRunner", func() {
 
 	Describe("CommandExists", func() {
 		It("command exists", func() {
-			var cmd string
-			if runtime.GOOS == "windows" {
-				cmd = "cmd.exe"
-			} else {
-				cmd = "env"
-			}
-			Expect(runner.CommandExists(cmd)).To(BeTrue())
+			Expect(runner.CommandExists("env")).To(BeTrue())
 			Expect(runner.CommandExists("absolutely-does-not-exist-ever-please-unicorns")).To(BeFalse())
 		})
 	})

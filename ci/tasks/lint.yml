@@ -1,0 +1,8 @@
+---
+platform: linux
+
+inputs:
+- name: bosh-utils
+
+run:
+  path: bosh-utils/ci/tasks/lint.sh

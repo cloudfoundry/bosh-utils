@@ -42,7 +42,16 @@ jobs:
           GOOS_LIST: linux,windows
           GOPROXY: ((repository_mirrors.goproxy))
           GOSUMDB: ((repository_mirrors.gosumdb))
+          BUMP_TEST_DEPS: linux,windows
       - in_parallel:
+        - task: lint
+          input_mapping:
+            bosh-utils: bumped-bosh-utils
+          file: bosh-utils/ci/tasks/lint.yml
+          image: bosh-utils-registry-image
+          params:
+            GOPROXY: ((repository_mirrors.goproxy))
+            GOSUMDB: ((repository_mirrors.gosumdb))
         - task: test-unit
           input_mapping:
             bosh-utils: bumped-bosh-utils

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -eu -o pipefail
+
+ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+
+go_bin_path="$(go env GOBIN)"
+export PATH=${go_bin_path}:${PATH}
+(
+  cd "${ROOT_DIR}"
+  if ! command -v golangci-lint &> /dev/null; then
+    echo "Installing golangci-lint@latest..."
+    go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+  fi
+
+  golangci-lint version
+
+  linted_os_list=(linux windows)
+
+  for os in "${linted_os_list[@]}"; do
+    echo "lint-ing with GOOS=${os}..."
+    GOOS="${os}" golangci-lint run ./...
+  done
+)

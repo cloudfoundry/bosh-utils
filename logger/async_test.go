@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	. "github.com/cloudfoundry/bosh-utils/logger"
+	"github.com/cloudfoundry/bosh-utils/logger"
 )
 
 type intervalWriter struct {
@@ -52,33 +52,27 @@ func (w *blockingWriter) String() string {
 }
 
 var _ = Describe("Logger", func() {
-	var (
-		outBuf = new(bytes.Buffer)
-	)
-	BeforeEach(func() {
-		outBuf.Reset()
-	})
-
 	Describe("Async Logger", func() {
 		It("logs the formatted message to Logger.err at the debug level", func() {
-			logger := NewAsyncWriterLogger(LevelDebug, outBuf)
-			logger.Debug("TAG", "some %s info to log", "awesome")
-			logger.Flush()
+			out := new(bytes.Buffer)
+			asyncWriterLogger := logger.NewAsyncWriterLogger(logger.LevelDebug, out)
+			asyncWriterLogger.Debug("TAG", "some %s info to log", "awesome")
+			asyncWriterLogger.Flush()
 
 			expectedContent := expectedLogFormat("TAG", "DEBUG - some awesome info to log")
-			Expect(outBuf).To(MatchRegexp(expectedContent))
+			Expect(out).To(MatchRegexp(expectedContent))
 		})
 
 		It("does not block when its writer is blocked", func() {
 			out := new(blockingWriter)
-			logger := NewAsyncWriterLogger(LevelDebug, out)
+			asyncWriterLogger := logger.NewAsyncWriterLogger(logger.LevelDebug, out)
 
 			out.Lock()
 			ch := make(chan struct{}, 1)
 			go func() {
-				for i := 0; i < 10; i++ {
-					logger.Info("TAG", "Make sure we are not just buffering bytes: %s", strings.Repeat("A", 4096))
-					logger.Error("TAG", "Make sure we are not just buffering bytes: %s", strings.Repeat("A", 4096))
+				for range 10 {
+					asyncWriterLogger.Info("TAG", "Make sure we are not just buffering bytes: %s", strings.Repeat("A", 4096))
+					asyncWriterLogger.Error("TAG", "Make sure we are not just buffering bytes: %s", strings.Repeat("A", 4096))
 				}
 				ch <- struct{}{}
 			}()
@@ -90,46 +84,46 @@ var _ = Describe("Logger", func() {
 			const s0 = "ABCDEFGHIJ"
 			const s1 = "abcdefghij"
 
-			outBuf := new(blockingWriter)
-			logger := NewAsyncWriterLogger(LevelDebug, outBuf)
+			out := new(blockingWriter)
+			asyncWriterLogger := logger.NewAsyncWriterLogger(logger.LevelDebug, out)
 
-			outBuf.Lock()
-			logger.Debug("TAG", s0)
-			logger.Debug("TAG", s1)
-			outBuf.Unlock()
+			out.Lock()
+			asyncWriterLogger.Debug("TAG", s0)
+			asyncWriterLogger.Debug("TAG", s1)
+			out.Unlock()
 
-			Expect(logger.Flush()).To(Succeed())
+			Expect(asyncWriterLogger.Flush()).To(Succeed())
 
-			lines := strings.Split(strings.TrimSpace(outBuf.buf.String()), "\n")
+			lines := strings.Split(strings.TrimSpace(out.buf.String()), "\n")
 			Expect(lines).To(HaveLen(2))
 			Expect(lines[0]).To(HaveSuffix(s0))
 			Expect(lines[1]).To(HaveSuffix(s1))
 		})
 
 		It("continuously flushes queued log messages", func() {
-			outBuf := new(blockingWriter)
-			logger := NewAsyncWriterLogger(LevelDebug, outBuf)
+			out := new(blockingWriter)
+			asyncWriterLogger := logger.NewAsyncWriterLogger(logger.LevelDebug, out)
 
-			outBuf.Lock()
-			for i := 0; i < 10; i++ {
-				logger.Debug("TAG", "Queued log message")
+			out.Lock()
+			for range 10 {
+				asyncWriterLogger.Debug("TAG", "Queued log message")
 			}
-			Expect(outBuf.buf.Len()).To(Equal(0))
-			outBuf.Unlock()
-			Eventually(outBuf.Len).ShouldNot(Equal(0))
+			Expect(out.buf.Len()).To(Equal(0))
+			out.Unlock()
+			Eventually(out.Len).ShouldNot(Equal(0))
 		})
 
 		It("flushes with a timeout", func() {
-			outBuf := new(blockingWriter)
-			logger := NewAsyncWriterLogger(LevelDebug, outBuf)
-			logger.Debug("TAG", "something")
+			out := new(blockingWriter)
+			asyncWriterLogger := logger.NewAsyncWriterLogger(logger.LevelDebug, out)
+			asyncWriterLogger.Debug("TAG", "something")
 
-			outBuf.Lock()
-			Expect(logger.FlushTimeout(time.Millisecond * 10)).ToNot(Succeed())
+			out.Lock()
+			Expect(asyncWriterLogger.FlushTimeout(time.Millisecond * 10)).ToNot(Succeed())
 
-			outBuf.Unlock()
-			Expect(logger.FlushTimeout(time.Millisecond * 10)).To(Succeed())
-			Expect(strings.TrimSpace(outBuf.buf.String())).To(HaveSuffix("something"))
+			out.Unlock()
+			Expect(asyncWriterLogger.FlushTimeout(time.Millisecond * 10)).To(Succeed())
+			Expect(strings.TrimSpace(out.buf.String())).To(HaveSuffix("something"))
 		})
 
 		It("flush doesn't block writes", func() {
@@ -140,21 +134,21 @@ var _ = Describe("Logger", func() {
 			)
 
 			out := &intervalWriter{dur: WriteInterval}
-			logger := NewAsyncWriterLogger(LevelDebug, out)
+			asyncWriterLogger := logger.NewAsyncWriterLogger(logger.LevelDebug, out)
 
 			// add some messages to the queue
 			out.Lock()
-			for i := 0; i < MessageCount; i++ {
-				logger.Debug("NEW", "message")
+			for range MessageCount {
+				asyncWriterLogger.Debug("NEW", "message")
 			}
 			out.Unlock()
 
-			go logger.Flush()
+			go asyncWriterLogger.Flush()
 
 			ch := make(chan struct{}, 1)
 			go func() {
-				for i := 0; i < MessageCount; i++ {
-					logger.Debug("NEW", "message")
+				for range MessageCount {
+					asyncWriterLogger.Debug("NEW", "message")
 				}
 				ch <- struct{}{}
 			}()
@@ -169,12 +163,12 @@ var _ = Describe("Logger", func() {
 			)
 
 			out := &intervalWriter{dur: WriteInterval}
-			logger := NewAsyncWriterLogger(LevelDebug, out)
+			asyncWriterLogger := logger.NewAsyncWriterLogger(logger.LevelDebug, out)
 
 			// add some messages to the queue
 			out.Lock()
-			for i := 0; i < MessageCount; i++ {
-				logger.Debug("QUEUED", "queued")
+			for range MessageCount {
+				asyncWriterLogger.Debug("QUEUED", "queued")
 			}
 			out.Unlock()
 
@@ -183,13 +177,13 @@ var _ = Describe("Logger", func() {
 			defer tick.Stop()
 			go func() {
 				for range tick.C {
-					logger.Debug("NEW", "new")
+					asyncWriterLogger.Debug("NEW", "new")
 				}
 			}()
 
 			ch := make(chan struct{}, 1)
 			go func() {
-				logger.Flush()
+				asyncWriterLogger.Flush()
 				ch <- struct{}{}
 			}()
 
@@ -200,7 +194,7 @@ var _ = Describe("Logger", func() {
 		It("prints the correct prefix during concurrent writes", func() {
 			ch := make(chan struct{}, 1)
 			go func() {
-				testConcurrentPrefix(NewAsyncWriterLogger)
+				testConcurrentPrefix(logger.NewAsyncWriterLogger)
 				ch <- struct{}{}
 			}()
 			Eventually(ch, time.Second*5).Should(Receive())

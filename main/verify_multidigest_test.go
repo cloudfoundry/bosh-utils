@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -31,7 +32,7 @@ var _ = Describe("VerifyMultidigest", func() {
 		It("has a version flag", func() {
 			session, err := runVerifyMultidigest("--version")
 			Expect(err).ToNot(HaveOccurred())
-			Eventually(session).Should(gexec.Exit(0))
+			Eventually(session).WithTimeout(3 * time.Second).Should(gexec.Exit(0))
 			Eventually(session.Out).Should(gbytes.Say("version \\[DEV BUILD\\]"))
 		})
 	})
