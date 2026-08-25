@@ -37,10 +37,10 @@ var _ = Describe("HTTPClient", func() {
 
 				Proxy: http.ProxyFromEnvironment,
 
-				Dial: (&net.Dialer{
+				DialContext: (&net.Dialer{
 					Timeout:   10 * time.Second,
 					KeepAlive: 0,
-				}).Dial,
+				}).DialContext,
 
 				TLSHandshakeTimeout: 10 * time.Second,
 				DisableKeepAlives:   true,
@@ -56,10 +56,10 @@ var _ = Describe("HTTPClient", func() {
 
 				Proxy: http.ProxyFromEnvironment,
 
-				Dial: (&net.Dialer{
+				DialContext: (&net.Dialer{
 					Timeout:   1 * time.Millisecond,
 					KeepAlive: 0,
-				}).Dial,
+				}).DialContext,
 
 				TLSHandshakeTimeout: 1 * time.Millisecond,
 				DisableKeepAlives:   true,
