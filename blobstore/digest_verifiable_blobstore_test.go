@@ -7,10 +7,9 @@ import (
 	. "github.com/onsi/gomega"
 
 	boshblob "github.com/cloudfoundry/bosh-utils/blobstore"
-	fakeblob "github.com/cloudfoundry/bosh-utils/blobstore/fakes"
+	"github.com/cloudfoundry/bosh-utils/blobstore/blobstorefakes"
 	boshcrypto "github.com/cloudfoundry/bosh-utils/crypto"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
-
 	fakesys "github.com/cloudfoundry/bosh-utils/system/fakes"
 )
 
@@ -21,7 +20,7 @@ var _ = Describe("checksumVerifiableBlobstore", func() {
 	)
 
 	var (
-		innerBlobstore              *fakeblob.FakeBlobstore
+		innerBlobstore              *blobstorefakes.FakeBlobstore
 		checksumVerifiableBlobstore boshblob.DigestBlobstore
 		correctDigest               boshcrypto.Digest
 		fs                          *fakesys.FakeFileSystem
@@ -29,7 +28,7 @@ var _ = Describe("checksumVerifiableBlobstore", func() {
 
 	BeforeEach(func() {
 		correctDigest = boshcrypto.NewDigest(boshcrypto.DigestAlgorithmSHA1, fixtureSHA1)
-		innerBlobstore = &fakeblob.FakeBlobstore{}
+		innerBlobstore = &blobstorefakes.FakeBlobstore{}
 		fs = fakesys.NewFakeFileSystem()
 		createAlgorithms := []boshcrypto.Algorithm{
 			boshcrypto.DigestAlgorithmSHA1,

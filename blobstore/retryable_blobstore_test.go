@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	boshblob "github.com/cloudfoundry/bosh-utils/blobstore"
-	fakeblob "github.com/cloudfoundry/bosh-utils/blobstore/fakes"
+	"github.com/cloudfoundry/bosh-utils/blobstore/blobstorefakes"
 	boshcrypto "github.com/cloudfoundry/bosh-utils/crypto"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
@@ -15,13 +15,13 @@ import (
 
 var _ = Describe("retryableBlobstore", func() {
 	var (
-		innerBlobstore     *fakeblob.FakeDigestBlobstore
+		innerBlobstore     *blobstorefakes.FakeDigestBlobstore
 		logger             boshlog.Logger
 		retryableBlobstore boshblob.DigestBlobstore
 	)
 
 	BeforeEach(func() {
-		innerBlobstore = &fakeblob.FakeDigestBlobstore{}
+		innerBlobstore = &blobstorefakes.FakeDigestBlobstore{}
 		logger = boshlog.NewLogger(boshlog.LevelNone)
 		retryableBlobstore = boshblob.NewRetryableBlobstore(innerBlobstore, 3, logger)
 	})
