@@ -400,6 +400,28 @@ var _ = Describe("OS FileSystem", func() {
 			})
 		})
 
+		Context("with quiet content enabled", func() {
+			It("logs the read but not the file content", func() {
+				logger := &loggerfakes.FakeLogger{}
+				osFs := NewOsFileSystem(logger)
+				testPath := filepath.Join(TempDir, "ReadFileTestFile")
+
+				osFs.WriteFileQuietly(testPath, []byte("some contents")) //nolint:errcheck
+				defer os.Remove(testPath)
+
+				beforeCount := logger.DebugCallCount()
+				beforeCountDetails := logger.DebugWithDetailsCallCount()
+
+				opts := ReadOpts{QuietContent: true}
+				content, err := osFs.ReadFileWithOpts(testPath, opts)
+				Expect(err).ToNot(HaveOccurred())
+				Expect("some contents").To(Equal(string(content)))
+
+				Expect(logger.DebugCallCount() - beforeCount).To(Equal(1))
+				Expect(logger.DebugWithDetailsCallCount() - beforeCountDetails).To(Equal(0))
+			})
+		})
+
 		Context("with default strategy", func() {
 			It("logs the file content", func() {
 				logger := &loggerfakes.FakeLogger{}
