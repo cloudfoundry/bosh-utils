@@ -56,6 +56,27 @@ var _ = Describe("Secret", func() {
 		Expect(buf.String()).ToNot(ContainSubstring("supersecret"))
 	})
 
+	It("redacts a nested Secret logged through slog.TextHandler", func() {
+		var buf strings.Builder
+		logger := slog.New(slog.NewTextHandler(&buf, nil))
+		logger.Info("msg", "wrap", struct{ URL redact.Secret }{URL: s})
+		Expect(buf.String()).To(ContainSubstring(redact.Placeholder))
+		Expect(buf.String()).ToNot(ContainSubstring("supersecret"))
+	})
+
+	It("does NOT redact a nested Secret marshaled by slog.JSONHandler", func() {
+		// Documented boundary: slog.JSONHandler marshals the enclosing struct
+		// with encoding/json, which bypasses Format and LogValue. Secret keeps
+		// its real value under encoding/json on purpose (functional round-trip),
+		// so it leaks here. Consumers must not log JSON-serialized structs that
+		// contain a Secret. This test pins that boundary — if it starts passing,
+		// the JSON round-trip contract has changed and consumers must be revisited.
+		var buf strings.Builder
+		logger := slog.New(slog.NewJSONHandler(&buf, nil))
+		logger.Info("msg", "wrap", struct{ URL redact.Secret }{URL: s})
+		Expect(buf.String()).To(ContainSubstring("supersecret"))
+	})
+
 	It("reveals the real value only via Reveal", func() {
 		Expect(s.Reveal()).To(Equal(sensitive))
 	})

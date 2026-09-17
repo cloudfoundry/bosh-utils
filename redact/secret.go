@@ -12,13 +12,20 @@ import (
 // Placeholder is what a Secret renders as in place of its value.
 const Placeholder = "<redacted>"
 
-// Secret is a string that never reveals itself through fmt, Stringer, slog or
-// any other rendering path. The real value is available only via Reveal().
+// Secret is a string that redacts itself on the usual logging paths: every fmt
+// verb (via Format), Stringer/GoString, and slog when the Secret is the logged
+// value (via LogValue). The real value is available only via Reveal().
 //
-// JSON (un)marshaling is intentionally left as the default string behaviour so
-// secrets still round-trip for functional use — a Secret marshals to its real
-// value. Callers must therefore avoid logging already-serialized payloads that
-// contain a Secret; use Reveal() only where the value is genuinely needed.
+// Boundary — JSON: JSON (un)marshaling is intentionally left as the default
+// string behaviour so secrets still round-trip for functional use; a Secret
+// marshals to its real value. Consequently a Secret nested in a struct that is
+// serialized with encoding/json is NOT redacted. In particular slog.JSONHandler
+// marshals an enclosing struct passed as a log value with encoding/json, which
+// bypasses Format and LogValue and emits the real value (slog.TextHandler and
+// fmt are unaffected). Do not log JSON-serialized structures that contain a
+// Secret — log the Secret directly, use a text/fmt-based logger, or convert the
+// enclosing value to a logging-safe form. Do not add a redacting MarshalJSON
+// here: it would break the required round-trip.
 type Secret string
 
 var (
