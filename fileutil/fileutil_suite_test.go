@@ -63,7 +63,7 @@ var _ = BeforeEach(func() {
 	testAssetsDir, err = filepath.EvalSymlinks(GinkgoT().TempDir())
 	Expect(err).ToNot(HaveOccurred())
 
-	// TODO: use `os.CopyFS` instead of `localCopyFSForGo122` once we upgrade Golang versions
+	// TODO: use `os.CopyFS` instead of `localCopyFSForGo122` once we upgrade Go versions
 	err = localCopyFSForGo122(testAssetsDir, assetsDirFS)
 	Expect(err).NotTo(HaveOccurred())
 
