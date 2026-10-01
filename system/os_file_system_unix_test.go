@@ -97,6 +97,31 @@ var _ = Describe("OS FileSystem", func() {
 			})
 		})
 
+		Context("given a path or owner with shell syntax in it", func() {
+			var markerPath string
+
+			BeforeEach(func() {
+				markerPath = filepath.Join(GinkgoT().TempDir(), "marker")
+				GinkgoT().Setenv("CHOWN_TEST_MARKER", markerPath)
+			})
+
+			It("does not run the shell syntax in the path", func() {
+				shellPath := filepath.Join(GinkgoT().TempDir(), `x'; touch "$CHOWN_TEST_MARKER"; echo '`)
+				Expect(os.Mkdir(shellPath, os.FileMode(0700))).To(Succeed())
+
+				_ = createOsFs().Chown(shellPath, "root") //nolint:errcheck
+
+				Expect(markerPath).ToNot(BeAnExistingFile())
+			})
+
+			It("does not run the shell syntax in the owner", func() {
+				err := createOsFs().Chown(testPath, `root; touch "$CHOWN_TEST_MARKER"`)
+
+				Expect(err).To(HaveOccurred())
+				Expect(markerPath).ToNot(BeAnExistingFile())
+			})
+		})
+
 		Context("given a group that does not exist", func() {
 			It("should return error", func() {
 				osFs := createOsFs()
