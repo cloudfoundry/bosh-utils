@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io"
 	"log"
-	"os"
 	"time"
 )
 
@@ -121,9 +120,10 @@ func (l *asyncLogger) ErrorWithDetails(tag, msg string, args ...interface{}) {
 }
 
 func (l *asyncLogger) HandlePanic(tag string) {
-	if l.log.recoverPanic(tag) {
+	if e := recover(); e != nil {
+		l.log.logPanic(tag, e)
 		l.FlushTimeout(time.Second * 30) //nolint:errcheck
-		os.Exit(2)
+		osExit(2)
 	}
 }
 
