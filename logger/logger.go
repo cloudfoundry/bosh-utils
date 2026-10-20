@@ -165,10 +165,6 @@ func (l *logger) ErrorWithDetails(tag, msg string, args ...interface{}) {
 	l.Error(tag, msg, args...)
 }
 
-// osExit is a seam so tests can assert HandlePanic's exit behaviour without
-// terminating the test process.
-var osExit = os.Exit
-
 func (l *logger) logPanic(tag string, e interface{}) {
 	var msg string
 	switch obj := e.(type) {
@@ -190,7 +186,7 @@ func (l *logger) logPanic(tag string, e interface{}) {
 func (l *logger) HandlePanic(tag string) {
 	if e := recover(); e != nil {
 		l.logPanic(tag, e)
-		osExit(2)
+		os.Exit(2)
 	}
 }
 
