@@ -1,4 +1,4 @@
-name: Master Branch Protection
+name: Release Branch Protection
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check branch
-        if: github.event.pull_request.base.ref == 'master'
+        if: github.event.pull_request.base.ref == 'master' || github.event.pull_request.base.ref == 'main'
         run: |
-          echo "Error: Pull request against master is prohibited"
+          echo "Error: Submit pull requests to develop instead of the release branch"
           exit 1
