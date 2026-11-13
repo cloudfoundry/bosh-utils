@@ -1,4 +1,4 @@
-# code.cloudfoundry.org/clock v1.94.0
+# code.cloudfoundry.org/clock v1.96.0
 ## explicit; go 1.26.0
 code.cloudfoundry.org/clock
 code.cloudfoundry.org/clock/fakeclock
@@ -14,10 +14,10 @@ github.com/bmatcuk/doublestar
 # github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851
 ## explicit; go 1.21.0
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.194
-## explicit; go 1.26.10
+# github.com/cloudfoundry/socks5-proxy v0.2.196
+## explicit; go 1.26.11
 github.com/cloudfoundry/socks5-proxy
-# github.com/gkampitakis/ciinfo v0.3.4
+# github.com/gkampitakis/ciinfo v0.3.5
 ## explicit; go 1.20
 # github.com/go-logr/logr v1.4.4
 ## explicit; go 1.18
@@ -35,7 +35,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/pprof v0.0.0-20261026192309-dbd0ed30aa88
+# github.com/google/pprof v0.0.0-20261111200114-fac431ef4d26
 ## explicit; go 1.26.0
 github.com/google/pprof/profile
 # github.com/jessevdk/go-flags v1.6.1
@@ -55,7 +55,7 @@ github.com/maxbrunsfeld/counterfeiter/v6/generator
 # github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 ## explicit
 github.com/nu7hatch/gouuid
-# github.com/onsi/ginkgo/v2 v2.33.1
+# github.com/onsi/ginkgo/v2 v2.34.0
 ## explicit; go 1.25.0
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
@@ -103,12 +103,12 @@ github.com/stretchr/testify/assert
 github.com/stretchr/testify/assert/yaml
 github.com/stretchr/testify/internal/difflib
 github.com/stretchr/testify/internal/spew
-# go.step.sm/crypto v0.91.1
+# go.step.sm/crypto v0.92.0
 ## explicit; go 1.26.0
-# go.yaml.in/yaml/v3 v3.0.5
+# go.yaml.in/yaml/v3 v3.0.6
 ## explicit; go 1.16
 go.yaml.in/yaml/v3
-# golang.org/x/crypto v0.58.0
+# golang.org/x/crypto v0.59.0
 ## explicit; go 1.26.0
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
@@ -119,7 +119,7 @@ golang.org/x/crypto/internal/alias
 golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/mod v0.42.0
+# golang.org/x/mod v0.43.0
 ## explicit; go 1.26.0
 golang.org/x/mod/internal/lazyregexp
 golang.org/x/mod/module
@@ -132,15 +132,15 @@ golang.org/x/net/html/atom
 golang.org/x/net/html/charset
 golang.org/x/net/internal/socks
 golang.org/x/net/proxy
-# golang.org/x/sync v0.24.0
+# golang.org/x/sync v0.25.0
 ## explicit; go 1.26.0
 golang.org/x/sync/errgroup
-# golang.org/x/sys v0.49.0
+# golang.org/x/sys v0.50.0
 ## explicit; go 1.26.0
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/text v0.43.0
+# golang.org/x/text v0.44.0
 ## explicit; go 1.26.0
 golang.org/x/text/cases
 golang.org/x/text/encoding
