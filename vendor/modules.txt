@@ -14,11 +14,9 @@ github.com/bmatcuk/doublestar
 # github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851
 ## explicit; go 1.21.0
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.196
+# github.com/cloudfoundry/socks5-proxy v0.2.197
 ## explicit; go 1.26.11
 github.com/cloudfoundry/socks5-proxy
-# github.com/gkampitakis/ciinfo v0.3.5
-## explicit; go 1.20
 # github.com/go-logr/logr v1.4.4
 ## explicit; go 1.18
 github.com/go-logr/logr
@@ -103,6 +101,8 @@ github.com/stretchr/testify/assert
 github.com/stretchr/testify/assert/yaml
 github.com/stretchr/testify/internal/difflib
 github.com/stretchr/testify/internal/spew
+# github.com/tidwall/gjson v1.20.3
+## explicit; go 1.23
 # go.step.sm/crypto v0.92.0
 ## explicit; go 1.26.0
 # go.yaml.in/yaml/v3 v3.0.6

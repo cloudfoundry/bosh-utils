@@ -10,8 +10,8 @@ github.com/bmatcuk/doublestar v1.3.4 h1:gPypJ5xD31uhX6Tf54sDPUOBXTqKH4c9aPY66CyQ
 github.com/bmatcuk/doublestar v1.3.4/go.mod h1:wiQtGV+rzVYxB7WIlirSN++5HPtPlXEo9MEoZQC/PmE=
 github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851 h1:oy59UYcspoP44ggE8DM3kjxl1+sTFd802bbZlBBhBMk=
 github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851/go.mod h1:72EEm1oq5oXqGfu9XGtaRPWEcAFYd/P10cMNln0QhA8=
-github.com/cloudfoundry/socks5-proxy v0.2.196 h1:U3eX/nDpAlrFXOX+g4FHurFyv563Y389fPxo2fZah2k=
-github.com/cloudfoundry/socks5-proxy v0.2.196/go.mod h1:zEeLlgafB5MNOXeELwGhEwOdc+3oFXQNpajuXK0SRnE=
+github.com/cloudfoundry/socks5-proxy v0.2.197 h1:s1tEIafEEJI2VtP11ZyQ/fWTRjayC0kXTqfdaEfH798=
+github.com/cloudfoundry/socks5-proxy v0.2.197/go.mod h1:QBH0basaz5RDGhczQ/hNfoK2k3HSwafsQzlhApQ+QLY=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/gkampitakis/ciinfo v0.3.5 h1:DBDxDsyaU4NPX5cP9xb0GtrexgeVHprzN3GnJnESv4g=
@@ -71,8 +71,8 @@ github.com/stretchr/testify v1.12.1 h1:EuwCh5fleGS7H32xRwO3wRGT7DxrDhLAT6FF8MpWD
 github.com/stretchr/testify v1.12.1/go.mod h1:MDEgiDPPsNp5cuIrHPPCyornHKgEVbtFUmoNlxoYthg=
 github.com/tedsuo/ifrit v0.0.0-20260908181113-dd353a7daa27 h1:gKDGsw+NqSByQPkCbwKfTiTNo+d3tsdjQjKUYVG3jAY=
 github.com/tedsuo/ifrit v0.0.0-20260908181113-dd353a7daa27/go.mod h1:U4gRO4lEOLwO3h4CO9BE6c28VB74a5R+HjCwG7o1Mw0=
-github.com/tidwall/gjson v1.20.2 h1:Ag48cSOUCOq/sheSLXV3M4ZS0FOd4YMnY1N7FRoxGQY=
-github.com/tidwall/gjson v1.20.2/go.mod h1:jV1Xkr7LRLVFhesDFU/nInoQ+MjVlnuqkUreTWMveUo=
+github.com/tidwall/gjson v1.20.3 h1:tHf8iVpOj3zixZ0/usiKUWsETUoXaGz6apTqzsAQz7M=
+github.com/tidwall/gjson v1.20.3/go.mod h1:jV1Xkr7LRLVFhesDFU/nInoQ+MjVlnuqkUreTWMveUo=
 github.com/tidwall/match v1.2.0 h1:0pt8FlkOwjN2fPt4bIl4BoNxb98gGHN2ObFEDkrfZnM=
 github.com/tidwall/match v1.2.0/go.mod h1:eRSPERbgtNPcGhD8UCthc6PmLEQXEWd3PRB5JTxsfmM=
 github.com/tidwall/pretty v1.3.0 h1:DZmEzADnMIbThFXXslDgq9C0LCC/xzMrONm7iM77RM0=

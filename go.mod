@@ -6,7 +6,7 @@ require (
 	code.cloudfoundry.org/clock v1.96.0
 	code.cloudfoundry.org/tlsconfig v0.69.0
 	github.com/bmatcuk/doublestar v1.3.4
-	github.com/cloudfoundry/socks5-proxy v0.2.196
+	github.com/cloudfoundry/socks5-proxy v0.2.197
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/jpillora/backoff v1.1.0
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
@@ -21,7 +21,6 @@ require (
 require (
 	github.com/Masterminds/semver/v3 v3.5.0 // indirect
 	github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851 // indirect
-	github.com/gkampitakis/ciinfo v0.3.5 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/goccy/go-yaml v1.19.2 // indirect
@@ -30,6 +29,7 @@ require (
 	github.com/maruel/natural v1.3.0 // indirect
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.14.0 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
+	github.com/tidwall/gjson v1.20.3 // indirect
 	go.step.sm/crypto v0.92.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.6 // indirect
 	golang.org/x/crypto v0.59.0 // indirect
