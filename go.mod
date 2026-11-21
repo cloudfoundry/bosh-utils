@@ -3,17 +3,17 @@ module github.com/cloudfoundry/bosh-utils
 go 1.26.11
 
 require (
-	code.cloudfoundry.org/clock v1.96.0
+	code.cloudfoundry.org/clock v1.97.0
 	code.cloudfoundry.org/tlsconfig v0.69.0
 	github.com/bmatcuk/doublestar v1.3.4
-	github.com/cloudfoundry/socks5-proxy v0.2.197
+	github.com/cloudfoundry/socks5-proxy v0.2.198
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/jpillora/backoff v1.1.0
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/onsi/ginkgo/v2 v2.34.0
 	github.com/onsi/gomega v1.44.0
 	github.com/stretchr/testify v1.12.1
-	golang.org/x/net v0.62.0
+	golang.org/x/net v0.63.0
 	golang.org/x/sys v0.50.0
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -25,18 +25,16 @@ require (
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/goccy/go-yaml v1.19.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20261111200114-fac431ef4d26 // indirect
+	github.com/google/pprof v0.0.0-20261118010117-084b33a85f63 // indirect
 	github.com/maruel/natural v1.3.0 // indirect
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.14.0 // indirect
-	github.com/sergi/go-diff v1.4.0 // indirect
-	github.com/tidwall/gjson v1.20.3 // indirect
-	go.step.sm/crypto v0.92.0 // indirect
+	go.step.sm/crypto v0.92.1 // indirect
 	go.yaml.in/yaml/v3 v3.0.6 // indirect
 	golang.org/x/crypto v0.59.0 // indirect
 	golang.org/x/mod v0.43.0 // indirect
 	golang.org/x/sync v0.25.0 // indirect
 	golang.org/x/text v0.44.0 // indirect
-	golang.org/x/tools v0.52.0 // indirect
+	golang.org/x/tools v0.53.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
